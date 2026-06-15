@@ -30,12 +30,32 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
         return Inertia::render('Admin/Dashboard');
     })->name('dashboard');
 
-    Route::get('/students', function () {
+    Route::get('/alunos', function () {
         $students = \App\Models\User::where('role', 'student')->get();
         return Inertia::render('Admin/Students', [
             'students' => $students
         ]);
     })->name('students.index');
+
+    Route::post('/alunos', function (\Illuminate\Http\Request $request) {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'phone' => 'nullable|string|max:20',
+            'status' => 'required|string|in:active,inactive',
+        ]);
+
+        \App\Models\User::create([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'phone' => $validated['phone'],
+            'status' => $validated['status'],
+            'password' => bcrypt('password'), // default password
+            'role' => 'student',
+        ]);
+
+        return redirect()->back();
+    })->name('students.store');
 
     Route::get('/courses', function () {
         return Inertia::render('Admin/CoursesAndPackages');
@@ -46,6 +66,33 @@ Route::middleware(['auth', 'role:school_admin'])->prefix('school-admin')->name('
     Route::get('/dashboard', function () {
         return Inertia::render('SchoolAdmin/Dashboard');
     })->name('dashboard');
+
+    Route::get('/alunos', function () {
+        $students = \App\Models\User::where('role', 'student')->get();
+        return Inertia::render('Admin/Students', [
+            'students' => $students
+        ]);
+    })->name('students.index');
+
+    Route::post('/alunos', function (\Illuminate\Http\Request $request) {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'phone' => 'nullable|string|max:20',
+            'status' => 'required|string|in:active,inactive',
+        ]);
+
+        \App\Models\User::create([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'phone' => $validated['phone'],
+            'status' => $validated['status'],
+            'password' => bcrypt('password'), // default password
+            'role' => 'student',
+        ]);
+
+        return redirect()->back();
+    })->name('students.store');
 });
 
 Route::middleware(['auth', 'role:student'])->prefix('student')->name('student.')->group(function () {

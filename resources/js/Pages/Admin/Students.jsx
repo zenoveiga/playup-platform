@@ -1,10 +1,21 @@
 import AdminLayout from '@/Layouts/AdminLayout';
-import { Head, Link } from '@inertiajs/react';
+import SchoolAdminLayout from '@/Layouts/SchoolAdminLayout';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { useState } from 'react';
+import Modal from '@/Components/Modal';
+import InputLabel from '@/Components/InputLabel';
+import TextInput from '@/Components/TextInput';
+import InputError from '@/Components/InputError';
 
 export default function Students({ students = [] }) {
+    const { auth } = usePage().props;
+    const user = auth.user;
+    const isSchoolAdmin = user.role === 'school_admin';
+    const Layout = isSchoolAdmin ? SchoolAdminLayout : AdminLayout;
+
     const [searchQuery, setSearchQuery] = useState('');
     const [statusFilter, setStatusFilter] = useState('all'); // all, active, inactive
+    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
     // Dynamic stat calculation based on seeded database users + mock base for high-fidelity alignment
     const dbTotal = students.length;
@@ -15,6 +26,32 @@ export default function Students({ students = [] }) {
     const displayActive = 11200 + dbActive;
     const displayInactive = 1280 + dbInactive;
     const displayNewThisMonth = 856 + (students.filter(s => new Date(s.created_at).getMonth() === new Date().getMonth()).length);
+
+    // Form logic for Matricular Novo Aluno
+    const { data, setData, post, processing, errors, reset } = useForm({
+        name: '',
+        email: '',
+        phone: '',
+        status: 'active',
+    });
+
+    const storeRoute = isSchoolAdmin ? 'school-admin.students.store' : 'admin.students.store';
+
+    const openCreateModal = () => {
+        setIsCreateModalOpen(true);
+    };
+
+    const closeCreateModal = () => {
+        setIsCreateModalOpen(false);
+        reset();
+    };
+
+    const submit = (e) => {
+        e.preventDefault();
+        post(route(storeRoute), {
+            onSuccess: () => closeCreateModal(),
+        });
+    };
 
     // Client-side filtering for search and tabs
     const filteredStudents = students.filter(student => {
@@ -46,7 +83,7 @@ export default function Students({ students = [] }) {
     };
 
     return (
-        <AdminLayout>
+        <Layout>
             <Head title="Gestão de Alunos - PlayUp Velocity" />
 
             <div className="p-8 max-w-7xl mx-auto space-y-8">
@@ -65,7 +102,10 @@ export default function Students({ students = [] }) {
                             <span className="material-symbols-outlined text-lg">file_download</span>
                             <span>Exportar</span>
                         </button>
-                        <button className="flex-1 md:flex-none bg-primary text-white font-bold px-6 py-3 rounded-xl flex items-center justify-center gap-2 shadow-xl shadow-primary/20 hover:opacity-95 active:scale-[0.98] transition-all select-none">
+                        <button 
+                            onClick={openCreateModal}
+                            className="flex-1 md:flex-none bg-primary text-white font-bold px-6 py-3 rounded-xl flex items-center justify-center gap-2 shadow-xl shadow-primary/20 hover:opacity-95 active:scale-[0.98] transition-all select-none cursor-pointer"
+                        >
                             <span className="material-symbols-outlined text-lg">person_add</span>
                             <span>Matricular Novo Aluno</span>
                         </button>
@@ -291,7 +331,7 @@ export default function Students({ students = [] }) {
                     {/* Pagination Footer */}
                     <div className="px-8 py-6 bg-surface-container-low/40 dark:bg-slate-900/60 border-t border-outline-variant/10 dark:border-slate-800 flex flex-col sm:flex-row gap-4 items-center justify-between">
                         <div className="text-sm text-[#507c94] dark:text-[#87b3cd] font-semibold">
-                            Mostrando <span className="font-bold text-on-surface">1-{filteredStudents.length}</span> de <span class="font-bold text-on-surface">{(statusFilter === 'all' ? displayTotal : statusFilter === 'active' ? displayActive : displayInactive).toLocaleString()}</span> alunos
+                            Mostrando <span className="font-bold text-on-surface">1-{filteredStudents.length}</span> de <span className="font-bold text-on-surface">{(statusFilter === 'all' ? displayTotal : statusFilter === 'active' ? displayActive : displayInactive).toLocaleString()}</span> alunos
                         </div>
                         <div className="flex items-center gap-2">
                             <button className="w-10 h-10 flex items-center justify-center rounded-xl bg-surface-container-lowest dark:bg-slate-850 border border-outline-variant/20 dark:border-slate-800 text-[#507c94] hover:border-primary dark:hover:border-[#00D1FF] hover:text-primary dark:hover:text-[#00D1FF] transition-all disabled:opacity-40" disabled>
@@ -317,6 +357,98 @@ export default function Students({ students = [] }) {
                     </div>
                 </div>
             </div>
-        </AdminLayout>
+
+            {/* Matricular Novo Aluno Modal */}
+            <Modal show={isCreateModalOpen} onClose={closeCreateModal} maxWidth="md">
+                <form onSubmit={submit} className="p-6 space-y-6">
+                    <div>
+                        <h2 className="text-xl font-bold text-on-surface font-headline">
+                            Matricular Novo Aluno
+                        </h2>
+                        <p className="text-sm text-slate-500 mt-1">
+                            Preencha os dados do estudante para realizar a matrícula.
+                        </p>
+                    </div>
+
+                    <div className="space-y-4">
+                        <div>
+                            <InputLabel htmlFor="name" value="Nome Completo" className="text-sm font-bold text-on-surface" />
+                            <TextInput
+                                id="name"
+                                type="text"
+                                name="name"
+                                value={data.name}
+                                className="mt-1 block w-full rounded-xl border-slate-200 focus:border-primary focus:ring-primary/20"
+                                isFocused={true}
+                                onChange={(e) => setData('name', e.target.value)}
+                                required
+                            />
+                            <InputError message={errors.name} className="mt-1" />
+                        </div>
+
+                        <div>
+                            <InputLabel htmlFor="email" value="E-mail" className="text-sm font-bold text-on-surface" />
+                            <TextInput
+                                id="email"
+                                type="email"
+                                name="email"
+                                value={data.email}
+                                className="mt-1 block w-full rounded-xl border-slate-200 focus:border-primary focus:ring-primary/20"
+                                onChange={(e) => setData('email', e.target.value)}
+                                required
+                            />
+                            <InputError message={errors.email} className="mt-1" />
+                        </div>
+
+                        <div>
+                            <InputLabel htmlFor="phone" value="Telefone / WhatsApp" className="text-sm font-bold text-on-surface" />
+                            <TextInput
+                                id="phone"
+                                type="text"
+                                name="phone"
+                                value={data.phone}
+                                className="mt-1 block w-full rounded-xl border-slate-200 focus:border-primary focus:ring-primary/20"
+                                placeholder="(11) 99999-9999"
+                                onChange={(e) => setData('phone', e.target.value)}
+                            />
+                            <InputError message={errors.phone} className="mt-1" />
+                        </div>
+
+                        <div>
+                            <InputLabel htmlFor="status" value="Status Inicial" className="text-sm font-bold text-on-surface" />
+                            <select
+                                id="status"
+                                name="status"
+                                value={data.status}
+                                className="mt-1 block w-full rounded-xl border-slate-200 focus:border-primary focus:ring-primary/20 bg-white text-sm py-2 px-3 text-on-surface outline-none"
+                                onChange={(e) => setData('status', e.target.value)}
+                            >
+                                <option value="active">Ativo</option>
+                                <option value="inactive">Inativo</option>
+                            </select>
+                            <InputError message={errors.status} className="mt-1" />
+                        </div>
+                    </div>
+
+                    <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
+                        <button
+                            type="button"
+                            onClick={closeCreateModal}
+                            className="px-4 py-2.5 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-50 transition-colors"
+                        >
+                            Cancelar
+                        </button>
+                        <button
+                            type="submit"
+                            disabled={processing}
+                            className="px-5 py-2.5 rounded-xl text-sm font-bold bg-primary text-white shadow-md shadow-primary/10 hover:opacity-95 transition-all disabled:opacity-50"
+                        >
+                            Confirmar Matrícula
+                        </button>
+                    </div>
+                </form>
+            </Modal>
+        </Layout>
     );
 }
+

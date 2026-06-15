@@ -75,10 +75,17 @@ export default function SchoolAdminLayout({ children }) {
                         <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>dashboard</span>
                         <span className="font-['Manrope'] text-sm">Gestão Escolar</span>
                     </Link>
-                    <a className="flex items-center gap-3 px-4 py-3 text-[#003346]/70 dark:text-white/70 hover:bg-white/40 dark:hover:bg-slate-800/40 rounded-xl hover:translate-x-1 transition-all duration-200" href="#">
+                    <Link
+                        className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
+                            route().current('school-admin.students.index')
+                                ? 'bg-white dark:bg-slate-800 text-[#0050d4] dark:text-[#00D1FF] font-bold shadow-sm'
+                                : 'text-[#003346]/70 dark:text-white/70 hover:bg-white/40 dark:hover:bg-slate-800/40 hover:translate-x-1'
+                        }`}
+                        href={route('school-admin.students.index')}
+                    >
                         <span className="material-symbols-outlined">people</span>
                         <span className="font-['Manrope'] text-sm">Alunos</span>
-                    </a>
+                    </Link>
 
                     <a className="flex items-center gap-3 px-4 py-3 text-[#003346]/70 dark:text-white/70 hover:bg-white/40 dark:hover:bg-slate-800/40 rounded-xl hover:translate-x-1 transition-all duration-200" href="#">
                         <span className="material-symbols-outlined">school</span>
