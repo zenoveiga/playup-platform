@@ -65,6 +65,14 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
         return Inertia::render('Admin/CoursesAndPackages');
     })->name('courses.index');
 
+    Route::get('/courses/cadastrar', function () {
+        return Inertia::render('Admin/CourseCreate');
+    })->name('courses.create');
+
+    Route::post('/courses', function (\Illuminate\Http\Request $request) {
+        return redirect()->route('admin.courses.index');
+    })->name('courses.store');
+
     Route::get('/polos', function () {
         $polos = \App\Models\Polo::orderBy('id', 'desc')->get();
         return Inertia::render('Admin/Polos', [
@@ -225,6 +233,18 @@ Route::middleware(['auth', 'role:school_admin'])->prefix('school-admin')->name('
 
         return redirect()->route('school-admin.polos.index');
     })->name('polos.update');
+
+    Route::get('/courses', function () {
+        return Inertia::render('Admin/CoursesAndPackages');
+    })->name('courses.index');
+
+    Route::get('/courses/cadastrar', function () {
+        return Inertia::render('Admin/CourseCreate');
+    })->name('courses.create');
+
+    Route::post('/courses', function (\Illuminate\Http\Request $request) {
+        return redirect()->route('school-admin.courses.index');
+    })->name('courses.store');
 });
 
 Route::middleware(['auth', 'role:student'])->prefix('student')->name('student.')->group(function () {

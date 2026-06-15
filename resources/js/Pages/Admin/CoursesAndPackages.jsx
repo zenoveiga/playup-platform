@@ -1,12 +1,18 @@
 import AdminLayout from '@/Layouts/AdminLayout';
-import { Head, Link } from '@inertiajs/react';
+import SchoolAdminLayout from '@/Layouts/SchoolAdminLayout';
+import { Head, Link, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 
 export default function CoursesAndPackages() {
+    const { auth } = usePage().props;
+    const user = auth.user;
+    const isSchoolAdmin = user.role === 'school_admin';
+    const Layout = isSchoolAdmin ? SchoolAdminLayout : AdminLayout;
+
     const [searchQuery, setSearchQuery] = useState('');
     const [statusFilter, setStatusFilter] = useState('all'); // all, active, inactive
 
-    // Initial mock courses database (seeded with design template items and extended for high-fidelity filtering)
+    // Initial mock courses database
     const initialCourses = [
         {
             id: 1,
@@ -97,52 +103,45 @@ export default function CoursesAndPackages() {
         return true;
     });
 
-    // Dynamic counts
-    const totalCourses = 124; // Visual match to HTML template
-    const activeStudents = 3842; // Visual match to HTML template
+    const totalCourses = 124;
+    const activeStudents = 3842;
 
     return (
-        <AdminLayout>
-            <Head title="Cursos e Pacotes - Kinetic Admin" />
+        <Layout>
+            <Head title="Gestão de Cursos e Pacotes | PlayUp Velocity" />
 
-            <div className="p-8 max-w-7xl mx-auto space-y-8">
+            <div className="p-8 max-w-7xl mx-auto space-y-8 animate-in fade-in duration-700">
                 {/* Header Section */}
-                <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-2">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
                     <div>
-                        <nav className="flex items-center gap-2 text-xs text-[#507c94] dark:text-[#87b3cd]/70 mb-2 font-bold uppercase tracking-wider">
-                            <span>Administração</span>
-                            <span className="material-symbols-outlined text-[14px]">chevron_right</span>
-                            <span className="text-primary dark:text-[#00D1FF] font-bold">Cursos e Pacotes</span>
-                        </nav>
-                        <h1 className="text-4xl font-extrabold text-[#003346] dark:text-white tracking-tight font-headline">
+                        <h1 className="text-4xl font-extrabold tracking-tight text-on-surface mb-2 font-headline">
                             Gestão de Cursos e Pacotes
                         </h1>
-                        <p className="text-[#507c94] dark:text-[#87b3cd] mt-1 max-w-lg font-medium">
+                        <p className="text-[#507c94] dark:text-[#b5e3ff] font-medium">
                             Gerencie o catálogo acadêmico, defina novos pacotes de aprendizado e acompanhe o engajamento dos alunos.
                         </p>
                     </div>
-                    <div className="flex flex-wrap items-center gap-3">
-                        <button className="flex items-center gap-2 px-6 py-3 bg-surface-container-lowest dark:bg-slate-900 text-on-surface dark:text-white font-bold rounded-xl border border-outline-variant/15 dark:border-slate-800 hover:bg-surface-container dark:hover:bg-slate-800 transition-all active:scale-95 shadow-sm">
-                            <span className="material-symbols-outlined text-primary dark:text-[#00D1FF]">edit_square</span>
-                            <span>Alterar curso</span>
+                    <div className="flex gap-3 w-full md:w-auto">
+                        <button className="flex-1 md:flex-none bg-surface-container-low dark:bg-slate-800 text-primary dark:text-[#00D1FF] font-bold px-6 py-3 rounded-xl flex items-center justify-center gap-2 hover:bg-surface-container-high dark:hover:bg-slate-700 transition-colors select-none">
+                            <span className="material-symbols-outlined text-lg">file_download</span>
+                            <span>Exportar</span>
                         </button>
-                        <button className="flex items-center gap-2 px-6 py-3 bg-surface-container-lowest dark:bg-slate-900 text-on-surface dark:text-white font-bold rounded-xl border border-outline-variant/15 dark:border-slate-800 hover:bg-surface-container dark:hover:bg-slate-800 transition-all active:scale-95 shadow-sm">
-                            <span className="material-symbols-outlined text-primary dark:text-[#00D1FF]">list</span>
-                            <span>Todos os cursos</span>
-                        </button>
-                        <button className="flex items-center gap-2 px-6 py-3 kinetic-gradient text-white font-bold rounded-xl hover:shadow-lg hover:shadow-primary/20 transition-all active:scale-95">
-                            <span className="material-symbols-outlined">add</span>
-                            <span>Novo curso</span>
-                        </button>
+                        <Link
+                            href={route(isSchoolAdmin ? 'school-admin.courses.create' : 'admin.courses.create')}
+                            className="flex-1 md:flex-none bg-primary text-white font-bold px-6 py-3 rounded-xl flex items-center justify-center gap-2 shadow-xl shadow-primary/20 hover:opacity-95 active:scale-[0.98] transition-all select-none cursor-pointer text-center"
+                        >
+                            <span className="material-symbols-outlined text-lg">add</span>
+                            <span>Novo Curso</span>
+                        </Link>
                     </div>
                 </div>
 
-                {/* Metrics Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Metrics Bento Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                     {/* Stat: Total Courses */}
-                    <div className="glass-panel dark:bg-slate-900 rounded-[1.5rem] p-6 shadow-sm flex items-center justify-between border border-outline-variant/10 dark:border-slate-800 overflow-hidden relative group">
+                    <div className="col-span-1 md:col-span-2 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl border border-outline-variant/10 dark:border-slate-800 rounded-[1.5rem] p-6 shadow-sm flex items-center justify-between overflow-hidden relative group">
                         <div className="relative z-10">
-                            <p className="text-[#507c94] dark:text-[#87b3cd] font-semibold uppercase tracking-widest text-[10px] mb-2">Total de Cursos</p>
+                            <p className="text-on-surface-variant/70 dark:text-[#87b3cd] font-semibold uppercase tracking-widest text-[10px] mb-2">Total de Cursos</p>
                             <h3 className="text-5xl font-black text-[#003346] dark:text-white flex items-end gap-2 font-headline">
                                 {totalCourses}
                                 <span className="text-sm font-bold text-tertiary dark:text-[#6bfe9c] flex items-center gap-1 mb-2">
@@ -150,7 +149,7 @@ export default function CoursesAndPackages() {
                                     +12%
                                 </span>
                             </h3>
-                            <p className="text-xs text-[#507c94]/70 dark:text-[#87b3cd]/60 mt-4">Catálogo ativo atualizado hoje</p>
+                            <p className="text-xs text-on-surface-variant/60 dark:text-[#87b3cd]/60 mt-4">Catálogo ativo atualizado hoje</p>
                         </div>
                         <div className="bg-primary/5 p-6 rounded-full group-hover:scale-110 transition-transform duration-500">
                             <span className="material-symbols-outlined text-primary dark:text-[#00D1FF] text-6xl opacity-30">library_books</span>
@@ -159,9 +158,9 @@ export default function CoursesAndPackages() {
                     </div>
 
                     {/* Stat: Active Students */}
-                    <div className="glass-panel dark:bg-slate-900 rounded-[1.5rem] p-6 shadow-sm flex items-center justify-between border border-outline-variant/10 dark:border-slate-800 overflow-hidden relative group">
+                    <div className="col-span-1 md:col-span-2 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl border border-outline-variant/10 dark:border-slate-800 rounded-[1.5rem] p-6 shadow-sm flex items-center justify-between overflow-hidden relative group">
                         <div className="relative z-10">
-                            <p className="text-[#507c94] dark:text-[#87b3cd] font-semibold uppercase tracking-widest text-[10px] mb-2">Alunos Ativos</p>
+                            <p className="text-on-surface-variant/70 dark:text-[#87b3cd] font-semibold uppercase tracking-widest text-[10px] mb-2">Alunos Ativos</p>
                             <h3 className="text-5xl font-black text-[#003346] dark:text-white flex items-end gap-2 font-headline">
                                 {activeStudents.toLocaleString()}
                                 <span className="text-sm font-bold text-tertiary dark:text-[#6bfe9c] flex items-center gap-1 mb-2">
@@ -169,7 +168,7 @@ export default function CoursesAndPackages() {
                                     4.2k
                                 </span>
                             </h3>
-                            <p className="text-xs text-[#507c94]/70 dark:text-[#87b3cd]/60 mt-4">Matrículas recorrentes este mês</p>
+                            <p className="text-xs text-on-surface-variant/60 dark:text-[#87b3cd]/60 mt-4">Matrículas recorrentes este mês</p>
                         </div>
                         <div className="bg-tertiary/5 p-6 rounded-full group-hover:scale-110 transition-transform duration-500">
                             <span className="material-symbols-outlined text-tertiary dark:text-[#6bfe9c] text-6xl opacity-30">person_play</span>
@@ -183,17 +182,17 @@ export default function CoursesAndPackages() {
                     <div className="px-8 py-6 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 border-b border-outline-variant/10 dark:border-slate-800">
                         <h2 className="text-xl font-bold text-[#003346] dark:text-white font-headline">Lista de Cursos Disponíveis</h2>
                         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
-                            {/* Search bar inside the table area */}
-                            <div className="relative">
-                                <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#507c94] text-lg pointer-events-none">
+                            {/* Search bar */}
+                            <div className="relative font-body">
+                                <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#507c94] dark:text-[#87b3cd]/70 text-lg pointer-events-none">
                                     search
                                 </span>
                                 <input
                                     type="text"
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
-                                    placeholder="Buscar cursos..."
-                                    className="w-full sm:w-64 bg-surface dark:bg-slate-950 border-none rounded-xl py-2 pl-10 pr-4 text-xs focus:ring-2 focus:ring-primary/20 placeholder:text-[#507c94]/40 text-on-surface dark:text-white outline-none"
+                                    placeholder="Buscar cursos ou categoria..."
+                                    className="w-full sm:w-64 bg-surface dark:bg-slate-950 border-none rounded-xl py-2.5 pl-10 pr-4 text-xs focus:ring-2 focus:ring-primary/20 placeholder:text-[#507c94]/40 text-[#003346] dark:text-white outline-none"
                                 />
                             </div>
 
@@ -212,10 +211,11 @@ export default function CoursesAndPackages() {
                             </div>
                         </div>
                     </div>
+
                     <div className="overflow-x-auto">
-                        <table className="w-full text-left">
+                        <table className="w-full text-left border-collapse">
                             <thead>
-                                <tr className="bg-[#eff8ff]/50 dark:bg-slate-950/40">
+                                <tr className="bg-surface/50 dark:bg-slate-950/40">
                                     <th className="px-8 py-4 text-[10px] font-black uppercase tracking-widest text-[#507c94] dark:text-[#87b3cd]">Nome do Curso</th>
                                     <th className="px-8 py-4 text-[10px] font-black uppercase tracking-widest text-[#507c94] dark:text-[#87b3cd]">Categoria</th>
                                     <th className="px-8 py-4 text-[10px] font-black uppercase tracking-widest text-[#507c94] dark:text-[#87b3cd]">Data de Criação</th>
@@ -226,14 +226,14 @@ export default function CoursesAndPackages() {
                             <tbody className="divide-y divide-outline-variant/10 dark:divide-slate-800">
                                 {filteredCourses.length > 0 ? (
                                     filteredCourses.map((course) => (
-                                        <tr key={course.id} className="hover:bg-[#eff8ff]/40 dark:hover:bg-slate-800/40 transition-colors">
+                                        <tr key={course.id} className="hover:bg-surface/30 dark:hover:bg-slate-800/30 transition-colors group">
                                             <td className="px-8 py-5">
                                                 <div className="flex items-center gap-3">
                                                     <div className="w-10 h-10 rounded-lg bg-primary-container/20 flex items-center justify-center">
                                                         <span className="material-symbols-outlined text-primary dark:text-[#00D1FF]">{course.icon}</span>
                                                     </div>
                                                     <div>
-                                                        <p className="font-bold text-[#003346] dark:text-white text-sm">{course.name}</p>
+                                                        <p className="font-bold text-[#003346] dark:text-white text-sm group-hover:text-primary dark:group-hover:text-[#00D1FF] transition-colors">{course.name}</p>
                                                         <p className="text-xs text-[#507c94]/70 dark:text-[#87b3cd]/60">{course.modules} módulos • {course.hours} horas</p>
                                                     </div>
                                                 </div>
@@ -287,7 +287,7 @@ export default function CoursesAndPackages() {
                     </div>
 
                     {/* Pagination */}
-                    <div className="px-8 py-6 bg-[#eff8ff]/30 dark:bg-slate-950/20 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-outline-variant/10 dark:border-slate-800">
+                    <div className="px-8 py-6 bg-surface/30 dark:bg-slate-950/20 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-outline-variant/10 dark:border-slate-800">
                         <p className="text-xs text-[#507c94] dark:text-[#87b3cd]/70 font-medium">
                             Mostrando <span className="font-bold text-on-surface dark:text-white">1-{filteredCourses.length}</span> de <span className="font-bold text-on-surface dark:text-white">{totalCourses}</span> cursos
                         </p>
@@ -306,11 +306,11 @@ export default function CoursesAndPackages() {
                 </div>
 
                 {/* Featured Section Asymmetric Layout */}
-                <div className="grid grid-cols-12 gap-8 mt-4">
+                <div className="grid grid-cols-12 gap-8">
                     {/* Left Banner */}
-                    <div className="col-span-12 lg:col-span-8 bg-gradient-to-r from-[#0046bb] to-[#0050d4] rounded-[2rem] p-8 text-white flex flex-col md:flex-row items-center gap-12 relative overflow-hidden group shadow-md">
-                        <div className="flex-1 relative z-10">
-                            <span className="px-4 py-1.5 bg-white/20 backdrop-blur-md rounded-full text-[10px] font-black uppercase tracking-widest mb-6 inline-block">Novidade Kinetic</span>
+                    <div className="col-span-12 lg:col-span-8 bg-gradient-to-r from-primary-dim to-primary rounded-[2rem] p-8 text-white flex flex-col md:flex-row items-center gap-12 relative overflow-hidden group shadow-sm">
+                        <div className="flex-1 relative z-10 font-body">
+                            <span className="px-4 py-1.5 bg-white/20 backdrop-blur-md rounded-full text-[10px] font-black uppercase tracking-widest mb-6 inline-block font-label">Novidade Kinetic</span>
                             <h2 className="text-4xl font-black mb-4 leading-tight font-headline">
                                 Impulsione as Vendas com<br/>Pacotes Personalizados
                             </h2>
@@ -341,18 +341,18 @@ export default function CoursesAndPackages() {
                                 <div className="w-12 h-12 bg-tertiary-container dark:bg-emerald-950/50 text-tertiary dark:text-emerald-400 rounded-2xl flex items-center justify-center">
                                     <span className="material-symbols-outlined text-2xl">trending_up</span>
                                 </div>
-                                <span className="text-[10px] font-black text-[#507c94] dark:text-[#87b3cd]/70 uppercase tracking-widest">Relatório Mensal</span>
+                                <span className="text-[10px] font-black text-[#507c94] dark:text-[#87b3cd]/70 uppercase tracking-widest font-label">Relatório Mensal</span>
                             </div>
                             <h3 className="text-2xl font-bold text-[#003346] dark:text-white mb-2 font-headline">Desempenho</h3>
-                            <p className="text-sm text-[#507c94]/90 dark:text-[#87b3cd] font-medium leading-relaxed">
-                                A taxa de conclusão de cursos aumentou <span class="text-tertiary dark:text-[#6bfe9c] font-extrabold">18.4%</span> em relação ao mês anterior.
+                            <p className="text-sm text-[#507c94]/90 dark:text-[#87b3cd] font-medium leading-relaxed font-body">
+                                A taxa de conclusão de cursos aumentou <span className="text-tertiary dark:text-[#6bfe9c] font-extrabold">18.4%</span> em relação ao mês anterior.
                             </p>
                         </div>
                         <div className="mt-8 space-y-4">
                             <div className="h-2.5 w-full bg-surface-container-highest dark:bg-slate-800 rounded-full overflow-hidden">
                                 <div className="h-full bg-tertiary dark:bg-[#5bef90] w-[84%] rounded-full"></div>
                             </div>
-                            <div className="flex justify-between items-center text-[10px] font-black text-[#507c94] dark:text-[#87b3cd]/70 uppercase tracking-wider">
+                            <div className="flex justify-between items-center text-[10px] font-black text-[#507c94] dark:text-[#87b3cd]/70 uppercase tracking-wider font-label">
                                 <span>Meta de Engajamento</span>
                                 <span className="text-[#003346] dark:text-white">84% de 100%</span>
                             </div>
@@ -360,6 +360,6 @@ export default function CoursesAndPackages() {
                     </div>
                 </div>
             </div>
-        </AdminLayout>
+        </Layout>
     );
 }
