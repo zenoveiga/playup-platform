@@ -3,6 +3,8 @@ import SchoolAdminLayout from '@/Layouts/SchoolAdminLayout';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import InputError from '@/Components/InputError';
 import { useState } from 'react';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 
 export default function StudentCreate() {
     const { auth } = usePage().props;
@@ -418,20 +420,19 @@ export default function StudentCreate() {
                             </div>
                             <h2 className="text-lg font-headline font-bold text-on-surface">Observações</h2>
                         </div>
-                        <div className="bg-surface dark:bg-slate-950 rounded-xl overflow-hidden border border-outline-variant/10 dark:border-slate-800">
-                            {/* Editor Toolbar */}
-                            <div className="flex items-center gap-1 p-2 border-b border-outline-variant/10 dark:border-slate-850 bg-slate-50 dark:bg-slate-900">
-                                <button className="p-1.5 hover:bg-white dark:hover:bg-slate-800 rounded transition-colors text-on-surface-variant" type="button"><span className="material-symbols-outlined text-lg">format_bold</span></button>
-                                <button className="p-1.5 hover:bg-white dark:hover:bg-slate-800 rounded transition-colors text-on-surface-variant" type="button"><span className="material-symbols-outlined text-lg">format_italic</span></button>
-                                <button className="p-1.5 hover:bg-white dark:hover:bg-slate-800 rounded transition-colors text-on-surface-variant" type="button"><span className="material-symbols-outlined text-lg">format_list_bulleted</span></button>
-                                <div className="h-4 w-px bg-outline-variant/30 mx-1"></div>
-                                <button className="p-1.5 hover:bg-white dark:hover:bg-slate-800 rounded transition-colors text-on-surface-variant" type="button"><span className="material-symbols-outlined text-lg">link</span></button>
-                            </div>
-                            <textarea
-                                className="w-full bg-transparent border-none p-4 text-sm focus:ring-0 min-h-[160px] resize-y text-on-surface outline-none"
-                                placeholder="Adicione aqui notas adicionais, históricos ou detalhes relevantes sobre a matrícula..."
+                        <div className="bg-surface dark:bg-slate-950 rounded-xl overflow-hidden border border-outline-variant/10 dark:border-slate-800 premium-quill-container">
+                            <ReactQuill
+                                theme="snow"
                                 value={data.notes}
-                                onChange={e => setData('notes', e.target.value)}
+                                onChange={value => setData('notes', value)}
+                                placeholder="Adicione aqui notas adicionais, históricos ou detalhes relevantes sobre a matrícula..."
+                                modules={{
+                                    toolbar: [
+                                        ['bold', 'italic', 'underline'],
+                                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                                        ['link', 'clean']
+                                    ]
+                                }}
                             />
                         </div>
                     </div>
