@@ -88,8 +88,8 @@ export default function StudentCreate() {
                     <div className="bg-white dark:bg-slate-900 rounded-2xl p-8 border border-outline-variant/15 dark:border-slate-800 shadow-sm hover:shadow-md transition-all">
                         <div className="flex flex-col md:flex-row gap-8 items-start">
                             <div className="flex flex-col items-center gap-4">
-                                <div className="relative group">
-                                    <div className="w-32 h-32 rounded-2xl bg-surface dark:bg-slate-950 flex items-center justify-center overflow-hidden border-2 border-dashed border-outline-variant/30 group-hover:border-primary transition-colors cursor-pointer">
+                                <div className="relative w-32 h-32 group">
+                                    <div className="w-full h-full rounded-2xl bg-surface dark:bg-slate-950 flex items-center justify-center overflow-hidden border-2 border-dashed border-outline-variant/30 group-hover:border-primary transition-colors cursor-pointer">
                                         <span className="material-symbols-outlined text-4xl text-on-surface-variant group-hover:text-primary">add_a_photo</span>
                                     </div>
                                     <div className="absolute -bottom-2 -right-2 flex flex-col gap-1">
@@ -101,7 +101,7 @@ export default function StudentCreate() {
                                         </button>
                                     </div>
                                 </div>
-                                <span className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest text-center">Foto do Aluno</span>
+                                <span className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest text-center mt-2">Foto do Aluno</span>
                             </div>
 
                             <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-6">
