@@ -2,7 +2,7 @@ import AdminLayout from '@/Layouts/AdminLayout';
 import SchoolAdminLayout from '@/Layouts/SchoolAdminLayout';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import InputError from '@/Components/InputError';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 
@@ -38,6 +38,27 @@ export default function StudentCreate() {
     });
 
     const [isCepLoading, setIsCepLoading] = useState(false);
+
+    useEffect(() => {
+        // Prevent Inertia from intercepting click events on links/buttons inside Quill editor & tooltips
+        const handleQuillClick = (e) => {
+            const target = e.target;
+            if (target.closest('.ql-tooltip') || target.closest('.ql-container') || target.closest('.ql-toolbar')) {
+                e.stopPropagation();
+            }
+        };
+
+        const container = document.querySelector('.premium-quill-container');
+        if (container) {
+            container.addEventListener('click', handleQuillClick, true);
+        }
+
+        return () => {
+            if (container) {
+                container.removeEventListener('click', handleQuillClick, true);
+            }
+        };
+    }, []);
 
     const handleCourseToggle = (courseName) => {
         if (data.courses.includes(courseName)) {
@@ -420,12 +441,13 @@ export default function StudentCreate() {
                             </div>
                             <h2 className="text-lg font-headline font-bold text-on-surface">Observações</h2>
                         </div>
-                        <div className="bg-surface dark:bg-slate-950 rounded-xl overflow-hidden border border-outline-variant/10 dark:border-slate-800 premium-quill-container">
+                        <div className="bg-surface dark:bg-slate-950 rounded-xl border border-outline-variant/10 dark:border-slate-800 premium-quill-container">
                             <ReactQuill
                                 theme="snow"
                                 value={data.notes}
                                 onChange={value => setData('notes', value)}
                                 placeholder="Adicione aqui notas adicionais, históricos ou detalhes relevantes sobre a matrícula..."
+                                bounds=".premium-quill-container"
                                 modules={{
                                     toolbar: [
                                         ['bold', 'italic', 'underline'],

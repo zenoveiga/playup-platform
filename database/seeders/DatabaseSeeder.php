@@ -87,5 +87,80 @@ class DatabaseSeeder extends Seeder
                 User::factory()->create($userData);
             }
         }
+
+        $polos = [
+            [
+                'code' => 'PL-001',
+                'name' => 'Polo São Paulo Jardins',
+                'responsible' => 'Ricardo Mendes',
+                'phone' => '(11) 98877-6655',
+                'email' => 'jardins@playup.com',
+                'address' => 'Alameda Lorena, 1500, Jardins, São Paulo - SP',
+                'status' => 'active',
+                'active_students' => 452,
+                'capacity_pct' => 90,
+            ],
+            [
+                'code' => 'PL-002',
+                'name' => 'Polo Rio Centro',
+                'responsible' => 'Beatriz Pereira',
+                'phone' => '(21) 97766-5544',
+                'email' => 'riocentro@playup.com',
+                'address' => 'Av. das Américas, 5000, Barra da Tijuca, Rio de Janeiro - RJ',
+                'status' => 'active',
+                'active_students' => 310,
+                'capacity_pct' => 75,
+            ],
+            [
+                'code' => 'PL-003',
+                'name' => 'Polo Curitiba Central',
+                'responsible' => 'Guilherme Souza',
+                'phone' => '(41) 99988-7766',
+                'email' => 'curitiba@playup.com',
+                'address' => 'Rua XV de Novembro, 100, Centro, Curitiba - PR',
+                'status' => 'active',
+                'active_students' => 215,
+                'capacity_pct' => 60,
+            ],
+            [
+                'code' => 'PL-004',
+                'name' => 'Polo Belo Horizonte',
+                'responsible' => 'Ana Paula Santos',
+                'phone' => '(31) 98855-4433',
+                'email' => 'bh@playup.com',
+                'address' => 'Av. Afonso Pena, 1200, Centro, Belo Horizonte - MG',
+                'status' => 'inactive',
+                'active_students' => 180,
+                'capacity_pct' => 45,
+            ],
+            [
+                'code' => 'PL-005',
+                'name' => 'Polo Porto Alegre',
+                'responsible' => 'Carlos Silveira',
+                'phone' => '(51) 97744-3322',
+                'email' => 'portoalegre@playup.com',
+                'address' => 'Av. Ipiranga, 6681, Partenon, Porto Alegre - RS',
+                'status' => 'active',
+                'active_students' => 290,
+                'capacity_pct' => 80,
+            ],
+            [
+                'code' => 'PL-006',
+                'name' => 'Polo Recife Antigo',
+                'responsible' => 'Marina Costa',
+                'phone' => '(81) 99977-6655',
+                'email' => 'recife@playup.com',
+                'address' => 'Rua do Bom Jesus, 200, Recife Antigo, Recife - PE',
+                'status' => 'active',
+                'active_students' => 154,
+                'capacity_pct' => 35,
+            ]
+        ];
+
+        foreach ($polos as $poloData) {
+            if (\App\Models\Polo::where('code', $poloData['code'])->doesntExist()) {
+                \App\Models\Polo::create($poloData);
+            }
+        }
     }
 }

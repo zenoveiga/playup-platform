@@ -87,10 +87,17 @@ export default function SchoolAdminLayout({ children }) {
                         <span className="font-['Manrope'] text-sm">Alunos</span>
                     </Link>
 
-                    <a className="flex items-center gap-3 px-4 py-3 text-[#003346]/70 dark:text-white/70 hover:bg-white/40 dark:hover:bg-slate-800/40 rounded-xl hover:translate-x-1 transition-all duration-200" href="#">
-                        <span className="material-symbols-outlined">school</span>
+                    <Link
+                        className={`flex items-center gap-3 px-4 py-3 rounded-xl hover:translate-x-1 transition-all duration-200 ${
+                            route().current('school-admin.polos.index')
+                                ? 'bg-white dark:bg-slate-800 text-[#0050d4] dark:text-[#00D1FF] font-bold shadow-sm'
+                                : 'text-[#003346]/70 dark:text-white/70 hover:bg-white/40 dark:hover:bg-slate-800/40'
+                        }`}
+                        href={route('school-admin.polos.index')}
+                    >
+                        <span className="material-symbols-outlined" style={route().current('school-admin.polos.index') ? { fontVariationSettings: "'FILL' 1" } : {}}>location_on</span>
                         <span className="font-['Manrope'] text-sm">Polos</span>
-                    </a>
+                    </Link>
 
                     <a className="flex items-center gap-3 px-4 py-3 text-[#003346]/70 dark:text-white/70 hover:bg-white/40 dark:hover:bg-slate-800/40 rounded-xl hover:translate-x-1 transition-all duration-200" href="#">
                         <span className="material-symbols-outlined">workspace_premium</span>

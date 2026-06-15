@@ -37,6 +37,8 @@ body {
     border-bottom: 1px solid rgba(80, 124, 148, 0.15);
     background-color: rgba(241, 248, 255, 0.5);
     padding: 0.75rem 1rem;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
 }
 .dark .premium-quill-container .ql-toolbar.ql-snow {
     background-color: rgba(15, 23, 42, 0.5);
@@ -47,6 +49,8 @@ body {
     font-family: 'Manrope', sans-serif;
     font-size: 0.875rem;
     min-height: 180px;
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
 }
 .premium-quill-container .ql-editor {
     padding: 1rem;
@@ -79,5 +83,43 @@ body {
 }
 .dark .premium-quill-container .ql-snow .ql-picker {
     color: #b5e3ff;
+}
+
+/* Premium Quill Tooltip Styling */
+.premium-quill-container .ql-snow .ql-tooltip {
+    background-color: #ffffff !important;
+    border: 1px solid rgba(80, 124, 148, 0.2) !important;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+    border-radius: 12px !important;
+    color: #003346 !important;
+    padding: 8px 12px !important;
+    z-index: 50 !important;
+}
+
+.premium-quill-container .ql-snow .ql-tooltip input[type=text] {
+    border: 1px solid rgba(80, 124, 148, 0.2) !important;
+    border-radius: 8px !important;
+    color: #003346 !important;
+    padding: 4px 8px !important;
+    font-size: 0.875rem !important;
+    outline: none !important;
+}
+
+.premium-quill-container .ql-snow .ql-tooltip a.ql-action::after {
+    font-weight: 700 !important;
+}
+
+/* Dark mode overrides for Quill Tooltip */
+.dark .premium-quill-container .ql-snow .ql-tooltip {
+    background-color: #0f172a !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    color: #eff8ff !important;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2) !important;
+}
+
+.dark .premium-quill-container .ql-snow .ql-tooltip input[type=text] {
+    background-color: #020617 !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    color: #eff8ff !important;
 }
 
