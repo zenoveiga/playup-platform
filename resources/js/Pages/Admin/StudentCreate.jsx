@@ -69,7 +69,7 @@ export default function StudentCreate() {
     return (
         <Layout>
             <Head title="Matricular Novo Aluno | PlayUp Velocity" />
-            
+
             <div className="max-w-6xl mx-auto p-8 animate-in fade-in duration-700">
                 {/* Header Section */}
                 <div className="flex flex-col gap-1 mb-8">
@@ -107,9 +107,9 @@ export default function StudentCreate() {
                             <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="md:col-span-2">
                                     <label className="block text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-2">Nome Completo *</label>
-                                    <input 
-                                        className="w-full bg-surface dark:bg-slate-950 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary transition-all placeholder:text-on-surface-variant/40 text-on-surface outline-none" 
-                                        placeholder="Ex: João da Silva Santos" 
+                                    <input
+                                        className="w-full bg-surface dark:bg-slate-950 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary transition-all placeholder:text-on-surface-variant/40 text-on-surface outline-none"
+                                        placeholder="Ex: João da Silva Santos"
                                         type="text"
                                         value={data.name}
                                         onChange={e => setData('name', e.target.value)}
@@ -119,9 +119,9 @@ export default function StudentCreate() {
                                 </div>
                                 <div>
                                     <label className="block text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-2">E-mail *</label>
-                                    <input 
-                                        className="w-full bg-surface dark:bg-slate-950 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary transition-all text-on-surface outline-none" 
-                                        placeholder="email@exemplo.com" 
+                                    <input
+                                        className="w-full bg-surface dark:bg-slate-950 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary transition-all text-on-surface outline-none"
+                                        placeholder="email@exemplo.com"
                                         type="email"
                                         value={data.email}
                                         onChange={e => setData('email', e.target.value)}
@@ -132,8 +132,8 @@ export default function StudentCreate() {
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
                                         <label className="block text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-2">Data de Nasc.</label>
-                                        <input 
-                                            className="w-full bg-surface dark:bg-slate-950 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary transition-all text-on-surface outline-none" 
+                                        <input
+                                            className="w-full bg-surface dark:bg-slate-950 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary transition-all text-on-surface outline-none"
                                             type="date"
                                             value={data.birth_date}
                                             onChange={e => setData('birth_date', e.target.value)}
@@ -141,7 +141,7 @@ export default function StudentCreate() {
                                     </div>
                                     <div>
                                         <label className="block text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-2">Sexo</label>
-                                        <select 
+                                        <select
                                             className="w-full bg-surface dark:bg-slate-950 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary transition-all text-on-surface outline-none"
                                             value={data.gender}
                                             onChange={e => setData('gender', e.target.value)}
@@ -156,6 +156,8 @@ export default function StudentCreate() {
                                 </div>
                             </div>
                         </div>
+
+
                     </div>
 
                     {/* Section: Documentos e Contato */}
@@ -165,16 +167,16 @@ export default function StudentCreate() {
                                 <span className="material-symbols-outlined">badge</span>
                             </div>
                             <div>
-                                <h2 className="text-xl font-headline font-bold text-on-surface">Identificação e Contato</h2>
-                                <p className="text-sm text-on-surface-variant">Documentos oficiais e canais de comunicação</p>
+                                <h2 className="text-xl font-headline font-bold text-on-surface">Identificação do aluno</h2>
+                                <p className="text-sm text-on-surface-variant">Informações pessoais e documentos</p>
                             </div>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                             <div>
                                 <label className="block text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-2">CPF</label>
-                                <input 
-                                    className="w-full bg-surface dark:bg-slate-950 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary transition-all text-on-surface outline-none" 
-                                    placeholder="000.000.000-00" 
+                                <input
+                                    className="w-full bg-surface dark:bg-slate-950 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary transition-all text-on-surface outline-none"
+                                    placeholder="000.000.000-00"
                                     type="text"
                                     value={data.cpf}
                                     onChange={e => setData('cpf', e.target.value)}
@@ -182,9 +184,9 @@ export default function StudentCreate() {
                             </div>
                             <div>
                                 <label className="block text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-2">RG</label>
-                                <input 
-                                    className="w-full bg-surface dark:bg-slate-950 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary transition-all text-on-surface outline-none" 
-                                    placeholder="00.000.000-0" 
+                                <input
+                                    className="w-full bg-surface dark:bg-slate-950 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary transition-all text-on-surface outline-none"
+                                    placeholder="00.000.000-0"
                                     type="text"
                                     value={data.rg}
                                     onChange={e => setData('rg', e.target.value)}
@@ -192,9 +194,9 @@ export default function StudentCreate() {
                             </div>
                             <div>
                                 <label className="block text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-2">Telefone 1 (WhatsApp) *</label>
-                                <input 
-                                    className="w-full bg-surface dark:bg-slate-950 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary transition-all text-on-surface outline-none" 
-                                    placeholder="(00) 00000-0000" 
+                                <input
+                                    className="w-full bg-surface dark:bg-slate-950 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary transition-all text-on-surface outline-none"
+                                    placeholder="(00) 00000-0000"
                                     type="tel"
                                     value={data.phone}
                                     onChange={e => setData('phone', e.target.value)}
@@ -204,9 +206,9 @@ export default function StudentCreate() {
                             </div>
                             <div>
                                 <label className="block text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-2">Telefone 2</label>
-                                <input 
-                                    className="w-full bg-surface dark:bg-slate-950 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary transition-all text-on-surface outline-none" 
-                                    placeholder="(00) 00000-0000" 
+                                <input
+                                    className="w-full bg-surface dark:bg-slate-950 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary transition-all text-on-surface outline-none"
+                                    placeholder="(00) 00000-0000"
                                     type="tel"
                                     value={data.phone2}
                                     onChange={e => setData('phone2', e.target.value)}
@@ -229,9 +231,9 @@ export default function StudentCreate() {
                         <div className="grid grid-cols-1 md:grid-cols-6 gap-6">
                             <div className="md:col-span-3">
                                 <label className="block text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-2">Nome do Responsável</label>
-                                <input 
-                                    className="w-full bg-surface dark:bg-slate-950 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary transition-all text-on-surface outline-none" 
-                                    placeholder="Nome completo do pai, mãe ou tutor" 
+                                <input
+                                    className="w-full bg-surface dark:bg-slate-950 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary transition-all text-on-surface outline-none"
+                                    placeholder="Nome completo do pai, mãe ou tutor"
                                     type="text"
                                     value={data.guardian_name}
                                     onChange={e => setData('guardian_name', e.target.value)}
@@ -239,9 +241,9 @@ export default function StudentCreate() {
                             </div>
                             <div className="md:col-span-2">
                                 <label className="block text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-2">CPF Responsável</label>
-                                <input 
-                                    className="w-full bg-surface dark:bg-slate-950 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary transition-all text-on-surface outline-none" 
-                                    placeholder="000.000.000-00" 
+                                <input
+                                    className="w-full bg-surface dark:bg-slate-950 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary transition-all text-on-surface outline-none"
+                                    placeholder="000.000.000-00"
                                     type="text"
                                     value={data.guardian_cpf}
                                     onChange={e => setData('guardian_cpf', e.target.value)}
@@ -249,9 +251,9 @@ export default function StudentCreate() {
                             </div>
                             <div className="md:col-span-1">
                                 <label className="block text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-2">RG Responsável</label>
-                                <input 
-                                    className="w-full bg-surface dark:bg-slate-950 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary transition-all text-on-surface outline-none" 
-                                    placeholder="00.000.000-0" 
+                                <input
+                                    className="w-full bg-surface dark:bg-slate-950 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary transition-all text-on-surface outline-none"
+                                    placeholder="00.000.000-0"
                                     type="text"
                                     value={data.guardian_rg}
                                     onChange={e => setData('guardian_rg', e.target.value)}
@@ -275,16 +277,16 @@ export default function StudentCreate() {
                             <div className="md:col-span-2">
                                 <label className="block text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-2">CEP</label>
                                 <div className="relative">
-                                    <input 
-                                        className="w-full bg-surface dark:bg-slate-950 border-none rounded-xl pl-4 pr-12 py-3 text-sm focus:ring-2 focus:ring-primary transition-all placeholder:text-on-surface-variant/40 text-on-surface outline-none" 
-                                        placeholder="00000-000" 
+                                    <input
+                                        className="w-full bg-surface dark:bg-slate-950 border-none rounded-xl pl-4 pr-12 py-3 text-sm focus:ring-2 focus:ring-primary transition-all placeholder:text-on-surface-variant/40 text-on-surface outline-none"
+                                        placeholder="00000-000"
                                         type="text"
                                         value={data.cep}
                                         onChange={e => setData('cep', e.target.value)}
                                     />
-                                    <button 
+                                    <button
                                         onClick={simulateCepSearch}
-                                        className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 bg-primary text-white rounded-lg hover:scale-105 active:scale-95 transition-transform" 
+                                        className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 bg-primary text-white rounded-lg hover:scale-105 active:scale-95 transition-transform"
                                         type="button"
                                         title="Buscar CEP"
                                     >
@@ -296,9 +298,9 @@ export default function StudentCreate() {
                             </div>
                             <div className="md:col-span-3">
                                 <label className="block text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-2">Rua / Logradouro</label>
-                                <input 
-                                    className="w-full bg-surface dark:bg-slate-950 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary transition-all text-on-surface outline-none" 
-                                    placeholder="Ex: Av. Paulista, 1000" 
+                                <input
+                                    className="w-full bg-surface dark:bg-slate-950 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary transition-all text-on-surface outline-none"
+                                    placeholder="Ex: Av. Paulista, 1000"
                                     type="text"
                                     value={data.address}
                                     onChange={e => setData('address', e.target.value)}
@@ -306,9 +308,9 @@ export default function StudentCreate() {
                             </div>
                             <div className="md:col-span-1">
                                 <label className="block text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-2">Bairro</label>
-                                <input 
-                                    className="w-full bg-surface dark:bg-slate-950 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary transition-all text-on-surface outline-none" 
-                                    placeholder="Centro" 
+                                <input
+                                    className="w-full bg-surface dark:bg-slate-950 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary transition-all text-on-surface outline-none"
+                                    placeholder="Centro"
                                     type="text"
                                     value={data.neighborhood}
                                     onChange={e => setData('neighborhood', e.target.value)}
@@ -316,9 +318,9 @@ export default function StudentCreate() {
                             </div>
                             <div className="md:col-span-4">
                                 <label className="block text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-2">Cidade</label>
-                                <input 
-                                    className="w-full bg-surface dark:bg-slate-950 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary transition-all text-on-surface outline-none" 
-                                    placeholder="Sua Cidade" 
+                                <input
+                                    className="w-full bg-surface dark:bg-slate-950 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary transition-all text-on-surface outline-none"
+                                    placeholder="Sua Cidade"
                                     type="text"
                                     value={data.city}
                                     onChange={e => setData('city', e.target.value)}
@@ -326,7 +328,7 @@ export default function StudentCreate() {
                             </div>
                             <div className="md:col-span-2">
                                 <label className="block text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-2">Estado</label>
-                                <select 
+                                <select
                                     className="w-full bg-surface dark:bg-slate-950 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary transition-all text-on-surface outline-none"
                                     value={data.state}
                                     onChange={e => setData('state', e.target.value)}
@@ -357,7 +359,7 @@ export default function StudentCreate() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                             <div>
                                 <label className="block text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-2">Polo de Atendimento</label>
-                                <select 
+                                <select
                                     className="w-full bg-surface dark:bg-slate-950 border-none rounded-xl px-4 py-3 text-sm font-semibold focus:ring-2 focus:ring-primary transition-all text-on-surface outline-none"
                                     value={data.polo}
                                     onChange={e => setData('polo', e.target.value)}
@@ -371,7 +373,7 @@ export default function StudentCreate() {
                             </div>
                             <div>
                                 <label className="block text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-2">Status do Aluno *</label>
-                                <select 
+                                <select
                                     className="w-full bg-surface dark:bg-slate-950 border-none rounded-xl px-4 py-3 text-sm font-semibold focus:ring-2 focus:ring-primary transition-all text-on-surface outline-none"
                                     value={data.status}
                                     onChange={e => setData('status', e.target.value)}
@@ -387,18 +389,16 @@ export default function StudentCreate() {
                                     {['Análise de Sistemas', 'Ciência da Computação', 'Engenharia de Software', 'Segurança da Informação', 'Gestão de TI'].map((course, idx) => {
                                         const isSelected = data.courses.includes(course);
                                         return (
-                                            <div 
+                                            <div
                                                 key={idx}
                                                 onClick={() => handleCourseToggle(course)}
-                                                className={`flex items-center gap-3 p-4 rounded-xl border cursor-pointer select-none transition-all duration-200 ${
-                                                    isSelected 
-                                                        ? 'bg-primary-container/20 border-primary text-primary dark:text-[#00D1FF]' 
-                                                        : 'bg-surface dark:bg-slate-950 border-transparent hover:border-outline-variant/30 text-on-surface'
-                                                }`}
+                                                className={`flex items-center gap-3 p-4 rounded-xl border cursor-pointer select-none transition-all duration-200 ${isSelected
+                                                    ? 'bg-primary-container/20 border-primary text-primary dark:text-[#00D1FF]'
+                                                    : 'bg-surface dark:bg-slate-950 border-transparent hover:border-outline-variant/30 text-on-surface'
+                                                    }`}
                                             >
-                                                <div className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${
-                                                    isSelected ? 'bg-primary border-primary text-white' : 'border-outline-variant'
-                                                }`}>
+                                                <div className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${isSelected ? 'bg-primary border-primary text-white' : 'border-outline-variant'
+                                                    }`}>
                                                     {isSelected && <span className="material-symbols-outlined text-xs font-bold">check</span>}
                                                 </div>
                                                 <span className="text-sm font-medium">{course}</span>
@@ -427,8 +427,8 @@ export default function StudentCreate() {
                                 <div className="h-4 w-px bg-outline-variant/30 mx-1"></div>
                                 <button className="p-1.5 hover:bg-white dark:hover:bg-slate-800 rounded transition-colors text-on-surface-variant" type="button"><span className="material-symbols-outlined text-lg">link</span></button>
                             </div>
-                            <textarea 
-                                className="w-full bg-transparent border-none p-4 text-sm focus:ring-0 min-h-[160px] resize-y text-on-surface outline-none" 
+                            <textarea
+                                className="w-full bg-transparent border-none p-4 text-sm focus:ring-0 min-h-[160px] resize-y text-on-surface outline-none"
                                 placeholder="Adicione aqui notas adicionais, históricos ou detalhes relevantes sobre a matrícula..."
                                 value={data.notes}
                                 onChange={e => setData('notes', e.target.value)}
@@ -438,14 +438,14 @@ export default function StudentCreate() {
 
                     {/* Footer Actions */}
                     <div className="flex flex-col md:flex-row items-center justify-end gap-4 mt-4">
-                        <Link 
+                        <Link
                             href={route(indexRoute)}
                             className="w-full md:w-auto px-8 py-4 text-on-surface-variant text-center font-bold hover:bg-surface-container dark:hover:bg-slate-800 rounded-xl transition-all font-headline"
                         >
                             Cancelar
                         </Link>
-                        <button 
-                            className="w-full md:w-auto px-12 py-4 bg-gradient-to-br from-primary to-primary-dim text-white font-headline font-extrabold text-lg rounded-xl shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2" 
+                        <button
+                            className="w-full md:w-auto px-12 py-4 bg-gradient-to-br from-primary to-primary-dim text-white font-headline font-extrabold text-lg rounded-xl shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2"
                             type="submit"
                             disabled={processing}
                         >
