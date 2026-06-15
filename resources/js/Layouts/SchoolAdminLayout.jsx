@@ -50,7 +50,7 @@ export default function SchoolAdminLayout({ children }) {
             </header>
 
             {/* SideNavBar */}
-            <aside className="h-screen w-72 fixed left-0 top-0 overflow-y-auto bg-[#e2f3ff] dark:bg-slate-900 z-50 flex flex-col p-4 gap-1">
+            <aside className="h-screen w-72 fixed left-0 top-0 overflow-y-auto no-scrollbar bg-[#e2f3ff] dark:bg-slate-900 z-50 flex flex-col p-4 gap-1">
                 <div className="px-4 py-6 mb-2">
                     <div className="flex items-center gap-3">
                         <img
