@@ -37,6 +37,10 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
         ]);
     })->name('students.index');
 
+    Route::get('/alunos/matricular', function () {
+        return Inertia::render('Admin/StudentCreate');
+    })->name('students.create');
+
     Route::post('/alunos', function (\Illuminate\Http\Request $request) {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -54,7 +58,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
             'role' => 'student',
         ]);
 
-        return redirect()->back();
+        return redirect()->route('admin.students.index');
     })->name('students.store');
 
     Route::get('/courses', function () {
@@ -74,6 +78,10 @@ Route::middleware(['auth', 'role:school_admin'])->prefix('school-admin')->name('
         ]);
     })->name('students.index');
 
+    Route::get('/alunos/matricular', function () {
+        return Inertia::render('Admin/StudentCreate');
+    })->name('students.create');
+
     Route::post('/alunos', function (\Illuminate\Http\Request $request) {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -91,7 +99,7 @@ Route::middleware(['auth', 'role:school_admin'])->prefix('school-admin')->name('
             'role' => 'student',
         ]);
 
-        return redirect()->back();
+        return redirect()->route('school-admin.students.index');
     })->name('students.store');
 });
 

@@ -1,11 +1,7 @@
 import AdminLayout from '@/Layouts/AdminLayout';
 import SchoolAdminLayout from '@/Layouts/SchoolAdminLayout';
-import { Head, Link, useForm, usePage } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import { useState } from 'react';
-import Modal from '@/Components/Modal';
-import InputLabel from '@/Components/InputLabel';
-import TextInput from '@/Components/TextInput';
-import InputError from '@/Components/InputError';
 
 export default function Students({ students = [] }) {
     const { auth } = usePage().props;
@@ -15,7 +11,6 @@ export default function Students({ students = [] }) {
 
     const [searchQuery, setSearchQuery] = useState('');
     const [statusFilter, setStatusFilter] = useState('all'); // all, active, inactive
-    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
     // Dynamic stat calculation based on seeded database users + mock base for high-fidelity alignment
     const dbTotal = students.length;
@@ -27,31 +22,7 @@ export default function Students({ students = [] }) {
     const displayInactive = 1280 + dbInactive;
     const displayNewThisMonth = 856 + (students.filter(s => new Date(s.created_at).getMonth() === new Date().getMonth()).length);
 
-    // Form logic for Matricular Novo Aluno
-    const { data, setData, post, processing, errors, reset } = useForm({
-        name: '',
-        email: '',
-        phone: '',
-        status: 'active',
-    });
 
-    const storeRoute = isSchoolAdmin ? 'school-admin.students.store' : 'admin.students.store';
-
-    const openCreateModal = () => {
-        setIsCreateModalOpen(true);
-    };
-
-    const closeCreateModal = () => {
-        setIsCreateModalOpen(false);
-        reset();
-    };
-
-    const submit = (e) => {
-        e.preventDefault();
-        post(route(storeRoute), {
-            onSuccess: () => closeCreateModal(),
-        });
-    };
 
     // Client-side filtering for search and tabs
     const filteredStudents = students.filter(student => {
@@ -102,13 +73,13 @@ export default function Students({ students = [] }) {
                             <span className="material-symbols-outlined text-lg">file_download</span>
                             <span>Exportar</span>
                         </button>
-                        <button 
-                            onClick={openCreateModal}
+                        <Link 
+                            href={route(isSchoolAdmin ? 'school-admin.students.create' : 'admin.students.create')}
                             className="flex-1 md:flex-none bg-primary text-white font-bold px-6 py-3 rounded-xl flex items-center justify-center gap-2 shadow-xl shadow-primary/20 hover:opacity-95 active:scale-[0.98] transition-all select-none cursor-pointer"
                         >
                             <span className="material-symbols-outlined text-lg">person_add</span>
                             <span>Matricular Novo Aluno</span>
-                        </button>
+                        </Link>
                     </div>
                 </div>
 
@@ -357,97 +328,6 @@ export default function Students({ students = [] }) {
                     </div>
                 </div>
             </div>
-
-            {/* Matricular Novo Aluno Modal */}
-            <Modal show={isCreateModalOpen} onClose={closeCreateModal} maxWidth="md">
-                <form onSubmit={submit} className="p-6 space-y-6">
-                    <div>
-                        <h2 className="text-xl font-bold text-on-surface font-headline">
-                            Matricular Novo Aluno
-                        </h2>
-                        <p className="text-sm text-slate-500 mt-1">
-                            Preencha os dados do estudante para realizar a matrícula.
-                        </p>
-                    </div>
-
-                    <div className="space-y-4">
-                        <div>
-                            <InputLabel htmlFor="name" value="Nome Completo" className="text-sm font-bold text-on-surface" />
-                            <TextInput
-                                id="name"
-                                type="text"
-                                name="name"
-                                value={data.name}
-                                className="mt-1 block w-full rounded-xl border-slate-200 focus:border-primary focus:ring-primary/20"
-                                isFocused={true}
-                                onChange={(e) => setData('name', e.target.value)}
-                                required
-                            />
-                            <InputError message={errors.name} className="mt-1" />
-                        </div>
-
-                        <div>
-                            <InputLabel htmlFor="email" value="E-mail" className="text-sm font-bold text-on-surface" />
-                            <TextInput
-                                id="email"
-                                type="email"
-                                name="email"
-                                value={data.email}
-                                className="mt-1 block w-full rounded-xl border-slate-200 focus:border-primary focus:ring-primary/20"
-                                onChange={(e) => setData('email', e.target.value)}
-                                required
-                            />
-                            <InputError message={errors.email} className="mt-1" />
-                        </div>
-
-                        <div>
-                            <InputLabel htmlFor="phone" value="Telefone / WhatsApp" className="text-sm font-bold text-on-surface" />
-                            <TextInput
-                                id="phone"
-                                type="text"
-                                name="phone"
-                                value={data.phone}
-                                className="mt-1 block w-full rounded-xl border-slate-200 focus:border-primary focus:ring-primary/20"
-                                placeholder="(11) 99999-9999"
-                                onChange={(e) => setData('phone', e.target.value)}
-                            />
-                            <InputError message={errors.phone} className="mt-1" />
-                        </div>
-
-                        <div>
-                            <InputLabel htmlFor="status" value="Status Inicial" className="text-sm font-bold text-on-surface" />
-                            <select
-                                id="status"
-                                name="status"
-                                value={data.status}
-                                className="mt-1 block w-full rounded-xl border-slate-200 focus:border-primary focus:ring-primary/20 bg-white text-sm py-2 px-3 text-on-surface outline-none"
-                                onChange={(e) => setData('status', e.target.value)}
-                            >
-                                <option value="active">Ativo</option>
-                                <option value="inactive">Inativo</option>
-                            </select>
-                            <InputError message={errors.status} className="mt-1" />
-                        </div>
-                    </div>
-
-                    <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
-                        <button
-                            type="button"
-                            onClick={closeCreateModal}
-                            className="px-4 py-2.5 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-50 transition-colors"
-                        >
-                            Cancelar
-                        </button>
-                        <button
-                            type="submit"
-                            disabled={processing}
-                            className="px-5 py-2.5 rounded-xl text-sm font-bold bg-primary text-white shadow-md shadow-primary/10 hover:opacity-95 transition-all disabled:opacity-50"
-                        >
-                            Confirmar Matrícula
-                        </button>
-                    </div>
-                </form>
-            </Modal>
         </Layout>
     );
 }
