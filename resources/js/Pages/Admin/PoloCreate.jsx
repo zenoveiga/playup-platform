@@ -148,18 +148,24 @@ export default function PoloCreate() {
                                         <option value="inactive">Inativo</option>
                                     </select>
                                 </div>
+                            </div>
 
-                                {/* Submit button */}
-                                <div className="flex items-end">
-                                    <button 
-                                        type="submit" 
-                                        disabled={processing}
-                                        className="w-full bg-gradient-to-br from-primary to-primary-dim text-white font-bold py-3.5 rounded-xl transition-all hover:scale-[1.02] active:scale-95 shadow-lg shadow-primary/20 flex items-center justify-center gap-2 disabled:opacity-50"
-                                    >
-                                        <span className="material-symbols-outlined text-lg">check_circle</span>
-                                        <span>{processing ? 'Cadastrando...' : 'Cadastrar Polo'}</span>
-                                    </button>
-                                </div>
+                            {/* Form Action Buttons */}
+                            <div className="flex items-center justify-end gap-3 pt-6 mt-6 border-t border-outline-variant/10 dark:border-slate-800">
+                                <Link
+                                    href={route(indexRoute)}
+                                    className="px-8 py-3.5 text-sm font-bold rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-[#507c94] dark:text-[#87b3cd] transition-all text-center select-none"
+                                >
+                                    Cancelar
+                                </Link>
+                                <button
+                                    type="submit"
+                                    disabled={processing}
+                                    className="px-10 py-3.5 bg-gradient-to-br from-primary to-primary-dim text-white text-sm font-bold rounded-xl shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all flex items-center gap-2 disabled:opacity-50 cursor-pointer"
+                                >
+                                    <span className="material-symbols-outlined text-lg">check_circle</span>
+                                    <span>{processing ? 'Cadastrando...' : 'Cadastrar Polo'}</span>
+                                </button>
                             </div>
                         </form>
                     </section>

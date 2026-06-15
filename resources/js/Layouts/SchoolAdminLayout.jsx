@@ -7,16 +7,9 @@ export default function SchoolAdminLayout({ children }) {
     return (
         <div className="bg-surface min-h-screen">
             {/* TopAppBar */}
-            <header className="fixed top-0 right-0 left-72 flex justify-between items-center px-6 h-16 bg-[#eff8ff]/70 backdrop-blur-xl dark:bg-slate-950/70 z-40">
+            <header className="fixed top-0 right-0 left-72 flex justify-between items-center px-6 h-16 bg-[#eff8ff]/70 backdrop-blur-xl z-40">
                 <div className="flex items-center gap-8">
-                    <div className="hidden md:flex items-center bg-surface-container px-4 py-2 rounded-xl gap-2 w-96">
-                        <span className="material-symbols-outlined text-outline text-sm">search</span>
-                        <input
-                            className="bg-transparent border-none focus:ring-0 text-sm w-full placeholder-outline-variant text-on-surface"
-                            placeholder="Buscar na escola..."
-                            type="text"
-                        />
-                    </div>
+
                 </div>
                 <div className="flex items-center gap-4">
                     <button className="p-2 rounded-full hover:bg-[#c2e8ff] transition-colors relative">
@@ -76,11 +69,10 @@ export default function SchoolAdminLayout({ children }) {
                         <span className="font-['Manrope'] text-sm">Gestão Escolar</span>
                     </Link>
                     <Link
-                        className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
-                            route().current('school-admin.students.index')
-                                ? 'bg-white dark:bg-slate-800 text-[#0050d4] dark:text-[#00D1FF] font-bold shadow-sm'
-                                : 'text-[#003346]/70 dark:text-white/70 hover:bg-white/40 dark:hover:bg-slate-800/40 hover:translate-x-1'
-                        }`}
+                        className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${route().current('school-admin.students.index')
+                            ? 'bg-white dark:bg-slate-800 text-[#0050d4] dark:text-[#00D1FF] font-bold shadow-sm'
+                            : 'text-[#003346]/70 dark:text-white/70 hover:bg-white/40 dark:hover:bg-slate-800/40 hover:translate-x-1'
+                            }`}
                         href={route('school-admin.students.index')}
                     >
                         <span className="material-symbols-outlined">people</span>
@@ -88,11 +80,10 @@ export default function SchoolAdminLayout({ children }) {
                     </Link>
 
                     <Link
-                        className={`flex items-center gap-3 px-4 py-3 rounded-xl hover:translate-x-1 transition-all duration-200 ${
-                            route().current('school-admin.polos.index')
-                                ? 'bg-white dark:bg-slate-800 text-[#0050d4] dark:text-[#00D1FF] font-bold shadow-sm'
-                                : 'text-[#003346]/70 dark:text-white/70 hover:bg-white/40 dark:hover:bg-slate-800/40'
-                        }`}
+                        className={`flex items-center gap-3 px-4 py-3 rounded-xl hover:translate-x-1 transition-all duration-200 ${route().current('school-admin.polos.index')
+                            ? 'bg-white dark:bg-slate-800 text-[#0050d4] dark:text-[#00D1FF] font-bold shadow-sm'
+                            : 'text-[#003346]/70 dark:text-white/70 hover:bg-white/40 dark:hover:bg-slate-800/40'
+                            }`}
                         href={route('school-admin.polos.index')}
                     >
                         <span className="material-symbols-outlined" style={route().current('school-admin.polos.index') ? { fontVariationSettings: "'FILL' 1" } : {}}>location_on</span>
@@ -100,11 +91,10 @@ export default function SchoolAdminLayout({ children }) {
                     </Link>
 
                     <Link
-                        className={`flex items-center gap-3 px-4 py-3 rounded-xl hover:translate-x-1 transition-all duration-200 ${
-                            route().current('school-admin.courses.index')
-                                ? 'bg-white dark:bg-slate-800 text-[#0050d4] dark:text-[#00D1FF] font-bold shadow-sm'
-                                : 'text-[#003346]/70 dark:text-white/70 hover:bg-white/40 dark:hover:bg-slate-800/40'
-                        }`}
+                        className={`flex items-center gap-3 px-4 py-3 rounded-xl hover:translate-x-1 transition-all duration-200 ${route().current('school-admin.courses.index')
+                            ? 'bg-white dark:bg-slate-800 text-[#0050d4] dark:text-[#00D1FF] font-bold shadow-sm'
+                            : 'text-[#003346]/70 dark:text-white/70 hover:bg-white/40 dark:hover:bg-slate-800/40'
+                            }`}
                         href={route('school-admin.courses.index')}
                     >
                         <span className="material-symbols-outlined" style={route().current('school-admin.courses.index') ? { fontVariationSettings: "'FILL' 1" } : {}}>workspace_premium</span>

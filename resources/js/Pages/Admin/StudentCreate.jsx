@@ -460,20 +460,20 @@ export default function StudentCreate() {
                     </div>
 
                     {/* Footer Actions */}
-                    <div className="flex flex-col md:flex-row items-center justify-end gap-4 mt-4">
+                    <div className="flex flex-col md:flex-row items-center justify-end gap-4 mt-8 pt-6 border-t border-outline-variant/10 dark:border-slate-800">
                         <Link
                             href={route(indexRoute)}
-                            className="w-full md:w-auto px-8 py-4 text-on-surface-variant text-center font-bold hover:bg-surface-container dark:hover:bg-slate-800 rounded-xl transition-all font-headline"
+                            className="w-full md:w-auto px-8 py-3.5 text-on-surface-variant text-center font-bold hover:bg-surface-container dark:hover:bg-slate-800 rounded-xl transition-all text-sm select-none"
                         >
                             Cancelar
                         </Link>
                         <button
-                            className="w-full md:w-auto px-12 py-4 bg-gradient-to-br from-primary to-primary-dim text-white font-headline font-extrabold text-lg rounded-xl shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2"
                             type="submit"
                             disabled={processing}
+                            className="w-full md:w-auto px-10 py-3.5 bg-gradient-to-br from-primary to-primary-dim text-white font-bold text-sm rounded-xl shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
                         >
-                            <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>how_to_reg</span>
-                            {processing ? 'Matriculando...' : 'Matricular Aluno'}
+                            <span className="material-symbols-outlined text-lg" style={{ fontVariationSettings: "'FILL' 1" }}>how_to_reg</span>
+                            <span>{processing ? 'Matriculando...' : 'Matricular Aluno'}</span>
                         </button>
                     </div>
                 </form>
