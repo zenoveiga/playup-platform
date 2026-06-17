@@ -302,16 +302,16 @@ export default function CourseCreate() {
                         <div className="flex items-center gap-4">
                             <Link
                                 href={route(indexRoute)}
-                                className="px-8 py-3.5 rounded-xl font-bold text-[#507c94] dark:text-[#87b3cd] hover:bg-[#c2e8ff]/30 dark:hover:bg-slate-800 transition-all text-sm flex items-center justify-center select-none"
+                                className="w-full md:w-auto px-8 py-3.5 text-on-surface-variant text-center font-bold hover:bg-surface-container dark:hover:bg-slate-800 rounded-xl transition-all text-sm select-none"
                             >
                                 Cancelar
                             </Link>
-                            <button 
+                            <button
                                 type="submit"
                                 disabled={processing}
-                                className="px-10 py-3.5 bg-gradient-to-br from-primary to-primary-dim text-white font-bold rounded-xl shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50 text-sm cursor-pointer"
+                                className="w-full md:w-auto px-10 py-3.5 bg-gradient-to-br from-primary to-primary-dim text-white font-bold text-sm rounded-xl shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
                             >
-                                <span className="material-symbols-outlined text-lg">save</span>
+                                <span className="material-symbols-outlined text-lg" style={{ fontVariationSettings: "'FILL' 1" }}>save</span>
                                 <span>{processing ? 'Salvando...' : 'Salvar Curso'}</span>
                             </button>
                         </div>

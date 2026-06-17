@@ -101,30 +101,56 @@ export default function SchoolAdminLayout({ children }) {
                         <span className="font-['Manrope'] text-sm">Cursos e Pacotes</span>
                     </Link>
 
-                    <a className="flex items-center gap-3 px-4 py-3 text-[#003346]/70 dark:text-white/70 hover:bg-white/40 dark:hover:bg-slate-800/40 rounded-xl hover:translate-x-1 transition-all duration-200" href="#">
-                        <span className="material-symbols-outlined">view_column</span>
+                    <Link
+                        className={`flex items-center gap-3 px-4 py-3 rounded-xl hover:translate-x-1 transition-all duration-200 ${route().current('school-admin.classes.index')
+                            ? 'bg-white dark:bg-slate-800 text-[#0050d4] dark:text-[#00D1FF] font-bold shadow-sm'
+                            : 'text-[#003346]/70 dark:text-white/70 hover:bg-white/40 dark:hover:bg-slate-800/40'
+                            }`}
+                        href={route('school-admin.classes.index')}
+                    >
+                        <span className="material-symbols-outlined" style={route().current('school-admin.classes.index') ? { fontVariationSettings: "'FILL' 1" } : {}}>school</span>
                         <span className="font-['Manrope'] text-sm">Turmas</span>
-                    </a>
+                    </Link>
 
-                    <a className="flex items-center gap-3 px-4 py-3 text-[#003346]/70 dark:text-white/70 hover:bg-white/40 dark:hover:bg-slate-800/40 rounded-xl hover:translate-x-1 transition-all duration-200" href="#">
-                        <span className="material-symbols-outlined">book</span>
+                    <Link
+                        className={`flex items-center gap-3 px-4 py-3 rounded-xl hover:translate-x-1 transition-all duration-200 ${route().current('school-admin.pedagogical.index')
+                            ? 'bg-white dark:bg-slate-800 text-[#0050d4] dark:text-[#00D1FF] font-bold shadow-sm'
+                            : 'text-[#003346]/70 dark:text-white/70 hover:bg-white/40 dark:hover:bg-slate-800/40'
+                            }`}
+                        href={route('school-admin.pedagogical.index')}
+                    >
+                        <span className="material-symbols-outlined" style={route().current('school-admin.pedagogical.index') ? { fontVariationSettings: "'FILL' 1" } : {}}>menu_book</span>
                         <span className="font-['Manrope'] text-sm">Pedagógico</span>
-                    </a>
+                    </Link>
 
                     <a className="flex items-center gap-3 px-4 py-3 text-[#003346]/70 dark:text-white/70 hover:bg-white/40 dark:hover:bg-slate-800/40 rounded-xl hover:translate-x-1 transition-all duration-200" href="#">
                         <span className="material-symbols-outlined">inventory_2</span>
                         <span className="font-['Manrope'] text-sm">Produtos</span>
                     </a>
 
-                    <a className="flex items-center gap-3 px-4 py-3 text-[#003346]/70 dark:text-white/70 hover:bg-white/40 dark:hover:bg-slate-800/40 rounded-xl hover:translate-x-1 transition-all duration-200" href="#">
-                        <span className="material-symbols-outlined">monetization_on</span>
+                    <Link 
+                        className={`flex items-center gap-3 px-4 py-3 rounded-xl hover:translate-x-1 transition-all duration-200 ${
+                            route().current('school-admin.financial.index') 
+                                ? 'bg-white dark:bg-slate-800 text-[#0050d4] dark:text-[#00D1FF] font-bold shadow-sm' 
+                                : 'text-[#003346]/70 dark:text-white/70 hover:bg-white/40 dark:hover:bg-slate-800/40'
+                        }`} 
+                        href={route('school-admin.financial.index')}
+                    >
+                        <span className="material-symbols-outlined" style={route().current('school-admin.financial.index') ? { fontVariationSettings: "'FILL' 1" } : {}}>monetization_on</span>
                         <span className="font-['Manrope'] text-sm">Financeiro</span>
-                    </a>
+                    </Link>
 
-                    <a className="flex items-center gap-3 px-4 py-3 text-[#003346]/70 dark:text-white/70 hover:bg-white/40 dark:hover:bg-slate-800/40 rounded-xl hover:translate-x-1 transition-all duration-200" href="#">
-                        <span className="material-symbols-outlined">shopping_bag</span>
+                    <Link 
+                        className={`flex items-center gap-3 px-4 py-3 rounded-xl hover:translate-x-1 transition-all duration-200 ${
+                            route().current('school-admin.sales.index') 
+                                ? 'bg-white dark:bg-slate-800 text-[#0050d4] dark:text-[#00D1FF] font-bold shadow-sm' 
+                                : 'text-[#003346]/70 dark:text-white/70 hover:bg-white/40 dark:hover:bg-slate-800/40'
+                        }`} 
+                        href={route('school-admin.sales.index')}
+                    >
+                        <span className="material-symbols-outlined" style={route().current('school-admin.sales.index') ? { fontVariationSettings: "'FILL' 1" } : {}}>point_of_sale</span>
                         <span className="font-['Manrope'] text-sm">Vendas</span>
-                    </a>
+                    </Link>
 
                     <a className="flex items-center gap-3 px-4 py-3 text-[#003346]/70 dark:text-white/70 hover:bg-white/40 dark:hover:bg-slate-800/40 rounded-xl hover:translate-x-1 transition-all duration-200" href="#">
                         <span className="material-symbols-outlined">receipt</span>

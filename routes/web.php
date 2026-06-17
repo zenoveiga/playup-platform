@@ -73,6 +73,18 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
         return redirect()->route('admin.courses.index');
     })->name('courses.store');
 
+    Route::get('/turmas', function () {
+        return Inertia::render('Admin/Classes');
+    })->name('classes.index');
+
+    Route::get('/turmas/cadastrar', function () {
+        return Inertia::render('Admin/ClassCreate');
+    })->name('classes.create');
+
+    Route::post('/turmas', function (\Illuminate\Http\Request $request) {
+        return redirect()->route('admin.classes.index');
+    })->name('classes.store');
+
     Route::get('/polos', function () {
         $polos = \App\Models\Polo::orderBy('id', 'desc')->get();
         return Inertia::render('Admin/Polos', [
@@ -134,6 +146,42 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 
         return redirect()->route('admin.polos.index');
     })->name('polos.update');
+
+    Route::get('/pedagogico', function () {
+        return Inertia::render('Admin/Pedagogical');
+    })->name('pedagogical.index');
+
+    Route::get('/financeiro', function () {
+        return Inertia::render('Admin/Financial');
+    })->name('financial.index');
+
+    Route::get('/vendas', function () {
+        return Inertia::render('Admin/Sales');
+    })->name('sales.index');
+
+    Route::get('/alunos/interessado/cadastrar', function () {
+        return Inertia::render('Admin/StudentInterestedCreate');
+    })->name('students.interested.create');
+
+    Route::post('/alunos/interessado', function (\Illuminate\Http\Request $request) {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'phone' => 'nullable|string|max:20',
+            'status' => 'required|string|in:active,inactive,interested,blocked',
+        ]);
+
+        \App\Models\User::create([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'phone' => $validated['phone'],
+            'status' => $validated['status'] === 'interested' ? 'inactive' : $validated['status'],
+            'password' => bcrypt('password'),
+            'role' => 'student',
+        ]);
+
+        return redirect()->route('admin.sales.index')->with('success', 'Interessado cadastrado com sucesso!');
+    })->name('students.interested.store');
 });
 
 Route::middleware(['auth', 'role:school_admin'])->prefix('school-admin')->name('school-admin.')->group(function () {
@@ -245,6 +293,54 @@ Route::middleware(['auth', 'role:school_admin'])->prefix('school-admin')->name('
     Route::post('/courses', function (\Illuminate\Http\Request $request) {
         return redirect()->route('school-admin.courses.index');
     })->name('courses.store');
+
+    Route::get('/turmas', function () {
+        return Inertia::render('Admin/Classes');
+    })->name('classes.index');
+
+    Route::get('/turmas/cadastrar', function () {
+        return Inertia::render('Admin/ClassCreate');
+    })->name('classes.create');
+
+    Route::post('/turmas', function (\Illuminate\Http\Request $request) {
+        return redirect()->route('school-admin.classes.index');
+    })->name('classes.store');
+
+    Route::get('/pedagogico', function () {
+        return Inertia::render('Admin/Pedagogical');
+    })->name('pedagogical.index');
+
+    Route::get('/financeiro', function () {
+        return Inertia::render('Admin/Financial');
+    })->name('financial.index');
+
+    Route::get('/vendas', function () {
+        return Inertia::render('Admin/Sales');
+    })->name('sales.index');
+
+    Route::get('/alunos/interessado/cadastrar', function () {
+        return Inertia::render('Admin/StudentInterestedCreate');
+    })->name('students.interested.create');
+
+    Route::post('/alunos/interessado', function (\Illuminate\Http\Request $request) {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'phone' => 'nullable|string|max:20',
+            'status' => 'required|string|in:active,inactive,interested,blocked',
+        ]);
+
+        \App\Models\User::create([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'phone' => $validated['phone'],
+            'status' => $validated['status'] === 'interested' ? 'inactive' : $validated['status'],
+            'password' => bcrypt('password'),
+            'role' => 'student',
+        ]);
+
+        return redirect()->route('school-admin.sales.index')->with('success', 'Interessado cadastrado com sucesso!');
+    })->name('students.interested.store');
 });
 
 Route::middleware(['auth', 'role:student'])->prefix('student')->name('student.')->group(function () {

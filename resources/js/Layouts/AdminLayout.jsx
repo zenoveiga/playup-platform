@@ -109,26 +109,54 @@ export default function AdminLayout({ children }) {
                         <span className="material-symbols-outlined">auto_stories</span>
                         <span className="font-['Manrope'] text-sm">Cursos e Pacotes</span>
                     </Link>
-                    <a className="flex items-center gap-3 px-4 py-3 text-[#003346]/70 dark:text-white/70 hover:bg-white/40 dark:hover:bg-slate-800/40 rounded-xl hover:translate-x-1 transition-all duration-200" href="#">
-                        <span className="material-symbols-outlined">school</span>
+                    <Link 
+                        className={`flex items-center gap-3 px-4 py-3 rounded-xl hover:translate-x-1 transition-all duration-200 ${
+                            route().current('admin.classes.index') 
+                                ? 'bg-white dark:bg-slate-800 text-[#0050d4] dark:text-[#00D1FF] font-bold shadow-sm' 
+                                : 'text-[#003346]/70 dark:text-white/70 hover:bg-white/40 dark:hover:bg-slate-800/40'
+                        }`} 
+                        href={route('admin.classes.index')}
+                    >
+                        <span className="material-symbols-outlined" style={route().current('admin.classes.index') ? { fontVariationSettings: "'FILL' 1" } : {}}>school</span>
                         <span className="font-['Manrope'] text-sm">Turmas</span>
-                    </a>
-                    <a className="flex items-center gap-3 px-4 py-3 text-[#003346]/70 dark:text-white/70 hover:bg-white/40 dark:hover:bg-slate-800/40 rounded-xl hover:translate-x-1 transition-all duration-200" href="#">
-                        <span className="material-symbols-outlined">psychology</span>
+                    </Link>
+                    <Link 
+                        className={`flex items-center gap-3 px-4 py-3 rounded-xl hover:translate-x-1 transition-all duration-200 ${
+                            route().current('admin.pedagogical.index') 
+                                ? 'bg-white dark:bg-slate-800 text-[#0050d4] dark:text-[#00D1FF] font-bold shadow-sm' 
+                                : 'text-[#003346]/70 dark:text-white/70 hover:bg-white/40 dark:hover:bg-slate-800/40'
+                        }`} 
+                        href={route('admin.pedagogical.index')}
+                    >
+                        <span className="material-symbols-outlined" style={route().current('admin.pedagogical.index') ? { fontVariationSettings: "'FILL' 1" } : {}}>menu_book</span>
                         <span className="font-['Manrope'] text-sm">Pedagógico</span>
-                    </a>
+                    </Link>
                     <a className="flex items-center gap-3 px-4 py-3 text-[#003346]/70 dark:text-white/70 hover:bg-white/40 dark:hover:bg-slate-800/40 rounded-xl hover:translate-x-1 transition-all duration-200" href="#">
                         <span className="material-symbols-outlined">inventory</span>
                         <span className="font-['Manrope'] text-sm">Produtos</span>
                     </a>
-                    <a className="flex items-center gap-3 px-4 py-3 text-[#003346]/70 dark:text-white/70 hover:bg-white/40 dark:hover:bg-slate-800/40 rounded-xl hover:translate-x-1 transition-all duration-200" href="#">
-                        <span className="material-symbols-outlined">payments</span>
+                    <Link 
+                        className={`flex items-center gap-3 px-4 py-3 rounded-xl hover:translate-x-1 transition-all duration-200 ${
+                            route().current('admin.financial.index') 
+                                ? 'bg-white dark:bg-slate-800 text-[#0050d4] dark:text-[#00D1FF] font-bold shadow-sm' 
+                                : 'text-[#003346]/70 dark:text-white/70 hover:bg-white/40 dark:hover:bg-slate-800/40'
+                        }`} 
+                        href={route('admin.financial.index')}
+                    >
+                        <span className="material-symbols-outlined" style={route().current('admin.financial.index') ? { fontVariationSettings: "'FILL' 1" } : {}}>payments</span>
                         <span className="font-['Manrope'] text-sm">Financeiro</span>
-                    </a>
-                    <a className="flex items-center gap-3 px-4 py-3 text-[#003346]/70 dark:text-white/70 hover:bg-white/40 dark:hover:bg-slate-800/40 rounded-xl hover:translate-x-1 transition-all duration-200" href="#">
-                        <span className="material-symbols-outlined">trending_up</span>
+                    </Link>
+                    <Link 
+                        className={`flex items-center gap-3 px-4 py-3 rounded-xl hover:translate-x-1 transition-all duration-200 ${
+                            route().current('admin.sales.index') 
+                                ? 'bg-white dark:bg-slate-800 text-[#0050d4] dark:text-[#00D1FF] font-bold shadow-sm' 
+                                : 'text-[#003346]/70 dark:text-white/70 hover:bg-white/40 dark:hover:bg-slate-800/40'
+                        }`} 
+                        href={route('admin.sales.index')}
+                    >
+                        <span className="material-symbols-outlined" style={route().current('admin.sales.index') ? { fontVariationSettings: "'FILL' 1" } : {}}>point_of_sale</span>
                         <span className="font-['Manrope'] text-sm">Vendas</span>
-                    </a>
+                    </Link>
                     <a className="flex items-center gap-3 px-4 py-3 text-[#003346]/70 dark:text-white/70 hover:bg-white/40 dark:hover:bg-slate-800/40 rounded-xl hover:translate-x-1 transition-all duration-200" href="#">
                         <span className="material-symbols-outlined">badge</span>
                         <span className="font-['Manrope'] text-sm">Funcionários</span>
