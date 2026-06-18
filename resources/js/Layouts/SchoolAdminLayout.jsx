@@ -157,10 +157,16 @@ export default function SchoolAdminLayout({ children }) {
                         <span className="font-['Manrope'] text-sm">Contas a Pagar</span>
                     </a>
 
-                    <a className="flex items-center gap-3 px-4 py-3 text-[#003346]/70 dark:text-white/70 hover:bg-white/40 dark:hover:bg-slate-800/40 rounded-xl hover:translate-x-1 transition-all duration-200" href="#">
-                        <span className="material-symbols-outlined">badge</span>
+                    <Link
+                        className={`flex items-center gap-3 px-4 py-3 rounded-xl hover:translate-x-1 transition-all duration-200 ${route().current('school-admin.employees.index')
+                            ? 'bg-white dark:bg-slate-800 text-[#0050d4] dark:text-[#00D1FF] font-bold shadow-sm'
+                            : 'text-[#003346]/70 dark:text-white/70 hover:bg-white/40 dark:hover:bg-slate-800/40'
+                            }`}
+                        href={route('school-admin.employees.index')}
+                    >
+                        <span className="material-symbols-outlined" style={route().current('school-admin.employees.index') ? { fontVariationSettings: "'FILL' 1" } : {}}>badge</span>
                         <span className="font-['Manrope'] text-sm">Funcionários</span>
-                    </a>
+                    </Link>
                     <a className="flex items-center gap-3 px-4 py-3 text-[#003346]/70 dark:text-white/70 hover:bg-white/40 dark:hover:bg-slate-800/40 rounded-xl hover:translate-x-1 transition-all duration-200" href="#">
                         <span className="material-symbols-outlined">group_add</span>
                         <span className="font-['Manrope'] text-sm">Novas Matrículas</span>

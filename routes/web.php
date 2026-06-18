@@ -182,6 +182,10 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 
         return redirect()->route('admin.sales.index')->with('success', 'Interessado cadastrado com sucesso!');
     })->name('students.interested.store');
+
+    Route::get('/funcionarios', function () {
+        return Inertia::render('Admin/Employees');
+    })->name('employees.index');
 });
 
 Route::middleware(['auth', 'role:school_admin'])->prefix('school-admin')->name('school-admin.')->group(function () {
@@ -341,6 +345,10 @@ Route::middleware(['auth', 'role:school_admin'])->prefix('school-admin')->name('
 
         return redirect()->route('school-admin.sales.index')->with('success', 'Interessado cadastrado com sucesso!');
     })->name('students.interested.store');
+
+    Route::get('/funcionarios', function () {
+        return Inertia::render('Admin/Employees');
+    })->name('employees.index');
 });
 
 Route::middleware(['auth', 'role:student'])->prefix('student')->name('student.')->group(function () {
