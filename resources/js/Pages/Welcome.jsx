@@ -1,4 +1,5 @@
 import { Head, Link } from '@inertiajs/react';
+import ApplicationLogo from '@/Components/ApplicationLogo';
 
 export default function Welcome({ auth, laravelVersion, phpVersion }) {
     return (
@@ -9,12 +10,12 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                 <header className="bg-white/70 dark:bg-slate-950/70 backdrop-blur-md border-b border-slate-200/50 dark:border-slate-800/50 sticky top-0 z-50">
                     <nav className="flex justify-between items-center w-full px-6 py-4 max-w-7xl mx-auto">
                         <div className="flex items-center gap-8">
-                            <Link className="flex items-center" href="/">
-                                <img 
-                                    alt="Play Up Logo" 
-                                    className="object-contain object-left w-[140px] h-[40px]" 
-                                    src="https://lh3.googleusercontent.com/aida/ADBb0uhS1JcQe8AiNAlR6jdKB6a8a4bwg0bGlB00VmLMT64X6h80yhV1uDpzVraS8eDbtG5Ln43dYbFr_GZmAqvIhWfKSVFsPeiuJvesQZl0MqRHPN27xPCBI-sFD1JFM49J3H7-p1XoJGQuRzllyu5Xz6-nxq2O-DD7oXQe7bRavFBPsacntHyR-Ge-9Ig8Mkhzc4WXUYdAo6A_7EpjtgHg7Mevsbz--PCEqDNHQZ0pgIag5jHp6oO0L-qYkCsFjTQmni0adYc49UlXZA"
-                                />
+                            <Link className="flex items-center gap-3" href="/">
+                                <ApplicationLogo className="w-10 h-10 object-contain text-primary dark:text-[#00D1FF]" />
+                                <div className="text-left">
+                                    <h1 className="text-2xl font-black tracking-tight text-primary dark:text-white leading-none font-headline">PlayUp</h1>
+                                    <p className="text-[10px] font-bold uppercase tracking-widest text-[#003346]/40 dark:text-white/40">Velocity</p>
+                                </div>
                             </Link>
                             <div className="hidden md:flex gap-6">
                                 <a className="font-headline text-sm font-semibold text-primary border-b-2 border-primary transition-colors" href="#">Home</a>
@@ -242,12 +243,12 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                 <footer className="bg-slate-50 dark:bg-slate-950 py-16 border-t border-slate-200 dark:border-slate-800">
                     <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-8">
                         <div className="flex flex-col items-center md:items-start gap-4">
-                            <Link href="/">
-                                <img 
-                                    alt="Play Up Logo" 
-                                    className="object-contain object-left w-[140px] h-[40px]" 
-                                    src="https://lh3.googleusercontent.com/aida/ADBb0uhS1JcQe8AiNAlR6jdKB6a8a4bwg0bGlB00VmLMT64X6h80yhV1uDpzVraS8eDbtG5Ln43dYbFr_GZmAqvIhWfKSVFsPeiuJvesQZl0MqRHPN27xPCBI-sFD1JFM49J3H7-p1XoJGQuRzllyu5Xz6-nxq2O-DD7oXQe7bRavFBPsacntHyR-Ge-9Ig8Mkhzc4WXUYdAo6A_7EpjtgHg7Mevsbz--PCEqDNHQZ0pgIag5jHp6oO0L-qYkCsFjTQmni0adYc49UlXZA"
-                                />
+                            <Link className="flex items-center gap-3" href="/">
+                                <ApplicationLogo className="w-10 h-10 object-contain text-primary dark:text-[#00D1FF]" />
+                                <div className="text-left">
+                                    <h1 className="text-2xl font-black tracking-tight text-primary dark:text-white leading-none font-headline">PlayUp</h1>
+                                    <p className="text-[10px] font-bold uppercase tracking-widest text-[#003346]/40 dark:text-white/40">Velocity</p>
+                                </div>
                             </Link>
                             <p className="font-headline text-sm text-slate-500">
                                 © 2026 Play Up. Professional, Innovative, and Educational.

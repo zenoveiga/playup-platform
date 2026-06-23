@@ -1,4 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
+import ApplicationLogo from '@/Components/ApplicationLogo';
 
 export default function StudentLayout({ children }) {
     const { auth } = usePage().props;
@@ -53,10 +54,8 @@ export default function StudentLayout({ children }) {
             <aside className="h-screen w-72 fixed left-0 top-0 overflow-y-auto no-scrollbar bg-[#e2f3ff] dark:bg-slate-900 z-50 flex flex-col p-4 gap-1">
                 <div className="px-4 py-6 mb-2">
                     <div className="flex items-center gap-3">
-                        <img 
-                            alt="PlayUp Logo" 
-                            className="w-10 h-10 object-contain" 
-                            src="https://lh3.googleusercontent.com/aida/ADBb0ujjMtbP5QMlZPGkRV2MC2aBO2D_Otck_Qk8vxtNqxMdMhWeJOUxCQm8rStFOTGRxTTy3NIyEG3520ikvHIgCWD4VRN_7rInuEKt3vzWWSnFC01wANIRs3-znFDeSGcFkyYBJ1-Ipx2Nuo6USdCpnLboiq8PyBZBsR6CxWAgOhF3UexQGz-pfwoTWFGtJ8s8A9H6-5Cig7sSHB7ycoNj_2t-HD9CVCnjQxA22CKwRxTCvCejoN4F_HSw6PYG18lHlI5p7ar424AQzQ"
+                        <ApplicationLogo 
+                            className="w-10 h-10 object-contain text-primary dark:text-[#00D1FF]" 
                         />
                         <div>
                             <h1 className="text-2xl font-black text-[#0050d4] dark:text-[#00D1FF] leading-none">PlayUp</h1>

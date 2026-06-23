@@ -1,4 +1,5 @@
 import { Link } from '@inertiajs/react';
+import ApplicationLogo from '@/Components/ApplicationLogo';
 
 export default function GuestLayout({ children }) {
     return (
@@ -11,10 +12,8 @@ export default function GuestLayout({ children }) {
                 
                 {/* Header Logo */}
                 <div className="relative z-10 flex items-center gap-3">
-                    <img
-                        alt="PlayUp Logo"
-                        className="w-10 h-10 object-contain brightness-0 invert"
-                        src="https://lh3.googleusercontent.com/aida/ADBb0ujjMtbP5QMlZPGkRV2MC2aBO2D_Otck_Qk8vxtNqxMdMhWeJOUxCQm8rStFOTGRxTTy3NIyEG3520ikvHIgCWD4VRN_7rInuEKt3vzWWSnFC01wANIRs3-znFDeSGcFkyYBJ1-Ipx2Nuo6USdCpnLboiq8PyBZBsR6CxWAgOhF3UexQGz-pfwoTWFGtJ8s8A9H6-5Cig7sSHB7ycoNj_2t-HD9CVCnjQxA22CKwRxTCvCejoN4F_HSw6PYG18lHlI5p7ar424AQzQ"
+                    <ApplicationLogo
+                        className="w-10 h-10 object-contain text-white"
                     />
                     <div>
                         <h1 className="text-2xl font-black tracking-tight text-white leading-none">PlayUp</h1>
@@ -75,10 +74,8 @@ export default function GuestLayout({ children }) {
                 <div className="w-full max-w-md">
                     {/* Logo Mobile */}
                     <div className="lg:hidden flex justify-center mb-8 gap-3 items-center">
-                        <img
-                            alt="PlayUp Logo"
-                            className="w-10 h-10 object-contain"
-                            src="https://lh3.googleusercontent.com/aida/ADBb0ujjMtbP5QMlZPGkRV2MC2aBO2D_Otck_Qk8vxtNqxMdMhWeJOUxCQm8rStFOTGRxTTy3NIyEG3520ikvHIgCWD4VRN_7rInuEKt3vzWWSnFC01wANIRs3-znFDeSGcFkyYBJ1-Ipx2Nuo6USdCpnLboiq8PyBZBsR6CxWAgOhF3UexQGz-pfwoTWFGtJ8s8A9H6-5Cig7sSHB7ycoNj_2t-HD9CVCnjQxA22CKwRxTCvCejoN4F_HSw6PYG18lHlI5p7ar424AQzQ"
+                        <ApplicationLogo
+                            className="w-10 h-10 object-contain text-primary dark:text-[#00D1FF]"
                         />
                         <div className="text-left">
                             <h1 className="text-2xl font-black tracking-tight text-primary dark:text-[#00D1FF] leading-none">PlayUp</h1>
