@@ -1,207 +1,399 @@
 import AdminLayout from '@/Layouts/AdminLayout';
-import { Head } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
+import { useState, useEffect } from 'react';
 
 export default function Dashboard() {
+    // Toast Notification State
+    const [notification, setNotification] = useState(null);
+    
+    // Animation trigger for chart bars
+    const [animateBars, setAnimateBars] = useState(false);
+
+    // Initial chart data
+    const chartData = [
+        { month: 'Jan', value: 30, peak: false },
+        { month: 'Fev', value: 45, peak: false },
+        { month: 'Mar', value: 60, peak: false },
+        { month: 'Abr', value: 85, peak: false },
+        { month: 'Mai', value: 95, peak: true, peakLabel: 'Pico: 124' },
+        { month: 'Jun', value: 70, peak: false },
+        { month: 'Jul', value: 55, peak: false },
+        { month: 'Ago', value: 65, peak: false },
+        { month: 'Set', value: 75, peak: false },
+        { month: 'Out', value: 80, peak: false },
+        { month: 'Nov', value: 60, peak: false },
+        { month: 'Dez', value: 50, peak: false },
+    ];
+
+    useEffect(() => {
+        // Trigger the grow animation shortly after component mount
+        const timer = setTimeout(() => setAnimateBars(true), 150);
+        return () => clearTimeout(timer);
+    }, []);
+
+    // Toast triggers
+    const showNotification = (message, type = 'success') => {
+        setNotification({ message, type });
+        setTimeout(() => setNotification(null), 3500);
+    };
+
     return (
         <AdminLayout>
-            <Head title="Painel Rápido" />
-            
-            <div className="p-8 max-w-7xl mx-auto space-y-8">
-                {/* Welcome Header */}
-                <section className="flex flex-col md:flex-row justify-between items-end gap-4">
-                    <div>
-                        <h2 className="text-4xl font-extrabold text-on-surface font-['Plus_Jakarta_Sans'] tracking-tight">Dashboard Executivo</h2>
-                        <p className="text-outline-variant font-medium mt-1">Bem-vindo de volta. Aqui está o desempenho da PlayUp hoje.</p>
-                    </div>
-                    <div className="flex gap-3">
-                        <div className="flex items-center bg-surface-container-high px-4 py-2 rounded-xl text-primary font-bold text-sm">
-                            <span className="material-symbols-outlined mr-2 text-lg">calendar_today</span>
-                            Hoje: 24 Out, 2023
-                        </div>
-                    </div>
-                </section>
+            <Head title="Gestão Escolar | PlayUp Velocity" />
 
-                {/* KPI Grid */}
-                <section className="grid grid-cols-1 gap-6">
-                    {/* Students KPI */}
-                    <div className="bg-surface-container-lowest p-6 rounded-[1.5rem] relative overflow-hidden group shadow-sm">
-                        <div className="absolute -right-4 -top-4 w-24 h-24 bg-primary/5 rounded-full group-hover:scale-150 transition-transform duration-500"></div>
-                        <div className="relative z-10">
-                            <div className="w-12 h-12 bg-primary/10 text-primary rounded-xl flex items-center justify-center mb-4">
-                                <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>group</span>
-                            </div>
-                            <p className="text-sm font-semibold text-outline-variant uppercase tracking-wider">Total de Alunos</p>
-                            <div className="flex items-baseline gap-2 mt-2">
-                                <h3 className="text-4xl font-black text-on-surface">24,892</h3>
-                                <span className="text-tertiary text-sm font-bold flex items-center">
-                                    +12% <span className="material-symbols-outlined text-xs">trending_up</span>
-                                </span>
-                            </div>
-                            <div className="mt-4 h-1 bg-surface-container rounded-full overflow-hidden">
-                                <div className="h-full kinetic-gradient w-[78%]"></div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
+            {/* Toast Notification */}
+            {notification && (
+                <div className={`fixed top-20 right-8 z-50 flex items-center gap-2 px-6 py-4 rounded-xl border shadow-xl animate-in slide-in-from-top-4 duration-300 ${
+                    notification.type === 'error'
+                        ? 'bg-rose-50 dark:bg-rose-955 text-[#b31b25] border-rose-200 dark:border-rose-900/50'
+                        : 'bg-emerald-50 dark:bg-emerald-955 text-[#006a35] dark:text-emerald-400 border-emerald-200 dark:border-emerald-900/50'
+                }`}>
+                    <span className="material-symbols-outlined text-lg">
+                        {notification.type === 'error' ? 'error' : 'check_circle'}
+                    </span>
+                    <span className="text-sm font-bold">{notification.message}</span>
+                </div>
+            )}
 
-                {/* Bento Content Grid */}
-                <section className="grid grid-cols-1 md:grid-cols-12 gap-6">
-                    {/* Large Chart Placeholder Area */}
-                    <div className="md:col-span-8 bg-surface-container-lowest p-8 rounded-[1.5rem] shadow-sm">
-                        <div className="flex justify-between items-center mb-8">
+            <div className="p-8 space-y-8 max-w-7xl mx-auto animate-in fade-in duration-700">
+                {/* PAGE HEADER */}
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
+                    <div className="space-y-1">
+                        <h1 className="font-headline font-extrabold text-4xl text-on-surface dark:text-white tracking-tight">Gestão Escolar</h1>
+                        <p className="text-on-surface-variant dark:text-outline-variant font-medium opacity-80">Visão geral e estratégica da unidade operacional</p>
+                    </div>
+                    <div className="flex gap-3 w-full sm:w-auto">
+                        <button 
+                            onClick={() => showNotification("Relatório PDF geral da unidade gerado com sucesso!")}
+                            className="flex-1 sm:flex-none px-5 py-2.5 rounded-xl border border-outline-variant/30 dark:border-slate-700 text-on-surface-variant dark:text-outline-variant font-bold text-sm hover:bg-surface-container-low dark:hover:bg-slate-800 transition-all cursor-pointer text-center"
+                        >
+                            Exportar PDF
+                        </button>
+                        <button 
+                            onClick={() => showNotification("Visualizando dados do período de Maio/2026...", "info")}
+                            className="flex-1 sm:flex-none px-5 py-2.5 rounded-xl bg-primary text-white font-bold text-sm hover:opacity-90 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                        >
+                            <span className="material-symbols-outlined text-lg">calendar_today</span>
+                            <span>Maio, 2026</span>
+                        </button>
+                    </div>
+                </div>
+
+                {/* STRATEGIC KPIs */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    {/* KPI 1 */}
+                    <Link 
+                        href={route('admin.students.index')}
+                        className="bg-surface-container-lowest dark:bg-slate-900 p-6 rounded-xl relative overflow-hidden group shadow-sm border border-outline-variant/10 dark:border-slate-800 hover:shadow-md transition-all cursor-pointer"
+                    >
+                        <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 -mr-8 -mt-8 rounded-full group-hover:scale-110 transition-transform"></div>
+                        <div className="flex flex-col gap-4">
+                            <div className="flex justify-between items-start">
+                                <div className="p-2 bg-primary/10 text-primary dark:text-[#00D1FF] rounded-lg">
+                                    <span className="material-symbols-outlined">person_add</span>
+                                </div>
+                                <span className="text-[10px] font-bold text-tertiary dark:text-emerald-400 bg-tertiary-container/20 px-2 py-1 rounded-full">+12% vs mês ant.</span>
+                            </div>
                             <div>
-                                <h4 className="text-xl font-bold text-on-surface">Crescimento de Matrículas</h4>
-                                <p className="text-sm text-outline-variant">Performance mensal comparada ao ano anterior</p>
+                                <p className="text-on-surface-variant dark:text-outline-variant text-xs font-bold uppercase tracking-wider">Total de Alunos</p>
+                                <h3 className="text-3xl font-headline font-extrabold text-on-surface dark:text-white mt-1">1.452</h3>
                             </div>
-                            <select className="bg-surface-container border-none rounded-xl text-sm font-bold text-primary focus:ring-primary">
-                                <option>Últimos 12 meses</option>
-                                <option>Últimos 6 meses</option>
-                            </select>
                         </div>
-                        {/* Mockup Chart Area */}
-                        <div className="h-64 flex items-end justify-between gap-4 px-4">
-                            <div className="w-full bg-surface-container-high rounded-t-xl h-[40%]"></div>
-                            <div className="w-full bg-surface-container-high rounded-t-xl h-[55%]"></div>
-                            <div className="w-full bg-surface-container-high rounded-t-xl h-[45%]"></div>
-                            <div className="w-full bg-surface-container-high rounded-t-xl h-[70%]"></div>
-                            <div className="w-full bg-surface-container-high rounded-t-xl h-[60%]"></div>
-                            <div className="w-full bg-surface-container-high rounded-t-xl h-[85%]"></div>
-                            <div className="w-full kinetic-gradient rounded-t-xl h-[95%] shadow-lg shadow-primary/20"></div>
-                            <div className="w-full bg-surface-container-high rounded-t-xl h-[65%]"></div>
-                            <div className="w-full bg-surface-container-high rounded-t-xl h-[75%]"></div>
-                            <div className="w-full bg-surface-container-high rounded-t-xl h-[50%]"></div>
-                            <div className="w-full bg-surface-container-high rounded-t-xl h-[60%]"></div>
-                            <div className="w-full bg-surface-container-high rounded-t-xl h-[80%]"></div>
-                        </div>
-                        <div className="flex justify-between mt-4 px-4 text-[10px] font-bold text-outline-variant uppercase tracking-widest">
-                            <span>Jan</span><span>Fev</span><span>Mar</span><span>Abr</span><span>Mai</span><span>Jun</span><span>Jul</span><span>Ago</span><span>Set</span><span>Out</span><span>Nov</span><span>Dez</span>
-                        </div>
-                    </div>
+                    </Link>
 
-                    {/* Activity Feed */}
-                    <div className="md:col-span-4 bg-surface-container-lowest p-8 rounded-[1.5rem] shadow-sm">
-                        <h4 className="text-xl font-bold text-on-surface mb-6">Atividades Recentes</h4>
-                        <div className="space-y-6">
-                            <div className="flex gap-4">
-                                <div className="w-10 h-10 rounded-full bg-tertiary-container flex items-center justify-center shrink-0">
-                                    <span className="material-symbols-outlined text-on-tertiary-container text-sm">person_add</span>
+                    {/* KPI 2 */}
+                    <div className="bg-surface-container-lowest dark:bg-slate-900 p-6 rounded-xl relative overflow-hidden group shadow-sm border border-outline-variant/10 dark:border-slate-800 hover:shadow-md transition-all">
+                        <div className="absolute top-0 right-0 w-24 h-24 bg-tertiary/5 -mr-8 -mt-8 rounded-full"></div>
+                        <div className="flex flex-col gap-4">
+                            <div className="flex justify-between items-start">
+                                <div className="p-2 bg-tertiary/10 text-tertiary dark:text-emerald-400 rounded-lg">
+                                    <span className="material-symbols-outlined">sync_alt</span>
                                 </div>
-                                <div>
-                                    <p className="text-sm font-bold text-on-surface">Nova Matrícula</p>
-                                    <p className="text-xs text-outline-variant">Ricardo Silva em 'Engenharia de Prompt'</p>
-                                    <p className="text-[10px] text-outline mt-1 uppercase font-bold">Há 2 minutos</p>
-                                </div>
+                                <span className="text-[10px] font-bold text-tertiary dark:text-emerald-400 bg-tertiary-container/20 px-2 py-1 rounded-full">Meta: 95%</span>
                             </div>
-                            <div className="flex gap-4">
-                                <div className="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center shrink-0">
-                                    <span className="material-symbols-outlined text-on-primary-container text-sm">shopping_cart</span>
-                                </div>
-                                <div>
-                                    <p className="text-sm font-bold text-on-surface">Venda Realizada</p>
-                                    <p className="text-xs text-outline-variant">Pacote Business Plus - Unidade Centro</p>
-                                    <p className="text-[10px] text-outline mt-1 uppercase font-bold">Há 15 minutos</p>
-                                </div>
-                            </div>
-                            <div className="flex gap-4">
-                                <div className="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center shrink-0">
-                                    <span className="material-symbols-outlined text-on-secondary-container text-sm">domain</span>
-                                </div>
-                                <div>
-                                    <p className="text-sm font-bold text-on-surface">Novo Polo Ativado</p>
-                                    <p className="text-xs text-outline-variant">Unidade Curitiba - Santa Felicidade</p>
-                                    <p className="text-[10px] text-outline mt-1 uppercase font-bold">Há 1 hora</p>
-                                </div>
-                            </div>
-                            <div className="flex gap-4">
-                                <div className="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center shrink-0">
-                                    <span className="material-symbols-outlined text-outline text-sm">edit</span>
-                                </div>
-                                <div>
-                                    <p className="text-sm font-bold text-on-surface">Curso Atualizado</p>
-                                    <p className="text-xs text-outline-variant">Conteúdo de 'Marketing Digital' revisado</p>
-                                    <p className="text-[10px] text-outline mt-1 uppercase font-bold">Há 3 horas</p>
-                                </div>
-                            </div>
-                        </div>
-                        <button className="w-full mt-8 py-3 text-sm font-bold text-primary hover:bg-primary/5 rounded-xl transition-colors">Ver Todo Histórico</button>
-                    </div>
-
-                    {/* Bottom Grid Items */}
-                    <div className="md:col-span-6 bg-surface-container-lowest p-8 rounded-[1.5rem] relative overflow-hidden shadow-sm">
-                        <div className="flex justify-between items-start">
                             <div>
-                                <h4 className="text-xl font-bold text-on-surface">Cursos Populares</h4>
-                                <p className="text-sm text-outline-variant mb-6">Top performance por engajamento</p>
-                            </div>
-                            <div className="bg-tertiary-container text-on-tertiary-container px-3 py-1 rounded-full text-[10px] font-black uppercase">Alta Demanda</div>
-                        </div>
-                        <div className="space-y-4">
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-12 h-12 rounded-lg bg-surface-container-high overflow-hidden">
-                                        <img 
-                                            alt="Course Thumbnail" 
-                                            className="w-full h-full object-cover" 
-                                            src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=100&auto=format&fit=crop"
-                                        />
-                                    </div>
-                                    <div>
-                                        <p className="text-sm font-bold">Desenvolvimento Fullstack</p>
-                                        <p className="text-xs text-outline">8,420 alunos</p>
-                                    </div>
-                                </div>
-                                <div className="text-right">
-                                    <p className="text-sm font-bold text-tertiary">R$ 124k</p>
-                                    <p className="text-[10px] text-outline uppercase">Mês Atual</p>
-                                </div>
-                            </div>
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-12 h-12 rounded-lg bg-surface-container-high overflow-hidden">
-                                        <img 
-                                            alt="Course Thumbnail" 
-                                            className="w-full h-full object-cover" 
-                                            src="https://images.unsplash.com/photo-1531403009284-440f080d1e12?q=80&w=100&auto=format&fit=crop"
-                                        />
-                                    </div>
-                                    <div>
-                                        <p className="text-sm font-bold">Gestão Ágil (Scrum)</p>
-                                        <p className="text-xs text-outline">5,190 alunos</p>
-                                    </div>
-                                </div>
-                                <div className="text-right">
-                                    <p className="text-sm font-bold text-tertiary">R$ 89k</p>
-                                    <p className="text-[10px] text-outline uppercase">Mês Atual</p>
-                                </div>
+                                <p className="text-on-surface-variant dark:text-outline-variant text-xs font-bold uppercase tracking-wider">Taxa de Retenção</p>
+                                <h3 className="text-3xl font-headline font-extrabold text-on-surface dark:text-white mt-1">94.2%</h3>
                             </div>
                         </div>
                     </div>
 
-                    <div className="md:col-span-6 kinetic-gradient p-8 rounded-[1.5rem] text-white flex flex-col justify-between shadow-sm">
-                        <div>
-                            <div className="flex justify-between items-center mb-4">
-                                <span className="text-xs font-black uppercase tracking-[0.2em] opacity-80">Meta Mensal</span>
-                                <span className="material-symbols-outlined">rocket_launch</span>
+                    {/* KPI 3 */}
+                    <Link 
+                        href={route('admin.classes.index')}
+                        className="bg-surface-container-lowest dark:bg-slate-900 p-6 rounded-xl relative overflow-hidden group shadow-sm border border-outline-variant/10 dark:border-slate-800 hover:shadow-md transition-all cursor-pointer"
+                    >
+                        <div className="absolute top-0 right-0 w-24 h-24 bg-secondary/5 -mr-8 -mt-8 rounded-full"></div>
+                        <div className="flex flex-col gap-4">
+                            <div className="flex justify-between items-start">
+                                <div className="p-2 bg-secondary/10 text-secondary dark:text-sky-400 rounded-lg">
+                                    <span className="material-symbols-outlined">pie_chart</span>
+                                </div>
+                                <span className="text-[10px] font-bold text-on-surface-variant dark:text-outline-variant bg-surface-container-low dark:bg-slate-800 px-2 py-1 rounded-full">85% Cap.</span>
                             </div>
-                            <h4 className="text-3xl font-black">R$ 500.000</h4>
-                            <p className="text-white/70 text-sm mt-1">Faltam apenas R$ 47.900 para atingir a meta global do mês!</p>
-                        </div>
-                        <div className="mt-8">
-                            <div className="flex justify-between text-xs font-bold mb-2">
-                                <span>Progresso Atual</span>
-                                <span>90.4%</span>
-                            </div>
-                            <div className="w-full h-3 bg-white/20 rounded-full overflow-hidden backdrop-blur-sm">
-                                <div className="h-full bg-white w-[90.4%] rounded-full shadow-[0_0_15px_rgba(255,255,255,0.5)]"></div>
-                            </div>
-                            <div className="mt-6 flex gap-4">
-                                <button className="bg-white text-primary px-6 py-2 rounded-xl text-xs font-bold hover:bg-white/90 transition-colors">Impulsionar Vendas</button>
-                                <button className="bg-white/10 border border-white/20 px-6 py-2 rounded-xl text-xs font-bold hover:bg-white/20 transition-colors">Relatório Detalhado</button>
+                            <div>
+                                <p className="text-on-surface-variant dark:text-outline-variant text-xs font-bold uppercase tracking-wider">Ocupação de Turmas</p>
+                                <h3 className="text-3xl font-headline font-extrabold text-on-surface dark:text-white mt-1">32/38</h3>
                             </div>
                         </div>
-                    </div>
-                </section>
+                    </Link>
+
+                    {/* KPI 4 */}
+                    <Link 
+                        href={route('admin.students.create')}
+                        className="bg-surface-container-lowest dark:bg-slate-900 p-6 rounded-xl relative overflow-hidden group shadow-sm border border-outline-variant/10 dark:border-slate-800 hover:shadow-md transition-all cursor-pointer"
+                    >
+                        <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 -mr-8 -mt-8 rounded-full"></div>
+                        <div className="flex flex-col gap-4">
+                            <div className="flex justify-between items-start">
+                                <div className="p-2 bg-primary/10 text-primary dark:text-[#00D1FF] rounded-lg">
+                                    <span className="material-symbols-outlined">trending_up</span>
+                                </div>
+                                <span className="text-[10px] font-bold text-primary dark:text-[#00D1FF] bg-primary-container/20 px-2 py-1 rounded-full">Este Mês</span>
+                            </div>
+                            <div>
+                                <p className="text-on-surface-variant dark:text-outline-variant text-xs font-bold uppercase tracking-wider">Novas Matrículas</p>
+                                <h3 className="text-3xl font-headline font-extrabold text-on-surface dark:text-white mt-1">87</h3>
+                            </div>
+                        </div>
+                    </Link>
+                </div>
+
+                {/* OPERATIONAL & ACTION CENTER */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    {/* QUICK ACTIONS (ASIDE) */}
+                    <section className="lg:col-span-1 space-y-6">
+                        <div className="bg-surface-container-lowest dark:bg-slate-900 p-6 rounded-xl border border-outline-variant/10 dark:border-slate-800">
+                            <h4 className="font-headline font-bold text-lg mb-6 flex items-center gap-2 text-on-surface dark:text-white">
+                                <span className="material-symbols-outlined text-primary dark:text-[#00D1FF]">bolt</span>
+                                Ações Rápidas de Gestão
+                            </h4>
+                            <div className="space-y-3">
+                                <button 
+                                    onClick={() => showNotification("Boletins emitidos com sucesso em massa!")}
+                                    className="w-full text-left p-4 rounded-xl border border-outline-variant/20 dark:border-slate-800 hover:border-primary dark:hover:border-primary hover:bg-primary/5 dark:hover:bg-primary/10 transition-all flex items-center justify-between group cursor-pointer"
+                                >
+                                    <div className="flex items-center gap-3">
+                                        <span className="material-symbols-outlined text-on-surface-variant dark:text-outline-variant group-hover:text-primary dark:group-hover:text-[#00D1FF]">description</span>
+                                        <span className="text-sm font-bold text-on-surface dark:text-white">Emitir Boletins em Massa</span>
+                                    </div>
+                                    <span className="material-symbols-outlined text-sm text-outline-variant group-hover:translate-x-1 transition-transform">chevron_right</span>
+                                </button>
+                                
+                                <button 
+                                    onClick={() => showNotification("Relatório analítico de risco de evasão exportado para download!")}
+                                    className="w-full text-left p-4 rounded-xl border border-outline-variant/20 dark:border-slate-800 hover:border-error hover:bg-error/5 dark:hover:bg-rose-955/20 transition-all flex items-center justify-between group cursor-pointer"
+                                >
+                                    <div className="flex items-center gap-3">
+                                        <span className="material-symbols-outlined text-on-surface-variant dark:text-outline-variant group-hover:text-error">analytics</span>
+                                        <span className="text-sm font-bold text-on-surface dark:text-white">Gerar Relatório de Evasão</span>
+                                    </div>
+                                    <span className="material-symbols-outlined text-sm text-outline-variant group-hover:translate-x-1 transition-transform">chevron_right</span>
+                                </button>
+
+                                <button 
+                                    onClick={() => showNotification("Agendamento de reunião geral de pais e mestres iniciado!")}
+                                    className="w-full text-left p-4 rounded-xl border border-outline-variant/20 dark:border-slate-800 hover:border-primary dark:hover:border-primary hover:bg-primary/5 dark:hover:bg-primary/10 transition-all flex items-center justify-between group cursor-pointer"
+                                >
+                                    <div className="flex items-center gap-3">
+                                        <span className="material-symbols-outlined text-on-surface-variant dark:text-outline-variant group-hover:text-primary dark:group-hover:text-[#00D1FF]">groups</span>
+                                        <span className="text-sm font-bold text-on-surface dark:text-white">Agendar Reunião de Pais</span>
+                                    </div>
+                                    <span className="material-symbols-outlined text-sm text-outline-variant group-hover:translate-x-1 transition-transform">chevron_right</span>
+                                </button>
+
+                                <button 
+                                    onClick={() => showNotification("Redirecionando para envio de comunicado pedagógico...")}
+                                    className="w-full text-left p-4 rounded-xl border border-outline-variant/20 dark:border-slate-800 hover:border-primary dark:hover:border-primary hover:bg-primary/5 dark:hover:bg-primary/10 transition-all flex items-center justify-between group cursor-pointer"
+                                >
+                                    <div className="flex items-center gap-3">
+                                        <span className="material-symbols-outlined text-on-surface-variant dark:text-outline-variant group-hover:text-primary dark:group-hover:text-[#00D1FF]">campaign</span>
+                                        <span className="text-sm font-bold text-on-surface dark:text-white">Comunicado Geral</span>
+                                    </div>
+                                    <span className="material-symbols-outlined text-sm text-outline-variant group-hover:translate-x-1 transition-transform">chevron_right</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* CRITICAL ALERTS */}
+                        <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-outline-variant/10 dark:border-slate-800">
+                            <div className="flex justify-between items-center mb-6">
+                                <h4 className="font-headline font-bold text-lg flex items-center gap-2 text-on-surface dark:text-white">
+                                    <span className="material-symbols-outlined text-error">warning</span>
+                                    Atenção Necessária
+                                </h4>
+                                <span className="px-2 py-0.5 bg-error/10 text-error text-[10px] font-extrabold rounded uppercase">Urgente</span>
+                            </div>
+                            <div className="space-y-4">
+                                {/* Alert Item 1 */}
+                                <div 
+                                    onClick={() => showNotification("Notificações enviadas aos responsáveis do aluno Lucas Oliveira.", "success")}
+                                    className="flex gap-4 p-3 hover:bg-surface-container-low dark:hover:bg-slate-850 rounded-lg transition-all cursor-pointer border-l-4 border-error"
+                                >
+                                    <div className="w-10 h-10 rounded-full overflow-hidden shrink-0 bg-slate-100 dark:bg-slate-800 flex items-center justify-center font-bold text-sm text-slate-500">
+                                        LO
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <span className="text-sm font-bold text-on-surface dark:text-white">Lucas Oliveira</span>
+                                        <span className="text-[11px] text-error font-medium">Risco Alto de Evasão (15 dias ausente)</span>
+                                    </div>
+                                </div>
+
+                                {/* Alert Item 2 */}
+                                <div 
+                                    onClick={() => showNotification("Abrindo ficha cadastral de pendências da aluna Ana Clara Mendes.", "info")}
+                                    className="flex gap-4 p-3 hover:bg-surface-container-low dark:hover:bg-slate-850 rounded-lg transition-all cursor-pointer border-l-4 border-error-container"
+                                >
+                                    <div className="w-10 h-10 rounded-full overflow-hidden shrink-0 bg-slate-100 dark:bg-slate-800 flex items-center justify-center font-bold text-sm text-slate-500">
+                                        AM
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <span className="text-sm font-bold text-on-surface dark:text-white">Ana Clara Mendes</span>
+                                        <span className="text-[11px] text-on-surface-variant dark:text-outline-variant font-medium">Documentação de matrícula pendente</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <button 
+                                onClick={() => showNotification("Abrindo todos os alertas de inadimplência e presença...")}
+                                className="w-full mt-4 py-2 text-xs font-bold text-primary dark:text-[#00D1FF] hover:underline transition-all cursor-pointer text-center"
+                            >
+                                Ver todos os alertas (8)
+                            </button>
+                        </div>
+                    </section>
+
+                    {/* VISUAL INSIGHTS (MAIN CONTENT) */}
+                    <section className="lg:col-span-2 space-y-8">
+                        {/* CHART 1: LINE CHART PLACEHOLDER */}
+                        <div className="bg-surface-container-lowest dark:bg-slate-900 p-8 rounded-xl border border-outline-variant/10 dark:border-slate-800 relative overflow-hidden min-h-[360px]">
+                            <div className="flex justify-between items-start mb-10">
+                                <div>
+                                    <h4 className="font-headline font-bold text-xl text-on-surface dark:text-white">Matrículas vs Cancelamentos</h4>
+                                    <p className="text-sm text-on-surface-variant dark:text-outline-variant">Análise comparativa do ciclo anual (Jan - Dez)</p>
+                                </div>
+                                <div className="flex gap-4 text-xs font-bold text-on-surface dark:text-slate-200">
+                                    <div className="flex items-center gap-2">
+                                        <span className="w-3 h-3 bg-primary rounded-full"></span>
+                                        <span>Matrículas</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <span className="w-3 h-3 bg-outline-variant dark:bg-slate-600 rounded-full"></span>
+                                        <span>Cancelamentos</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            {/* Visual representation of a chart */}
+                            <div className="h-48 flex items-end justify-between gap-2 px-4 relative">
+                                <div className="absolute inset-0 flex flex-col justify-between py-2 pointer-events-none opacity-20 dark:opacity-10">
+                                    <div className="border-t border-outline-variant dark:border-slate-700"></div>
+                                    <div className="border-t border-outline-variant dark:border-slate-700"></div>
+                                    <div className="border-t border-outline-variant dark:border-slate-700"></div>
+                                    <div className="border-t border-outline-variant dark:border-slate-700"></div>
+                                </div>
+                                
+                                {/* Bars mockup */}
+                                <div className="w-full h-4/5 flex items-end gap-1">
+                                    {chartData.map((d, index) => {
+                                        const barHeight = animateBars ? `${d.value}%` : '0%';
+                                        return (
+                                            <div 
+                                                key={d.month} 
+                                                className={`flex-1 ${d.peak ? 'bg-primary/40 dark:bg-sky-500/40' : 'bg-primary/20 dark:bg-sky-500/20'} hover:bg-primary dark:hover:bg-sky-400 transition-all rounded-t-sm relative group`}
+                                                style={{ 
+                                                    height: barHeight,
+                                                    transition: `height 1s cubic-bezier(0.175, 0.885, 0.32, 1.275) ${index * 0.05}s`
+                                                }}
+                                                title={d.month}
+                                            >
+                                                {d.peak && (
+                                                    <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-on-surface dark:bg-slate-950 text-white px-2 py-1 rounded text-[10px] whitespace-nowrap z-10 shadow-md">
+                                                        {d.peakLabel}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                            <div className="flex justify-between mt-4 px-4 text-[10px] font-bold text-outline-variant dark:text-outline-variant uppercase tracking-widest">
+                                <span>Jan</span><span>Mar</span><span>Mai</span><span>Jul</span><span>Set</span><span>Nov</span>
+                            </div>
+                        </div>
+
+                        {/* CHART 2: PERFORMANCE BY UNIT (BENTO) */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="bg-surface-container-lowest dark:bg-slate-900 p-6 rounded-xl border border-outline-variant/10 dark:border-slate-800">
+                                <h4 className="font-headline font-bold text-lg mb-4 text-on-surface dark:text-white">Desempenho por Polo</h4>
+                                <div className="space-y-4">
+                                    <div className="space-y-2">
+                                        <div className="flex justify-between text-sm font-bold text-on-surface dark:text-slate-200">
+                                            <span>Unidade São Paulo (Centro)</span>
+                                            <span className="text-primary dark:text-[#00D1FF]">92%</span>
+                                        </div>
+                                        <div className="w-full h-2 bg-surface-container-low dark:bg-slate-800 rounded-full overflow-hidden">
+                                            <div className="bg-primary dark:bg-[#00D1FF] h-full w-[92%] transition-all duration-1000"></div>
+                                        </div>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <div className="flex justify-between text-sm font-bold text-on-surface dark:text-slate-200">
+                                            <span>Unidade Rio (Barra)</span>
+                                            <span className="text-primary dark:text-[#00D1FF]">78%</span>
+                                        </div>
+                                        <div className="w-full h-2 bg-surface-container-low dark:bg-slate-800 rounded-full overflow-hidden">
+                                            <div className="bg-primary dark:bg-[#00D1FF] h-full w-[78%] transition-all duration-1000"></div>
+                                        </div>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <div className="flex justify-between text-sm font-bold text-on-surface dark:text-slate-200">
+                                            <span>Unidade Curitiba</span>
+                                            <span className="text-primary dark:text-[#00D1FF]">64%</span>
+                                        </div>
+                                        <div className="w-full h-2 bg-surface-container-low dark:bg-slate-800 rounded-full overflow-hidden">
+                                            <div className="bg-primary dark:bg-[#00D1FF] h-full w-[64%] transition-all duration-1000"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* RECENT ACTIVITY FEED */}
+                            <div className="bg-surface-container-lowest dark:bg-slate-900 p-6 rounded-xl border border-outline-variant/10 dark:border-slate-800">
+                                <h4 className="font-headline font-bold text-lg mb-4 text-on-surface dark:text-white">Atividade Recente</h4>
+                                <div className="space-y-4">
+                                    <div className="flex items-start gap-3">
+                                        <div className="w-8 h-8 rounded-full bg-tertiary/10 dark:bg-emerald-950/40 flex items-center justify-center shrink-0">
+                                            <span className="material-symbols-outlined text-sm text-tertiary dark:text-emerald-400">check_circle</span>
+                                        </div>
+                                        <div>
+                                            <p className="text-sm font-bold text-on-surface dark:text-white">Matrícula Confirmada</p>
+                                            <p className="text-xs text-on-surface-variant dark:text-outline-variant">Beatriz Silva finalizou o curso de Design.</p>
+                                            <p className="text-[10px] text-outline-variant dark:text-slate-500 mt-1">Há 5 minutos</p>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-start gap-3">
+                                        <div className="w-8 h-8 rounded-full bg-primary/10 dark:bg-blue-955/40 flex items-center justify-center shrink-0">
+                                            <span className="material-symbols-outlined text-sm text-primary dark:text-[#00D1FF]">groups</span>
+                                        </div>
+                                        <div>
+                                            <p className="text-sm font-bold text-on-surface dark:text-white">Nova Turma Criada</p>
+                                            <p className="text-xs text-on-surface-variant dark:text-outline-variant">Turma "Alpha-2024" iniciada no Polo Centro.</p>
+                                            <p className="text-[10px] text-outline-variant dark:text-slate-500 mt-1">Há 2 horas</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
             </div>
+
+            {/* FAB for quick entry */}
+            <button 
+                onClick={() => showNotification("Abertura rápida de formulário de nova entrada acadêmica.")}
+                className="fixed bottom-8 right-8 h-14 w-14 bg-gradient-to-br from-primary to-[#7b9cff] text-white rounded-full shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all z-50 group cursor-pointer"
+            >
+                <span className="material-symbols-outlined text-2xl group-hover:rotate-90 transition-transform">add</span>
+            </button>
         </AdminLayout>
     );
 }

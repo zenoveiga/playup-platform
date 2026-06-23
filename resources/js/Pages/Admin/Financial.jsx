@@ -1,6 +1,6 @@
 import AdminLayout from '@/Layouts/AdminLayout';
 import SchoolAdminLayout from '@/Layouts/SchoolAdminLayout';
-import { Head, usePage } from '@inertiajs/react';
+import { Head, usePage, Link } from '@inertiajs/react';
 import { useState } from 'react';
 
 export default function Financial() {
@@ -188,15 +188,15 @@ export default function Financial() {
         <Layout>
             <Head title="Gestão Financeira | PlayUp Velocity" />
 
-            <div className="max-w-7xl mx-auto p-8 space-y-8 animate-in fade-in duration-700 relative">
+            <div className="max-w-7xl mx-auto p-8 space-y-10 animate-in fade-in duration-700 relative">
                 {/* Toast Notification */}
                 {notification && (
                     <div className={`fixed top-20 right-8 z-50 flex items-center gap-2 px-6 py-4 rounded-xl border shadow-xl animate-in slide-in-from-top-4 duration-300 ${
                         notification.type === 'error'
-                            ? 'bg-rose-50 dark:bg-rose-950/30 text-[#b31b25] border-rose-200 dark:border-rose-900/50'
+                            ? 'bg-rose-50 dark:bg-rose-955 text-[#b31b25] border-rose-200 dark:border-rose-900/50'
                             : notification.type === 'warning'
-                            ? 'bg-amber-50 dark:bg-amber-950/30 text-amber-800 dark:text-amber-300 border-amber-200 dark:border-amber-900/50'
-                            : 'bg-emerald-50 dark:bg-emerald-950/30 text-[#006a35] dark:text-emerald-400 border-emerald-200 dark:border-emerald-900/50'
+                            ? 'bg-amber-50 dark:bg-amber-955 text-amber-800 dark:text-amber-300 border-amber-200 dark:border-amber-900/50'
+                            : 'bg-emerald-50 dark:bg-emerald-955 text-[#006a35] dark:text-emerald-400 border-emerald-200 dark:border-emerald-900/50'
                     }`}>
                         <span className="material-symbols-outlined text-lg">
                             {notification.type === 'error' ? 'error' : notification.type === 'warning' ? 'warning' : 'check_circle'}
@@ -205,362 +205,366 @@ export default function Financial() {
                     </div>
                 )}
 
-                {/* Page Title & Overview */}
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
-                    <div>
-                        <h2 className="text-4xl font-extrabold font-headline text-[#003346] dark:text-white tracking-tight leading-none mb-2">
-                            Gestão Financeira
-                        </h2>
-                        <p className="text-on-surface-variant dark:text-[#b5e3ff] font-medium text-lg max-w-2xl">
-                            Controle fluxos de caixa, gere carnês de pagamento e monitore índices de adimplência em tempo real.
-                        </p>
+                {/* Header Title */}
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
+                    <div className="space-y-1">
+                        <h1 className="text-[#003346] dark:text-white font-extrabold text-3xl font-headline tracking-tight">Gestão Financeira</h1>
+                        <p className="text-on-surface-variant dark:text-outline-variant font-medium">Fluxo de Caixa e Controle de Recebimentos</p>
                     </div>
-                    <div className="flex gap-3 w-full md:w-auto">
-                        <button 
-                            onClick={() => showNotification('Planilhas financeiras exportadas com sucesso (simulado).')}
-                            className="flex-1 md:flex-none bg-surface-container-low dark:bg-slate-800 text-primary dark:text-[#00D1FF] font-bold px-6 py-3 rounded-xl flex items-center justify-center gap-2 hover:bg-surface-container-high dark:hover:bg-slate-700 transition-colors select-none"
+                    <div className="flex gap-2 w-full sm:w-auto">
+                        <div 
+                            onClick={handleToggleCaixa}
+                            className={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm shadow-sm border border-tertiary/10 cursor-pointer select-none ${
+                                cashDrawerOpen 
+                                    ? 'bg-tertiary-container text-on-tertiary-container' 
+                                    : 'bg-rose-100 text-[#b31b25]'
+                            }`}
                         >
-                            <span className="material-symbols-outlined text-lg">file_download</span>
-                            <span>Relatórios</span>
-                        </button>
+                            <span className="material-symbols-outlined text-lg" style={{ fontVariationSettings: "'FILL' 1" }}>
+                                {cashDrawerOpen ? 'account_balance_wallet' : 'lock'}
+                            </span>
+                            <span>{cashDrawerOpen ? 'Caixa Aberto' : 'Caixa Fechado'}</span>
+                        </div>
                         <button 
                             onClick={() => setIsRecebimentoModalOpen(true)}
-                            className="flex-1 md:flex-none bg-primary text-white font-bold px-6 py-3 rounded-xl flex items-center justify-center gap-2 shadow-xl shadow-primary/20 hover:opacity-95 active:scale-[0.98] transition-all select-none cursor-pointer"
+                            className="bg-[#00D1FF] hover:bg-sky-400 text-white px-4 py-2 rounded-xl text-sm font-bold transition-all flex items-center gap-2 shadow-lg shadow-sky-400/20 cursor-pointer active:scale-95"
                         >
-                            <span className="material-symbols-outlined text-lg">add_circle</span>
-                            <span>Registrar Recebimento</span>
+                            <span className="material-symbols-outlined text-lg">add</span> 
+                            <span>Nova Operação</span>
                         </button>
                     </div>
                 </div>
 
-                {/* Primary Financial Indicators */}
+                {/* KPI Row */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {/* Card 1: Overdue Installments */}
-                    <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border-l-4 border-[#b31b25] border-y border-r border-outline-variant/10 dark:border-slate-800 shadow-sm flex flex-col justify-between">
+                    {/* KPI 1: Parcelas Vencidas */}
+                    <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-outline-variant/15 dark:border-slate-800 shadow-sm flex flex-col justify-between">
                         <div className="flex justify-between items-start">
                             <div>
-                                <p className="text-on-surface-variant dark:text-[#87b3cd] text-sm font-semibold mb-1">Parcelas Vencidas</p>
-                                <h3 className="text-3xl font-extrabold font-headline text-[#b31b25] dark:text-rose-400">R$ 12.450,00</h3>
+                                <div className="w-10 h-10 rounded-full bg-error-container/10 text-error flex items-center justify-center mb-4">
+                                    <span className="material-symbols-outlined">warning</span>
+                                </div>
+                                <p className="text-[10px] text-on-surface-variant dark:text-outline-variant font-bold uppercase tracking-wider">Parcelas Vencidas</p>
                             </div>
-                            <div className="w-12 h-12 rounded-full bg-rose-50 dark:bg-rose-950/20 flex items-center justify-center text-[#b31b25] dark:text-rose-400">
-                                <span className="material-symbols-outlined text-2xl">gavel</span>
-                            </div>
-                        </div>
-                        <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center">
-                            <span className="text-xs font-semibold text-slate-500 dark:text-[#87b3cd]">42 mensalidades pendentes</span>
                             <button 
                                 onClick={() => setIsOverdueModalOpen(true)}
-                                className="text-xs font-extrabold text-primary dark:text-[#00D1FF] hover:underline"
+                                className="text-xs font-extrabold text-primary dark:text-[#00D1FF] hover:underline cursor-pointer"
                             >
                                 Ver Alunos
                             </button>
                         </div>
+                        <div className="mt-4">
+                            <h3 className="text-2xl font-bold font-headline text-on-surface dark:text-white">R$ 12.450,00</h3>
+                            <p className="text-[10px] text-error font-bold flex items-center gap-1">
+                                <span className="material-symbols-outlined text-xs">group</span>
+                                42 Alunos em atraso
+                            </p>
+                        </div>
                     </div>
 
-                    {/* Card 2: Delinquency Rate */}
-                    <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border-l-4 border-amber-500 border-y border-r border-outline-variant/10 dark:border-slate-800 shadow-sm flex flex-col justify-between">
+                    {/* KPI 2: Total Inadimplentes */}
+                    <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-outline-variant/15 dark:border-slate-800 shadow-sm flex flex-col justify-between">
                         <div className="flex justify-between items-start">
                             <div>
-                                <p className="text-on-surface-variant dark:text-[#87b3cd] text-sm font-semibold mb-1">Taxa de Inadimplência</p>
-                                <h3 className="text-3xl font-extrabold font-headline text-amber-600 dark:text-amber-400">15.8%</h3>
+                                <div className="w-10 h-10 rounded-full bg-primary-container/10 text-primary dark:text-[#00D1FF] flex items-center justify-center mb-4">
+                                    <span className="material-symbols-outlined">trending_down</span>
+                                </div>
+                                <p className="text-[10px] text-on-surface-variant dark:text-outline-variant font-bold uppercase tracking-wider">Total Inadimplentes</p>
                             </div>
-                            <div className="w-12 h-12 rounded-full bg-amber-50 dark:bg-amber-950/20 flex items-center justify-center text-amber-600 dark:text-amber-400">
-                                <span className="material-symbols-outlined text-2xl">trending_up</span>
-                            </div>
-                        </div>
-                        <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center">
-                            <span className="text-xs font-semibold text-slate-500 dark:text-[#87b3cd]">+1.2% em relação ao mês anterior</span>
                             <button 
-                                onClick={() => showNotification('Estabilidade de pagamentos projetada em 84.2% para os próximos 30 dias.', 'warning')}
-                                className="text-xs font-extrabold text-amber-600 dark:text-amber-400 hover:underline"
+                                onClick={() => showNotification("Projeção de pagamento saudável baseada em Pix (84.2%).", "warning")}
+                                className="text-xs font-extrabold text-primary dark:text-[#00D1FF] hover:underline cursor-pointer"
                             >
                                 Detalhes
                             </button>
                         </div>
+                        <div className="mt-4">
+                            <h3 className="text-2xl font-bold font-headline text-on-surface dark:text-white">15.8%</h3>
+                            <p className="text-[10px] text-on-surface-variant dark:text-[#87b3cd] font-bold flex items-center gap-1">
+                                <span className="material-symbols-outlined text-xs text-tertiary">arrow_downward</span>
+                                -2% em relação ao mês anterior
+                            </p>
+                        </div>
                     </div>
 
-                    {/* Card 3: Daily Balance / Cashier State */}
-                    <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border-l-4 border-[#006a35] border-y border-r border-outline-variant/10 dark:border-slate-800 shadow-sm flex flex-col justify-between">
+                    {/* KPI 3: Saldo em Caixa */}
+                    <div className="bg-gradient-to-br from-primary to-primary-dim p-6 rounded-2xl shadow-xl flex flex-col justify-between text-on-primary">
                         <div className="flex justify-between items-start">
                             <div>
-                                <p className="text-on-surface-variant dark:text-[#87b3cd] text-sm font-semibold mb-1">Saldo em Caixa</p>
-                                <h3 className="text-3xl font-extrabold font-headline text-[#006a35] dark:text-[#6bfe9c]">
-                                    R$ {cashBalance.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                </h3>
-                            </div>
-                            <div className="w-12 h-12 rounded-full bg-emerald-50 dark:bg-emerald-950/20 flex items-center justify-center text-[#006a35] dark:text-emerald-400">
-                                <span className="material-symbols-outlined text-2xl">account_balance_wallet</span>
-                            </div>
-                        </div>
-                        <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center">
-                            <div className="flex items-center gap-1.5">
-                                <span className={`w-2.5 h-2.5 rounded-full ${cashDrawerOpen ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500'}`}></span>
-                                <span className="text-xs font-semibold text-slate-500 dark:text-[#87b3cd]">
-                                    Caixa {cashDrawerOpen ? 'ABERTO' : 'FECHADO'}
-                                </span>
+                                <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center mb-4">
+                                    <span className="material-symbols-outlined">account_balance_wallet</span>
+                                </div>
+                                <p className="text-[10px] opacity-80 font-bold uppercase tracking-wider">Saldo em Caixa Hoje</p>
                             </div>
                             <button 
-                                onClick={handleToggleCaixa}
-                                className="text-xs font-extrabold text-[#006a35] dark:text-emerald-400 hover:underline"
+                                onClick={() => setIsCaixaModalOpen(true)}
+                                className="text-xs font-extrabold text-white hover:underline cursor-pointer opacity-90 hover:opacity-100"
                             >
                                 Ajustes
                             </button>
                         </div>
+                        <div className="mt-4">
+                            <h3 className="text-2xl font-bold font-headline">
+                                R$ {cashBalance.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            </h3>
+                            <p className="text-[10px] opacity-90 font-bold">+ R$ 3.200,00 hoje</p>
+                        </div>
                     </div>
                 </div>
 
-                {/* Dashboard layout bento: Main Grid */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-                    {/* Transactions Left canvas */}
-                    <div className="lg:col-span-2 space-y-6">
-                        <div className="bg-white dark:bg-slate-900 rounded-[1.5rem] border border-outline-variant/10 dark:border-slate-800 shadow-sm overflow-hidden">
-                            
-                            {/* Table controls */}
-                            <div className="p-6 border-b border-outline-variant/10 dark:border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                                <h3 className="text-lg font-extrabold font-headline text-[#003346] dark:text-white">
-                                    Transações Recentes
-                                </h3>
-                                <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center w-full md:w-auto">
-                                    <div className="flex items-center bg-[#eff8ff] dark:bg-slate-800 px-4 py-2 rounded-xl gap-2 w-full sm:w-64 border border-outline-variant/10 dark:border-slate-700">
-                                        <span className="material-symbols-outlined text-outline text-sm">search</span>
-                                        <input 
-                                            value={searchQuery}
-                                            onChange={(e) => setSearchQuery(e.target.value)}
-                                            className="bg-transparent border-none focus:ring-0 text-sm w-full placeholder-outline-variant text-[#003346] dark:text-white p-0" 
-                                            placeholder="Buscar transações..." 
-                                            type="text"
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Status filter tabs */}
-                            <div className="px-6 py-3 bg-[#eff8ff]/40 dark:bg-slate-900/60 border-b border-outline-variant/10 dark:border-slate-800 flex gap-2 overflow-x-auto scrollbar-none">
-                                {[
-                                    { value: 'all', label: 'Todas' },
-                                    { value: 'confirmado', label: 'Confirmadas' },
-                                    { value: 'pendente', label: 'Pendentes' },
-                                    { value: 'atrasado', label: 'Atrasadas' }
-                                ].map((tab) => (
-                                    <button
-                                        key={tab.value}
-                                        onClick={() => setStatusFilter(tab.value)}
-                                        className={`px-4 py-2 text-xs font-extrabold rounded-full transition-all cursor-pointer whitespace-nowrap ${
-                                            statusFilter === tab.value
-                                                ? 'bg-primary text-white shadow-sm'
-                                                : 'bg-white dark:bg-slate-850 text-[#003346]/70 dark:text-[#87b3cd] border border-outline-variant/10 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800'
-                                        }`}
-                                    >
-                                        {tab.label}
-                                    </button>
-                                ))}
-                            </div>
-
-                            {/* Transactions Table */}
-                            <div className="overflow-x-auto">
-                                <table className="w-full text-left border-collapse">
-                                    <thead>
-                                        <tr className="bg-slate-50 dark:bg-slate-850/50 border-b border-outline-variant/10 dark:border-slate-800">
-                                            <th className="px-6 py-4 text-xs font-black text-outline dark:text-[#87b3cd]/80 uppercase tracking-wider">Aluno</th>
-                                            <th className="px-6 py-4 text-xs font-black text-outline dark:text-[#87b3cd]/80 uppercase tracking-wider">Método</th>
-                                            <th className="px-6 py-4 text-xs font-black text-outline dark:text-[#87b3cd]/80 uppercase tracking-wider">Valor</th>
-                                            <th className="px-6 py-4 text-xs font-black text-outline dark:text-[#87b3cd]/80 uppercase tracking-wider">Vencimento / Data</th>
-                                            <th className="px-6 py-4 text-xs font-black text-outline dark:text-[#87b3cd]/80 uppercase tracking-wider text-center">Status</th>
-                                            <th className="px-6 py-4 text-xs font-black text-outline dark:text-[#87b3cd]/80 uppercase tracking-wider text-center">Ações</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                                        {filteredTransactions.length === 0 ? (
-                                            <tr>
-                                                <td colSpan="6" className="px-6 py-8 text-center text-sm font-medium text-slate-400 dark:text-[#87b3cd]">
-                                                    Nenhuma transação encontrada correspondente aos filtros.
-                                                </td>
-                                            </tr>
-                                        ) : (
-                                            filteredTransactions.map((tx) => (
-                                                <tr key={tx.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-850/20 transition-colors">
-                                                    <td className="px-6 py-4">
-                                                        <div className="flex items-center gap-3">
-                                                            <div className="w-8 h-8 rounded-full bg-[#eff8ff] dark:bg-slate-800 flex items-center justify-center text-xs font-bold text-primary dark:text-[#00D1FF]">
-                                                                {tx.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()}
-                                                            </div>
-                                                            <span className="text-sm font-extrabold text-[#003346] dark:text-white">{tx.name}</span>
-                                                        </div>
-                                                    </td>
-                                                    <td className="px-6 py-4">
-                                                        <span className="text-xs font-semibold text-[#507c94] dark:text-[#87b3cd]">
-                                                            {tx.method}
-                                                        </span>
-                                                    </td>
-                                                    <td className="px-6 py-4">
-                                                        <span className="text-sm font-bold text-[#003346] dark:text-white">
-                                                            R$ {tx.amount.toFixed(2)}
-                                                        </span>
-                                                    </td>
-                                                    <td className="px-6 py-4">
-                                                        <span className="text-xs font-medium text-slate-500 dark:text-[#87b3cd]/80">
-                                                            {tx.date}
-                                                        </span>
-                                                    </td>
-                                                    <td className="px-6 py-4 text-center">
-                                                        <span className={`inline-flex px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border ${
-                                                            tx.status === 'confirmado'
-                                                                ? 'bg-emerald-50 dark:bg-emerald-950/20 text-[#006a35] dark:text-emerald-400 border-emerald-100 dark:border-emerald-900/30'
-                                                                : tx.status === 'atrasado'
-                                                                ? 'bg-rose-50 dark:bg-rose-950/20 text-[#b31b25] dark:text-rose-400 border-rose-100 dark:border-rose-900/30'
-                                                                : 'bg-amber-50 dark:bg-amber-950/20 text-amber-700 dark:text-amber-400 border-amber-100 dark:border-amber-900/30'
-                                                        }`}>
-                                                            {tx.status}
-                                                        </span>
-                                                    </td>
-                                                    <td className="px-6 py-4 text-center">
-                                                        <div className="flex justify-center items-center gap-2">
-                                                            {tx.status !== 'confirmado' ? (
-                                                                <button
-                                                                    onClick={() => handleConfirmPayment(tx.id, tx.name, tx.amount)}
-                                                                    title="Confirmar Recebimento"
-                                                                    className="p-2 bg-emerald-50 dark:bg-slate-800 text-[#006a35] dark:text-emerald-400 rounded-xl hover:bg-emerald-100 hover:scale-105 active:scale-95 transition-all"
-                                                                >
-                                                                    <span className="material-symbols-outlined text-sm">check_circle</span>
-                                                                </button>
-                                                            ) : (
-                                                                <button
-                                                                    onClick={() => showNotification(`Comprovante de pagamento de ${tx.name} baixado!`)}
-                                                                    title="Download Comprovante"
-                                                                    className="p-2 bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-[#87b3cd] rounded-xl hover:bg-slate-100 hover:scale-105 active:scale-95 transition-all"
-                                                                >
-                                                                    <span className="material-symbols-outlined text-sm">receipt</span>
-                                                                </button>
-                                                            )}
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            ))
-                                        )}
-                                    </tbody>
-                                </table>
-                            </div>
-
-                            {/* Table Pagination footer */}
-                            <div className="p-6 border-t border-outline-variant/10 dark:border-slate-800 flex justify-between items-center text-xs font-semibold text-slate-500 dark:text-[#87b3cd]">
-                                <span>Mostrando {filteredTransactions.length} de {transactions.length} transações</span>
-                                <div className="flex gap-2">
-                                    <button disabled className="w-8 h-8 rounded-xl bg-slate-50 dark:bg-slate-800 flex items-center justify-center opacity-50 cursor-not-allowed">
-                                        <span className="material-symbols-outlined text-base">chevron_left</span>
-                                    </button>
-                                    <button className="w-8 h-8 rounded-xl bg-primary text-white flex items-center justify-center font-bold">1</button>
-                                    <button disabled className="w-8 h-8 rounded-xl bg-slate-50 dark:bg-slate-800 flex items-center justify-center opacity-50 cursor-not-allowed">
-                                        <span className="material-symbols-outlined text-base">chevron_right</span>
-                                    </button>
-                                </div>
-                            </div>
-
+                {/* Grouped Work Context Sections */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {/* GESTÃO DE COBRANÇA */}
+                    <section className="space-y-4">
+                        <div className="flex items-center gap-2">
+                            <div className="w-1.5 h-6 bg-[#00D1FF] rounded-full"></div>
+                            <h2 className="text-on-surface dark:text-white font-bold text-sm font-headline uppercase tracking-wide">Gestão de Cobrança</h2>
                         </div>
-                    </div>
-
-                    {/* Bento Actions and Insights Right column */}
-                    <div className="space-y-6">
-
-                        {/* Caixa Status Controller */}
-                        <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-outline-variant/10 dark:border-slate-800 shadow-sm">
-                            <h3 className="text-lg font-extrabold font-headline text-[#003346] dark:text-white mb-2">Estado de Caixa</h3>
-                            <p className="text-sm text-on-surface-variant dark:text-[#87b3cd] font-medium leading-relaxed mb-6">
-                                {cashDrawerOpen 
-                                    ? 'O caixa da escola está aberto para registros, sangrias e conciliação de faturas diárias.' 
-                                    : 'O caixa está fechado. Abra-o para autorizar lançamentos de dinheiro ou PIX presenciais.'
-                                }
-                            </p>
-                            
-                            <button
-                                onClick={handleToggleCaixa}
-                                className={`w-full py-3.5 rounded-xl font-bold transition-all hover:scale-[1.01] active:scale-95 flex items-center justify-center gap-2 cursor-pointer text-sm shadow-md ${
-                                    cashDrawerOpen
-                                        ? 'bg-rose-50 hover:bg-rose-100/80 text-[#b31b25] shadow-rose-200/20'
-                                        : 'bg-primary hover:opacity-95 text-white shadow-primary/20'
-                                }`}
-                            >
-                                <span className="material-symbols-outlined text-sm">
-                                    {cashDrawerOpen ? 'lock' : 'lock_open'}
-                                </span>
-                                <span>{cashDrawerOpen ? 'Fechar Caixa Diário' : 'Abrir Caixa Diário'}</span>
-                            </button>
-                        </div>
-
-                        {/* Bento Quick Actions list */}
-                        <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-outline-variant/10 dark:border-slate-800 shadow-sm space-y-4">
-                            <h3 className="text-lg font-extrabold font-headline text-[#003346] dark:text-white">Ações Rápidas</h3>
-                            
-                            {/* Gerar Carnê */}
-                            <button
+                        <div className="grid grid-cols-2 gap-4">
+                            <button 
                                 onClick={() => setIsSlipsModalOpen(true)}
-                                className="w-full flex items-center justify-between p-4 bg-[#eff8ff] dark:bg-slate-800 rounded-2xl hover:bg-primary hover:text-white dark:hover:bg-primary transition-all group text-left border border-outline-variant/10 dark:border-slate-700 cursor-pointer"
+                                className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-outline-variant/10 dark:border-slate-800 shadow-sm hover:shadow-md transition-all text-center flex flex-col items-center gap-3 group cursor-pointer hover:-translate-y-0.5"
                             >
-                                <div className="flex items-center gap-3">
-                                    <div className="h-10 w-10 bg-primary/10 dark:bg-slate-700 rounded-xl flex items-center justify-center group-hover:bg-white/20 transition-colors">
-                                        <span className="material-symbols-outlined text-primary dark:text-[#00D1FF] group-hover:text-white">receipt_long</span>
-                                    </div>
-                                    <div>
-                                        <span className="block font-bold text-sm text-[#003346] dark:text-white group-hover:text-white">Gerar Carnê Escolar</span>
-                                        <span className="text-[10px] text-slate-500 dark:text-[#87b3cd] group-hover:text-white/80">Boletos parcelados para novos planos</span>
-                                    </div>
+                                <div className="w-12 h-12 rounded-xl bg-blue-50 dark:bg-blue-955/40 text-primary dark:text-[#00D1FF] flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all">
+                                    <span className="material-symbols-outlined text-2xl">receipt_long</span>
                                 </div>
-                                <span className="material-symbols-outlined text-lg group-hover:translate-x-1 transition-transform">chevron_right</span>
+                                <p className="font-bold text-[10px] text-on-surface dark:text-white leading-tight">Gerar Carnê</p>
+                            </button>
+                            
+                            <button 
+                                onClick={() => setIsOverdueModalOpen(true)}
+                                className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-outline-variant/10 dark:border-slate-800 shadow-sm hover:shadow-md transition-all text-center flex flex-col items-center gap-3 group cursor-pointer hover:-translate-y-0.5"
+                            >
+                                <div className="w-12 h-12 rounded-xl bg-red-50 dark:bg-red-955/40 text-red-600 dark:text-red-400 flex items-center justify-center group-hover:bg-red-600 group-hover:text-white transition-all">
+                                    <span className="material-symbols-outlined text-2xl">event_busy</span>
+                                </div>
+                                <p className="font-bold text-[10px] text-on-surface dark:text-white leading-tight">Parcelas Vencidas</p>
                             </button>
 
-                            {/* Receber Boleto Presencial */}
-                            <button
+                            <button 
+                                onClick={() => setIsOverdueModalOpen(true)}
+                                className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-outline-variant/10 dark:border-slate-800 shadow-sm hover:shadow-md transition-all text-center flex flex-col items-center gap-3 group cursor-pointer hover:-translate-y-0.5"
+                            >
+                                <div className="w-12 h-12 rounded-xl bg-orange-50 dark:bg-orange-950/40 text-orange-600 dark:text-orange-400 flex items-center justify-center group-hover:bg-orange-600 group-hover:text-white transition-all">
+                                    <span className="material-symbols-outlined text-2xl">person_remove</span>
+                                </div>
+                                <p className="font-bold text-[10px] text-on-surface dark:text-white leading-tight">Inadimplentes</p>
+                            </button>
+
+                            <button 
+                                onClick={() => showNotification("Visualizando histórico de cancelamentos...", "info")}
+                                className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-outline-variant/10 dark:border-slate-800 shadow-sm hover:shadow-md transition-all text-center flex flex-col items-center gap-3 group cursor-pointer hover:-translate-y-0.5"
+                            >
+                                <div className="w-12 h-12 rounded-xl bg-slate-50 dark:bg-slate-800 text-slate-500 flex items-center justify-center group-hover:bg-slate-500 group-hover:text-white transition-all">
+                                    <span className="material-symbols-outlined text-2xl">cancel</span>
+                                </div>
+                                <p className="font-bold text-[10px] text-on-surface dark:text-white leading-tight">Cancelamentos</p>
+                            </button>
+                        </div>
+                    </section>
+
+                    {/* OPERAÇÕES FINANCEIRAS */}
+                    <section className="space-y-4">
+                        <div className="flex items-center gap-2">
+                            <div className="w-1.5 h-6 bg-[#00D1FF] rounded-full"></div>
+                            <h2 className="text-on-surface dark:text-white font-bold text-sm font-headline uppercase tracking-wide">Operações Financeiras</h2>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                            <button 
                                 onClick={() => setIsRecebimentoModalOpen(true)}
-                                className="w-full flex items-center justify-between p-4 bg-[#eff8ff] dark:bg-slate-800 rounded-2xl hover:bg-primary hover:text-white dark:hover:bg-primary transition-all group text-left border border-outline-variant/10 dark:border-slate-700 cursor-pointer"
+                                className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-outline-variant/10 dark:border-slate-800 shadow-sm hover:shadow-md transition-all text-center flex flex-col items-center gap-3 group cursor-pointer hover:-translate-y-0.5"
                             >
-                                <div className="flex items-center gap-3">
-                                    <div className="h-10 w-10 bg-primary/10 dark:bg-slate-700 rounded-xl flex items-center justify-center group-hover:bg-white/20 transition-colors">
-                                        <span className="material-symbols-outlined text-primary dark:text-[#00D1FF] group-hover:text-white">currency_exchange</span>
-                                    </div>
-                                    <div>
-                                        <span className="block font-bold text-sm text-[#003346] dark:text-white group-hover:text-white">Lançamento de Caixa</span>
-                                        <span className="text-[10px] text-slate-500 dark:text-[#87b3cd] group-hover:text-white/80">Entrada manual rápida em dinheiro</span>
-                                    </div>
+                                <div className="w-12 h-12 rounded-xl bg-green-50 dark:bg-emerald-955/40 text-green-600 dark:text-emerald-400 flex items-center justify-center group-hover:bg-green-600 group-hover:text-white transition-all">
+                                    <span className="material-symbols-outlined text-2xl">payments</span>
                                 </div>
-                                <span className="material-symbols-outlined text-lg group-hover:translate-x-1 transition-transform">chevron_right</span>
+                                <p className="font-bold text-[10px] text-on-surface dark:text-white leading-tight">Recebimentos</p>
                             </button>
 
-                            {/* Fechamento Mensal */}
-                            <button
-                                onClick={() => showNotification('Fechamento consolidado e enviado para auditoria (Simulado).')}
-                                className="w-full flex items-center justify-between p-4 bg-[#eff8ff] dark:bg-slate-800 rounded-2xl hover:bg-primary hover:text-white dark:hover:bg-primary transition-all group text-left border border-outline-variant/10 dark:border-slate-700 cursor-pointer"
+                            <button 
+                                onClick={() => setIsCaixaModalOpen(true)}
+                                className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-outline-variant/10 dark:border-slate-800 shadow-sm hover:shadow-md transition-all text-center flex flex-col items-center gap-3 group cursor-pointer hover:-translate-y-0.5"
                             >
-                                <div className="flex items-center gap-3">
-                                    <div className="h-10 w-10 bg-primary/10 dark:bg-slate-700 rounded-xl flex items-center justify-center group-hover:bg-white/20 transition-colors">
-                                        <span className="material-symbols-outlined text-primary dark:text-[#00D1FF] group-hover:text-white">analytics</span>
-                                    </div>
-                                    <div>
-                                        <span className="block font-bold text-sm text-[#003346] dark:text-white group-hover:text-white">Fechamento do Mês</span>
-                                        <span className="text-[10px] text-slate-500 dark:text-[#87b3cd] group-hover:text-white/80">Balanço consolidado de receitas</span>
-                                    </div>
+                                <div className="w-12 h-12 rounded-xl bg-cyan-50 dark:bg-cyan-950/40 text-cyan-600 dark:text-cyan-400 flex items-center justify-center group-hover:bg-cyan-600 group-hover:text-white transition-all">
+                                    <span className="material-symbols-outlined text-2xl">point_of_sale</span>
                                 </div>
-                                <span className="material-symbols-outlined text-lg group-hover:translate-x-1 transition-transform">chevron_right</span>
+                                <p className="font-bold text-[10px] text-on-surface dark:text-white leading-tight">Caixa</p>
+                            </button>
+
+                            <button 
+                                onClick={() => showNotification("Visualizando contratos e planos acadêmicos...", "info")}
+                                className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-outline-variant/10 dark:border-slate-800 shadow-sm hover:shadow-md transition-all text-center flex flex-col items-center gap-3 group col-span-2 cursor-pointer hover:-translate-y-0.5"
+                            >
+                                <div className="w-12 h-12 rounded-xl bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 flex items-center justify-center group-hover:bg-indigo-600 group-hover:text-white transition-all">
+                                    <span className="material-symbols-outlined text-2xl">history_edu</span>
+                                </div>
+                                <p className="font-bold text-[10px] text-on-surface dark:text-white leading-tight">Contratos</p>
                             </button>
                         </div>
+                    </section>
 
-                        {/* Interactive Insights Box */}
-                        <div className="relative overflow-hidden bg-primary text-white p-6 rounded-[1.5rem] shadow-lg shadow-primary/10 flex flex-col justify-between min-h-[200px]">
-                            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl"></div>
-                            <div className="relative z-10">
-                                <span className="text-[10px] font-black text-white/70 uppercase tracking-widest font-headline">Insights de Caixa</span>
-                                <h4 className="text-xl font-bold font-headline mt-2 mb-1">Crescimento Saudável</h4>
-                                <p className="text-white/80 font-medium text-xs leading-relaxed max-w-[210px]">
-                                    A conciliação automática via Pix reduziu a taxa de inadimplência em <span className="text-[#6bfe9c] font-bold">4.2%</span> esta semana.
-                                </p>
-                            </div>
-                            <div className="relative z-10 mt-4 h-1.5 w-full bg-white/25 rounded-full overflow-hidden">
-                                <div className="h-full bg-[#6bfe9c] w-[84.2%] rounded-full"></div>
+                    {/* RELATÓRIOS E ANÁLISES */}
+                    <section className="space-y-4">
+                        <div className="flex items-center gap-2">
+                            <div className="w-1.5 h-6 bg-[#00D1FF] rounded-full"></div>
+                            <h2 className="text-on-surface dark:text-white font-bold text-sm font-headline uppercase tracking-wide">Relatórios e Análises</h2>
+                        </div>
+                        <div className="space-y-3">
+                            <button 
+                                onClick={() => showNotification("Balanço financeiro consolidado exportado com sucesso!")}
+                                className="w-full bg-white dark:bg-slate-900 p-4 rounded-2xl border border-outline-variant/10 dark:border-slate-800 shadow-sm hover:shadow-md transition-all flex items-center gap-4 group cursor-pointer hover:-translate-y-0.5"
+                            >
+                                <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-955/40 text-primary dark:text-[#00D1FF] flex items-center justify-center group-hover:scale-110 transition-transform">
+                                    <span className="material-symbols-outlined">assessment</span>
+                                </div>
+                                <div className="text-left">
+                                    <p className="font-bold text-[10px] text-on-surface dark:text-white leading-tight">Relatório Geral</p>
+                                    <p className="text-[8px] text-on-surface-variant dark:text-outline-variant font-medium">Balanço mensal e anual</p>
+                                </div>
+                            </button>
+
+                            <button 
+                                onClick={() => showNotification("Exportando análise de novas matrículas...")}
+                                className="w-full bg-white dark:bg-slate-900 p-4 rounded-2xl border border-outline-variant/10 dark:border-slate-800 shadow-sm hover:shadow-md transition-all flex items-center gap-4 group cursor-pointer hover:-translate-y-0.5"
+                            >
+                                <div className="w-10 h-10 rounded-xl bg-purple-50 dark:bg-purple-950/40 text-purple-600 dark:text-purple-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                    <span className="material-symbols-outlined">how_to_reg</span>
+                                </div>
+                                <div className="text-left">
+                                    <p className="font-bold text-[10px] text-on-surface dark:text-white leading-tight">Relatório de Matrículas</p>
+                                    <p className="text-[8px] text-on-surface-variant dark:text-outline-variant font-medium">Novos alunos vs. Perda</p>
+                                </div>
+                            </button>
+
+                            <button 
+                                onClick={() => showNotification("Relatório de bolsistas e descontos gerado com sucesso!")}
+                                className="w-full bg-white dark:bg-slate-900 p-4 rounded-2xl border border-outline-variant/10 dark:border-slate-800 shadow-sm hover:shadow-md transition-all flex items-center gap-4 group cursor-pointer hover:-translate-y-0.5"
+                            >
+                                <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                    <span className="material-symbols-outlined">workspace_premium</span>
+                                </div>
+                                <div className="text-left">
+                                    <p className="font-bold text-[10px] text-on-surface dark:text-white leading-tight">Relatório Bolsista</p>
+                                    <p className="text-[8px] text-on-surface-variant dark:text-outline-variant font-medium">Gestão de descontos e bolsas</p>
+                                </div>
+                            </button>
+                        </div>
+                    </section>
+                </div>
+
+                {/* Bottom Data Section */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 pb-10">
+                    {/* Transactions List */}
+                    <div className="bg-white dark:bg-slate-900 rounded-2xl border border-outline-variant/10 dark:border-slate-800 shadow-sm overflow-hidden flex flex-col">
+                        <div className="p-6 border-b border-outline-variant/5 dark:border-slate-800 flex items-center justify-between">
+                            <h2 className="text-on-surface dark:text-white font-bold text-lg font-headline">Transações Recentes</h2>
+                            <button 
+                                onClick={() => {
+                                    setSearchQuery('');
+                                    setStatusFilter('all');
+                                    showNotification("Mostrando todas as transações.");
+                                }}
+                                className="text-xs text-primary dark:text-[#00D1FF] font-bold hover:underline cursor-pointer"
+                            >
+                                Ver todas
+                            </button>
+                        </div>
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left">
+                                <thead className="bg-surface-container-low/30 dark:bg-slate-950/40">
+                                    <tr>
+                                        <th className="px-6 py-4 text-[10px] text-on-surface-variant dark:text-outline-variant font-bold uppercase">Aluno</th>
+                                        <th className="px-6 py-4 text-[10px] text-on-surface-variant dark:text-outline-variant font-bold uppercase">Valor</th>
+                                        <th className="px-6 py-4 text-[10px] text-on-surface-variant dark:text-outline-variant font-bold uppercase text-right">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-outline-variant/5 dark:divide-slate-800">
+                                    {filteredTransactions.map((tx) => (
+                                        <tr key={tx.id} className="hover:bg-surface-container-low/20 dark:hover:bg-slate-800/20 transition-colors">
+                                            <td className="px-6 py-4 flex items-center gap-3">
+                                                <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-950 flex items-center justify-center font-bold text-xs text-blue-700 dark:text-blue-300">
+                                                    {tx.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()}
+                                                </div>
+                                                <span className="text-xs font-bold text-[#003346] dark:text-white">{tx.name}</span>
+                                            </td>
+                                            <td className="px-6 py-4 text-xs font-bold text-on-surface dark:text-slate-200">
+                                                R$ {tx.amount.toFixed(2)}
+                                            </td>
+                                            <td className="px-6 py-4 text-right">
+                                                <span className={`px-3 py-1 text-[10px] font-bold rounded-full uppercase ${
+                                                    tx.status === 'confirmado'
+                                                        ? 'bg-green-100 text-green-700 dark:bg-emerald-950/40 dark:text-emerald-400'
+                                                        : tx.status === 'atrasado'
+                                                        ? 'bg-rose-100 text-[#b31b25] dark:bg-rose-950/40 dark:text-rose-400'
+                                                        : 'bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400'
+                                                }`}>
+                                                    {tx.status}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    {/* Insights/Visual Section */}
+                    <div className="relative h-full rounded-2xl overflow-hidden shadow-sm group min-h-[300px]">
+                        <img 
+                            alt="Dashboard data visualization" 
+                            className="w-full h-full object-cover absolute inset-0" 
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuDbtuv0ZeUSLmZpjIX3kIGzgFXEN-eyiMp2xAsnJlgh5T5UxLSbaXhEymXKutQapoxYYH8XJVPnftxmWZDc_PHEJHJEV3ro-tL8KS2Esaf6vQF3yLZYsitVmH1Y4EZG2Elznx4P6x8jXs3WwCvfZDgf9l74HkvWr8gFOSJIlSI8q2j9X7taQAnJuNvQRhQ8PAmfY5FLWwOhQG6yboL9tYQJtD5oTfarGtQXq4SUpknQi87M1GG3Gx5DfBu98mDgFmRKrwTNIU5flh86"
+                        />
+                        <div className="absolute inset-0 bg-primary/20 backdrop-blur-[2px] flex items-center justify-center p-6">
+                            <div className="text-center p-6 bg-white/90 dark:bg-slate-900/90 rounded-2xl shadow-2xl max-w-[90%]">
+                                <span className="material-symbols-outlined text-primary dark:text-[#00D1FF] text-4xl mb-2">insights</span>
+                                <h4 className="font-bold text-on-surface dark:text-white text-sm mb-1">Visão Analítica de Fluxo</h4>
+                                <p className="text-[10px] text-on-surface-variant dark:text-outline-variant mb-4 leading-tight">Explore projeções financeiras e tendências de inadimplência para os próximos meses.</p>
+                                <button 
+                                    onClick={() => showNotification("Abrindo painel analítico de fluxo de caixa e inadimplência...", "info")}
+                                    className="bg-primary hover:bg-primary-dim text-white px-6 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer"
+                                >
+                                    Explorar Insights
+                                </button>
                             </div>
                         </div>
-
                     </div>
                 </div>
 
+                {/* Footer Shell */}
+                <footer className="p-8 bg-surface-container dark:bg-slate-900/50 rounded-3xl flex flex-col md:flex-row justify-between items-center gap-6 border border-outline-variant/10 dark:border-slate-800">
+                    <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 bg-white dark:bg-slate-800 rounded-full flex items-center justify-center shadow-sm">
+                            <span className="material-symbols-outlined text-primary dark:text-[#00D1FF] text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>bolt</span>
+                        </div>
+                        <div>
+                            <h4 className="font-extrabold text-[#003346] dark:text-white font-headline text-sm">PlayUp Velocity</h4>
+                            <p className="text-[10px] text-on-surface-variant dark:text-outline-variant font-medium">Impulsionando o crescimento da Kinetic Academy</p>
+                        </div>
+                    </div>
+                    <div className="flex gap-4">
+                        <button 
+                            onClick={() => showNotification("Redirecionando para canal de suporte técnico...", "info")}
+                            className="px-6 py-2 bg-white dark:bg-slate-800 text-on-surface dark:text-white text-xs font-bold rounded-xl hover:bg-surface-container-low transition-colors border border-outline-variant/20 dark:border-slate-700 cursor-pointer"
+                        >
+                            Suporte
+                        </button>
+                        <button 
+                            onClick={() => showNotification("Acessando portal de ajuda e documentação...", "info")}
+                            className="px-6 py-2 bg-primary text-white text-xs font-bold rounded-xl hover:bg-primary-dim transition-colors shadow-lg shadow-primary/20 cursor-pointer"
+                        >
+                            Portal de Ajuda
+                        </button>
+                    </div>
+                </footer>
             </div>
+
+            {/* Floating Action Button for Support */}
+            <button 
+                onClick={() => showNotification("Abrindo chat de suporte financeiro...", "info")}
+                className="fixed bottom-6 right-6 w-14 h-14 bg-primary text-white rounded-full shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all z-50 cursor-pointer"
+            >
+                <span className="material-symbols-outlined text-3xl">support_agent</span>
+            </button>
 
             {/* Overdue Students Modal */}
             {isOverdueModalOpen && (
@@ -571,7 +575,7 @@ export default function Financial() {
                                 <h3 className="text-xl font-extrabold text-[#003346] dark:text-white font-headline">
                                     Alunos em Inadimplência
                                 </h3>
-                                <p className="text-xs font-semibold text-slate-500 dark:text-[#87b3cd] mt-0.5">
+                                <p className="text-xs font-semibold text-slate-500 dark:text-outline-variant mt-0.5">
                                     Lista detalhada de faturas e mensalidades atualmente vencidas
                                 </p>
                             </div>
@@ -590,8 +594,8 @@ export default function Financial() {
                                 >
                                     <div>
                                         <p className="font-extrabold text-sm text-[#003346] dark:text-white">{st.name}</p>
-                                        <p className="text-xs font-medium text-slate-500 dark:text-[#87b3cd]">{st.document}</p>
-                                        <span className="inline-block mt-2 text-[10px] font-bold text-[#b31b25] bg-rose-50 dark:bg-rose-950/20 px-2 py-0.5 rounded border border-rose-100 dark:border-rose-900/30">
+                                        <p className="text-xs font-medium text-slate-500 dark:text-outline-variant">{st.document}</p>
+                                        <span className="inline-block mt-2 text-[10px] font-bold text-[#b31b25] bg-rose-50 dark:bg-rose-955 px-2 py-0.5 rounded border border-rose-100 dark:border-rose-900/30">
                                             Atrasado há {st.delayDays} dias
                                         </span>
                                     </div>
@@ -622,7 +626,7 @@ export default function Financial() {
                         <div className="p-6 border-t border-outline-variant/10 dark:border-slate-800 flex justify-end">
                             <button
                                 onClick={() => setIsOverdueModalOpen(false)}
-                                className="px-6 py-2.5 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-[#87b3cd] font-bold text-xs rounded-xl hover:bg-slate-200 transition-colors"
+                                className="px-6 py-2.5 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-outline-variant font-bold text-xs rounded-xl hover:bg-slate-200 transition-colors"
                             >
                                 Fechar
                             </button>
@@ -631,7 +635,7 @@ export default function Financial() {
                 </div>
             )}
 
-            {/* Cash Drawer Modal (Sangria / Entrada / Fechamento) */}
+            {/* Cash Drawer Modal (Sangria / Entrada) */}
             {isCaixaModalOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-sm p-4">
                     <div className="bg-white dark:bg-slate-900 w-full max-w-md rounded-3xl shadow-2xl border border-outline-variant/10 dark:border-slate-800 overflow-hidden animate-in zoom-in-95 duration-200">
@@ -651,87 +655,92 @@ export default function Financial() {
                             {/* Toggle Cashier State Section */}
                             <div className="bg-slate-50 dark:bg-slate-850 p-4 rounded-2xl flex items-center justify-between border border-slate-100 dark:border-slate-800">
                                 <div>
-                                    <span className="block font-bold text-xs text-[#003346] dark:text-white">Estado do Caixa</span>
-                                    <span className="text-[10px] text-slate-500 dark:text-[#87b3cd]">Caixa atualmente {cashDrawerOpen ? 'Aberto' : 'Fechado'}</span>
+                                    <span className="block text-xs font-bold text-slate-500 dark:text-outline-variant uppercase tracking-wider">Status do Caixa</span>
+                                    <span className="text-sm font-extrabold text-[#003346] dark:text-white">
+                                        Caixa está atualmente {cashDrawerOpen ? 'ABERTO' : 'FECHADO'}
+                                    </span>
                                 </div>
                                 <button
                                     onClick={confirmToggleCaixa}
-                                    className={`px-4 py-2 text-xs font-black rounded-xl cursor-pointer transition-all ${
+                                    className={`px-4 py-2 text-xs font-extrabold rounded-xl transition-all cursor-pointer ${
                                         cashDrawerOpen 
-                                            ? 'bg-rose-50 text-[#b31b25] border border-rose-200 hover:bg-rose-100'
-                                            : 'bg-emerald-50 text-[#006a35] border border-emerald-200 hover:bg-emerald-100'
+                                            ? 'bg-rose-50 text-[#b31b25] hover:bg-rose-100' 
+                                            : 'bg-emerald-50 text-[#006a35] hover:bg-emerald-100'
                                     }`}
                                 >
                                     {cashDrawerOpen ? 'Fechar Caixa' : 'Abrir Caixa'}
                                 </button>
                             </div>
 
-                            {/* Cash Flow Inputs */}
-                            {cashDrawerOpen && (
-                                <form onSubmit={handleAdjustCash} className="space-y-4">
-                                    <h4 className="text-xs font-black text-slate-500 dark:text-[#87b3cd] uppercase tracking-wider">Ajuste de Saldo Diário</h4>
-                                    
-                                    <div className="grid grid-cols-2 gap-3">
-                                        <button
-                                            type="button"
-                                            onClick={() => setCaixaAdjustType('add')}
-                                            className={`py-3 rounded-xl text-xs font-bold border transition-all ${
-                                                caixaAdjustType === 'add'
-                                                    ? 'bg-emerald-50 dark:bg-emerald-950/20 text-[#006a35] dark:text-emerald-400 border-[#006a35]'
-                                                    : 'bg-white dark:bg-slate-900 text-slate-500 dark:text-[#87b3cd] border-outline-variant/10 dark:border-slate-850 hover:bg-slate-50'
-                                            }`}
-                                        >
-                                            Entrada / Reforço
-                                        </button>
-                                        <button
-                                            type="button"
-                                            onClick={() => setCaixaAdjustType('remove')}
-                                            className={`py-3 rounded-xl text-xs font-bold border transition-all ${
-                                                caixaAdjustType === 'remove'
-                                                    ? 'bg-rose-50 dark:bg-rose-950/20 text-[#b31b25] dark:text-rose-400 border-rose-300'
-                                                    : 'bg-white dark:bg-slate-900 text-slate-500 dark:text-[#87b3cd] border-outline-variant/10 dark:border-slate-850 hover:bg-slate-50'
-                                            }`}
-                                        >
-                                            Sangria / Retirada
-                                        </button>
+                            {/* Adjust cash value form */}
+                            <form onSubmit={handleAdjustCash} className="space-y-4">
+                                <div className="flex gap-4">
+                                    <label className="flex-1 flex items-center gap-2 p-3 bg-slate-50 dark:bg-slate-850 rounded-xl border border-slate-100 dark:border-slate-800 cursor-pointer">
+                                        <input 
+                                            type="radio" 
+                                            name="caixa_type" 
+                                            checked={caixaAdjustType === 'add'}
+                                            onChange={() => setCaixaAdjustType('add')}
+                                            className="text-primary focus:ring-primary focus:ring-offset-0"
+                                        />
+                                        <span className="text-xs font-extrabold text-[#003346] dark:text-white">Entrada (Reforço)</span>
+                                    </label>
+                                    <label className="flex-1 flex items-center gap-2 p-3 bg-slate-50 dark:bg-slate-850 rounded-xl border border-slate-100 dark:border-slate-800 cursor-pointer">
+                                        <input 
+                                            type="radio" 
+                                            name="caixa_type" 
+                                            checked={caixaAdjustType === 'remove'}
+                                            onChange={() => setCaixaAdjustType('remove')}
+                                            className="text-primary focus:ring-primary focus:ring-offset-0"
+                                        />
+                                        <span className="text-xs font-extrabold text-[#003346] dark:text-white">Saída (Sangria)</span>
+                                    </label>
+                                </div>
+
+                                <div className="space-y-1.5">
+                                    <label className="block text-xs font-bold text-[#003346] dark:text-white">Valor da Ajustagem</label>
+                                    <div className="relative flex items-center">
+                                        <span className="absolute left-4 text-xs font-bold text-slate-500 dark:text-[#87b3cd]">R$</span>
+                                        <input
+                                            value={caixaAdjustValue}
+                                            onChange={(e) => setCaixaAdjustValue(e.target.value)}
+                                            type="number"
+                                            step="0.01"
+                                            placeholder="0,00"
+                                            className="w-full h-12 pl-10 pr-4 bg-[#eff8ff] dark:bg-slate-800 border border-outline-variant/15 dark:border-slate-700 focus:ring-primary focus:border-primary rounded-xl text-sm font-bold text-[#003346] dark:text-white"
+                                            required
+                                        />
                                     </div>
+                                </div>
 
-                                    <div className="space-y-1.5">
-                                        <label className="block text-xs font-bold text-[#003346] dark:text-white">Valor do Lançamento</label>
-                                        <div className="relative flex items-center">
-                                            <span className="absolute left-4 text-sm font-bold text-slate-500 dark:text-[#87b3cd]">R$</span>
-                                            <input
-                                                value={caixaAdjustValue}
-                                                onChange={(e) => setCaixaAdjustValue(e.target.value)}
-                                                type="number"
-                                                step="0.01"
-                                                placeholder="0,00"
-                                                className="w-full h-12 pl-12 pr-4 bg-[#eff8ff] dark:bg-slate-800 border-outline-variant/15 dark:border-slate-700 focus:ring-primary focus:border-primary dark:focus:ring-[#00D1FF] dark:focus:border-[#00D1FF] rounded-xl text-sm font-bold text-[#003346] dark:text-white"
-                                            />
-                                        </div>
-                                    </div>
+                                <button
+                                    type="submit"
+                                    className="w-full py-3 bg-primary text-white text-xs font-extrabold rounded-xl hover:opacity-95 active:scale-95 transition-all cursor-pointer"
+                                >
+                                    Confirmar Lançamento
+                                </button>
+                            </form>
 
-                                    <button
-                                        type="submit"
-                                        className="w-full py-3 bg-primary text-white text-xs font-extrabold rounded-xl shadow-lg shadow-primary/20 hover:scale-[1.01] active:scale-95 transition-all mt-2 cursor-pointer"
-                                    >
-                                        Confirmar Lançamento
-                                    </button>
-                                </form>
-                            )}
-
+                        </div>
+                        <div className="p-6 border-t border-outline-variant/10 dark:border-slate-800 flex justify-end">
+                            <button
+                                onClick={() => setIsCaixaModalOpen(false)}
+                                className="px-6 py-2.5 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-outline-variant font-bold text-xs rounded-xl hover:bg-slate-200 transition-colors"
+                            >
+                                Fechar
+                            </button>
                         </div>
                     </div>
                 </div>
             )}
 
-            {/* Confirm Manual Recebimento Modal */}
+            {/* Modal: Registrar Recebimento */}
             {isRecebimentoModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-sm p-4">
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-955/60 backdrop-blur-sm p-4">
                     <div className="bg-white dark:bg-slate-900 w-full max-w-md rounded-3xl shadow-2xl border border-outline-variant/10 dark:border-slate-800 overflow-hidden animate-in zoom-in-95 duration-200">
                         <div className="p-6 border-b border-outline-variant/10 dark:border-slate-800 flex justify-between items-center bg-[#eff8ff] dark:bg-slate-900/60">
                             <h3 className="text-lg font-extrabold text-[#003346] dark:text-white font-headline">
-                                Registrar Recebimento Presencial
+                                Registrar Recebimento Manual
                             </h3>
                             <button 
                                 onClick={() => setIsRecebimentoModalOpen(false)}
@@ -747,14 +756,15 @@ export default function Financial() {
                                     value={recebimentoForm.studentName}
                                     onChange={(e) => setRecebimentoForm({ ...recebimentoForm, studentName: e.target.value })}
                                     type="text"
-                                    placeholder="Ex: Carlos Eduardo Silva"
-                                    className="w-full h-12 px-4 bg-[#eff8ff] dark:bg-slate-800 border-outline-variant/15 dark:border-slate-700 focus:ring-primary focus:border-primary dark:focus:ring-[#00D1FF] dark:focus:border-[#00D1FF] rounded-xl text-sm text-[#003346] dark:text-white font-medium"
+                                    placeholder="Ex: Arthur Camargo"
+                                    className="w-full h-12 px-4 bg-[#eff8ff] dark:bg-slate-800 border-outline-variant/15 dark:border-slate-700 focus:ring-primary focus:border-primary rounded-xl text-sm text-[#003346] dark:text-white font-medium"
+                                    required
                                 />
                             </div>
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-1.5">
-                                    <label className="block text-xs font-bold text-[#003346] dark:text-white">Valor</label>
+                                    <label className="block text-xs font-bold text-[#003346] dark:text-white">Valor Pago</label>
                                     <div className="relative flex items-center">
                                         <span className="absolute left-4 text-xs font-bold text-slate-500 dark:text-[#87b3cd]">R$</span>
                                         <input
@@ -763,22 +773,22 @@ export default function Financial() {
                                             type="number"
                                             step="0.01"
                                             placeholder="350,00"
-                                            className="w-full h-12 pl-10 pr-4 bg-[#eff8ff] dark:bg-slate-800 border-outline-variant/15 dark:border-slate-700 focus:ring-primary focus:border-primary dark:focus:ring-[#00D1FF] dark:focus:border-[#00D1FF] rounded-xl text-sm font-bold text-[#003346] dark:text-white"
+                                            className="w-full h-12 pl-10 pr-4 bg-[#eff8ff] dark:bg-slate-800 border-outline-variant/15 dark:border-slate-700 focus:ring-primary focus:border-primary rounded-xl text-sm font-bold text-[#003346] dark:text-white"
+                                            required
                                         />
                                     </div>
                                 </div>
                                 <div className="space-y-1.5">
-                                    <label className="block text-xs font-bold text-[#003346] dark:text-white">Forma de Pagamento</label>
+                                    <label className="block text-xs font-bold text-[#003346] dark:text-white">Meio de Pagamento</label>
                                     <select
                                         value={recebimentoForm.method}
                                         onChange={(e) => setRecebimentoForm({ ...recebimentoForm, method: e.target.value })}
-                                        className="w-full h-12 px-4 bg-[#eff8ff] dark:bg-slate-800 border-outline-variant/15 dark:border-slate-700 focus:ring-primary focus:border-primary dark:focus:ring-[#00D1FF] dark:focus:border-[#00D1FF] rounded-xl text-sm text-[#003346] dark:text-white font-bold"
+                                        className="w-full h-12 px-4 bg-[#eff8ff] dark:bg-slate-800 border-outline-variant/15 dark:border-slate-700 focus:ring-primary focus:border-primary rounded-xl text-sm text-[#003346] dark:text-white font-bold cursor-pointer"
                                     >
                                         <option value="Pix">Pix</option>
-                                        <option value="Dinheiro">Dinheiro</option>
-                                        <option value="Cartão de Crédito">Cartão de Crédito</option>
-                                        <option value="Cartão de Débito">Cartão de Débito</option>
                                         <option value="Boleto">Boleto Bancário</option>
+                                        <option value="Cartão de Crédito">Cartão de Crédito</option>
+                                        <option value="Dinheiro">Dinheiro Físico</option>
                                     </select>
                                 </div>
                             </div>
@@ -787,14 +797,14 @@ export default function Financial() {
                                 type="submit"
                                 className="w-full py-3.5 bg-primary text-white text-xs font-extrabold rounded-xl shadow-lg shadow-primary/20 hover:scale-[1.01] active:scale-95 transition-all mt-4 cursor-pointer"
                             >
-                                Confirmar e Conciliar Recebimento
+                                Registrar Recebimento
                             </button>
                         </form>
                     </div>
                 </div>
             )}
 
-            {/* Generate Carnê Modal */}
+            {/* slips modal (Gerar Carnê) */}
             {isSlipsModalOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-sm p-4">
                     <div className="bg-white dark:bg-slate-900 w-full max-w-md rounded-3xl shadow-2xl border border-outline-variant/10 dark:border-slate-800 overflow-hidden animate-in zoom-in-95 duration-200">
@@ -817,7 +827,8 @@ export default function Financial() {
                                     onChange={(e) => setSlipsForm({ ...slipsForm, studentName: e.target.value })}
                                     type="text"
                                     placeholder="Ex: Arthur Camargo"
-                                    className="w-full h-12 px-4 bg-[#eff8ff] dark:bg-slate-800 border-outline-variant/15 dark:border-slate-700 focus:ring-primary focus:border-primary dark:focus:ring-[#00D1FF] dark:focus:border-[#00D1FF] rounded-xl text-sm text-[#003346] dark:text-white font-medium"
+                                    className="w-full h-12 px-4 bg-[#eff8ff] dark:bg-slate-800 border-outline-variant/15 dark:border-slate-700 focus:ring-primary focus:border-primary rounded-xl text-sm text-[#003346] dark:text-white font-medium"
+                                    required
                                 />
                             </div>
 
@@ -826,7 +837,8 @@ export default function Financial() {
                                 <select
                                     value={slipsForm.course}
                                     onChange={(e) => setSlipsForm({ ...slipsForm, course: e.target.value })}
-                                    className="w-full h-12 px-4 bg-[#eff8ff] dark:bg-slate-800 border-outline-variant/15 dark:border-slate-700 focus:ring-primary focus:border-primary dark:focus:ring-[#00D1FF] dark:focus:border-[#00D1FF] rounded-xl text-sm text-[#003346] dark:text-white font-bold"
+                                    className="w-full h-12 px-4 bg-[#eff8ff] dark:bg-slate-800 border-outline-variant/15 dark:border-slate-700 focus:ring-primary focus:border-primary rounded-xl text-sm text-[#003346] dark:text-white font-bold cursor-pointer"
+                                    required
                                 >
                                     <option value="">Selecione o curso...</option>
                                     <option value="Marketing Digital">Marketing Digital Avançado</option>
@@ -842,7 +854,7 @@ export default function Financial() {
                                     <select
                                         value={slipsForm.installments}
                                         onChange={(e) => setSlipsForm({ ...slipsForm, installments: e.target.value })}
-                                        className="w-full h-12 px-4 bg-[#eff8ff] dark:bg-slate-800 border-outline-variant/15 dark:border-slate-700 focus:ring-primary focus:border-primary dark:focus:ring-[#00D1FF] dark:focus:border-[#00D1FF] rounded-xl text-sm text-[#003346] dark:text-white font-bold"
+                                        className="w-full h-12 px-4 bg-[#eff8ff] dark:bg-slate-800 border-outline-variant/15 dark:border-slate-700 focus:ring-primary focus:border-primary rounded-xl text-sm text-[#003346] dark:text-white font-bold cursor-pointer"
                                     >
                                         <option value="1">1x (À vista)</option>
                                         <option value="3">3x</option>
@@ -862,7 +874,8 @@ export default function Financial() {
                                             type="number"
                                             step="0.01"
                                             placeholder="350,00"
-                                            className="w-full h-12 pl-10 pr-4 bg-[#eff8ff] dark:bg-slate-800 border-outline-variant/15 dark:border-slate-700 focus:ring-primary focus:border-primary dark:focus:ring-[#00D1FF] dark:focus:border-[#00D1FF] rounded-xl text-sm font-bold text-[#003346] dark:text-white"
+                                            className="w-full h-12 pl-10 pr-4 bg-[#eff8ff] dark:bg-slate-800 border-outline-variant/15 dark:border-slate-700 focus:ring-primary focus:border-primary rounded-xl text-sm font-bold text-[#003346] dark:text-white"
+                                            required
                                         />
                                     </div>
                                 </div>
@@ -878,7 +891,6 @@ export default function Financial() {
                     </div>
                 </div>
             )}
-
         </Layout>
     );
 }
