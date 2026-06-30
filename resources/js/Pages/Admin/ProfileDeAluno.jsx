@@ -21,7 +21,7 @@ export default function ProfileDeAluno({ student }) {
     const Layout = isSchoolAdmin ? SchoolAdminLayout : AdminLayout;
 
     // React state for page messaging and active tabs
-    const [activeTab, setActiveTab] = useState('pedagogico'); // pedagogico, pessoal, financeiro
+    const [activeTab, setActiveTab] = useState('pessoal'); // pedagogico, pessoal, financeiro
     const [activePedagogicoSubTab, setActivePedagogicoSubTab] = useState('boletim'); // boletim, notas, etc.
     const [successToast, setSuccessToast] = useState(null);
 
@@ -77,8 +77,8 @@ export default function ProfileDeAluno({ student }) {
     // Sub-tab styling helper
     const getSubTabClass = (tabName) => {
         return `flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold transition-all select-none border border-transparent ${activePedagogicoSubTab === tabName
-                ? 'bg-white dark:bg-slate-800 text-primary dark:text-[#00D1FF] shadow-sm border-outline-variant/10'
-                : 'text-[#507c94] dark:text-[#87b3cd] hover:text-primary dark:hover:text-[#00D1FF]'
+            ? 'bg-white dark:bg-slate-800 text-primary dark:text-[#00D1FF] shadow-sm border-outline-variant/10'
+            : 'text-[#507c94] dark:text-[#87b3cd] hover:text-primary dark:hover:text-[#00D1FF]'
             }`;
     };
 
@@ -110,8 +110,8 @@ export default function ProfileDeAluno({ student }) {
                         <button
                             onClick={() => setActiveTab('pessoal')}
                             className={`px-6 py-2.5 rounded-lg text-sm font-bold transition-all select-none ${activeTab === 'pessoal'
-                                    ? 'bg-white dark:bg-slate-800 text-primary dark:text-[#00D1FF] shadow-sm'
-                                    : 'text-[#507c94] dark:text-[#87b3cd] hover:text-primary dark:hover:text-[#00D1FF]'
+                                ? 'bg-white dark:bg-slate-800 text-primary dark:text-[#00D1FF] shadow-sm'
+                                : 'text-[#507c94] dark:text-[#87b3cd] hover:text-primary dark:hover:text-[#00D1FF]'
                                 }`}
                         >
                             Dados Pessoais
@@ -119,8 +119,8 @@ export default function ProfileDeAluno({ student }) {
                         <button
                             onClick={() => setActiveTab('financeiro')}
                             className={`px-6 py-2.5 rounded-lg text-sm font-bold transition-all select-none ${activeTab === 'financeiro'
-                                    ? 'bg-white dark:bg-slate-800 text-primary dark:text-[#00D1FF] shadow-sm'
-                                    : 'text-[#507c94] dark:text-[#87b3cd] hover:text-primary dark:hover:text-[#00D1FF]'
+                                ? 'bg-white dark:bg-slate-800 text-primary dark:text-[#00D1FF] shadow-sm'
+                                : 'text-[#507c94] dark:text-[#87b3cd] hover:text-primary dark:hover:text-[#00D1FF]'
                                 }`}
                         >
                             Financeiro
@@ -128,8 +128,8 @@ export default function ProfileDeAluno({ student }) {
                         <button
                             onClick={() => setActiveTab('pedagogico')}
                             className={`px-6 py-2.5 rounded-lg text-sm font-bold transition-all select-none ${activeTab === 'pedagogico'
-                                    ? 'bg-white dark:bg-slate-800 text-primary dark:text-[#00D1FF] shadow-sm'
-                                    : 'text-[#507c94] dark:text-[#87b3cd] hover:text-primary dark:hover:text-[#00D1FF]'
+                                ? 'bg-white dark:bg-slate-800 text-primary dark:text-[#00D1FF] shadow-sm'
+                                : 'text-[#507c94] dark:text-[#87b3cd] hover:text-primary dark:hover:text-[#00D1FF]'
                                 }`}
                         >
                             Pedagógico
