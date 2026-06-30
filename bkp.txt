@@ -1,0 +1,175 @@
+<div className="col-span-12 lg:col-span-4 space-y-6">
+                        
+                        {/* Resumo do Aluno Card (Blue Header / Dark blue bg theme) */}
+                        <div className="bg-primary rounded-[2rem] p-0 shadow-xl overflow-hidden border border-primary-dim">
+                            {/* Blue Header section */}
+                            <div className="p-6 pb-4 flex items-center gap-3 text-white">
+                                <span className="material-symbols-outlined text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>account_circle</span>
+                                <h3 className="font-headline font-black text-lg">Resumo do Aluno</h3>
+                            </div>
+
+                            {/* White card container inside */}
+                            <div className="bg-white dark:bg-slate-900 mx-1 mb-1 p-6 rounded-b-[1.85rem] rounded-t-xl space-y-6 border-t border-slate-100/10">
+                                
+                                {/* Metrics grid (media, situacao, freq, score) */}
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="bg-[#f0f4f9] dark:bg-slate-950 p-4 rounded-2xl flex flex-col justify-between">
+                                        <span className="text-[10px] text-[#507c94] dark:text-[#87b3cd] uppercase tracking-wider font-extrabold">Média Geral</span>
+                                        <span className="text-3xl font-black text-primary dark:text-[#00D1FF] font-headline mt-1">8,3</span>
+                                    </div>
+
+                                    <div className="bg-[#f0f4f9] dark:bg-slate-950 p-4 rounded-2xl flex flex-col justify-between">
+                                        <span className="text-[10px] text-[#507c94] dark:text-[#87b3cd] uppercase tracking-wider font-extrabold">Situação</span>
+                                        <span className="text-xs font-black text-[#006a35] dark:text-emerald-400 mt-3 inline-flex bg-[#cdffd4] dark:bg-emerald-950/70 px-2 py-0.5 rounded self-start uppercase tracking-wider">
+                                            Aprovado
+                                        </span>
+                                    </div>
+
+                                    <div className="bg-[#f0f4f9] dark:bg-slate-950 p-4 rounded-2xl flex flex-col justify-between">
+                                        <span className="text-[10px] text-[#507c94] dark:text-[#87b3cd] uppercase tracking-wider font-extrabold">Frequência</span>
+                                        <span className="text-3xl font-black text-[#006a35] dark:text-emerald-400 font-headline mt-1">94%</span>
+                                    </div>
+
+                                    {/* Score de Desempenho - Circular gauge representation */}
+                                    <div className="bg-[#f0f4f9] dark:bg-slate-950 p-4 rounded-2xl flex items-center justify-between gap-2">
+                                        <div className="flex flex-col">
+                                            <span className="text-[9px] text-[#507c94] dark:text-[#87b3cd] uppercase tracking-wider font-extrabold">Score</span>
+                                            <span className="text-[10px] text-[#006a35] dark:text-[#6bfe9c] font-black mt-1 leading-none">Muito Bom</span>
+                                        </div>
+                                        
+                                        {/* Circular Indicator */}
+                                        <div className="relative w-16 h-16 flex items-center justify-center select-none">
+                                            <svg className="w-full h-full transform -rotate-90">
+                                                {/* Back circle */}
+                                                <circle
+                                                    cx="32"
+                                                    cy="32"
+                                                    r={radius}
+                                                    stroke="#e1e8ed"
+                                                    className="dark:stroke-slate-800"
+                                                    strokeWidth="4.5"
+                                                    fill="transparent"
+                                                />
+                                                {/* Progress circle */}
+                                                <circle
+                                                    cx="32"
+                                                    cy="32"
+                                                    r={radius}
+                                                    stroke="#00a35c"
+                                                    strokeWidth="4.5"
+                                                    fill="transparent"
+                                                    strokeDasharray={circumference}
+                                                    strokeDashoffset={strokeDashoffset}
+                                                    strokeLinecap="round"
+                                                />
+                                            </svg>
+                                            <span className="absolute text-sm font-black text-on-surface">{scoreVal}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Class and teacher detail box */}
+                                <div className="border-t border-outline-variant/10 pt-4 grid grid-cols-2 gap-4 text-xs">
+                                    <div>
+                                        <span className="text-[10px] text-[#507c94] uppercase tracking-wider font-extrabold">Curso / Turma</span>
+                                        <p className="font-bold text-[#003346] dark:text-white mt-1">Ens. Fundamental - 9º Ano A</p>
+                                    </div>
+                                    <div>
+                                        <span className="text-[10px] text-[#507c94] uppercase tracking-wider font-extrabold">Professor</span>
+                                        <p className="font-bold text-[#003346] dark:text-white mt-1">João Silva</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Planejamento Card */}
+                        <div className="bg-[#eaf5ed] dark:bg-slate-900 rounded-[2rem] p-6 border border-emerald-500/10 shadow-sm space-y-4">
+                            <div className="flex items-center gap-3 text-[#137333] dark:text-emerald-400">
+                                <span className="material-symbols-outlined text-2xl">event_available</span>
+                                <h3 className="font-headline font-bold text-sm uppercase tracking-wider">Planejamento</h3>
+                            </div>
+                            <p className="text-xs font-semibold text-[#507c94] dark:text-slate-300 leading-relaxed">
+                                Visualize a grade horária sugerida e eventos acadêmicos planejados para este percurso.
+                            </p>
+                            <button
+                                type="button"
+                                onClick={() => triggerToast('Acessando Agenda Acadêmica do aluno')}
+                                className="w-full bg-white dark:bg-slate-800 text-[#137333] dark:text-[#6bfe9c] border border-emerald-500/15 font-bold py-3 px-4 rounded-xl text-xs flex items-center justify-center gap-2 active:scale-95 transition-all select-none hover:bg-slate-50 dark:hover:bg-slate-750"
+                            >
+                                <span>Ver Agenda Acadêmica</span>
+                                <span className="material-symbols-outlined text-sm">open_in_new</span>
+                            </button>
+                        </div>
+
+                        {/* Adicionar Curso Button */}
+                        <button
+                            type="button"
+                            onClick={() => triggerToast('Abrir modal para vincular novo curso')}
+                            className="w-full bg-[#00a35c] hover:bg-[#008f50] text-white font-bold py-3.5 px-6 rounded-xl text-xs flex items-center justify-center gap-2 shadow-lg shadow-green-700/10 active:scale-95 transition-all select-none"
+                        >
+                            <span className="material-symbols-outlined text-md">add_circle</span>
+                            <span>ADICIONAR CURSO</span>
+                        </button>
+
+                        {/* Profile Progress & Attendance Status Widgets */}
+                        <div className="grid grid-cols-2 gap-4">
+                            {/* Profile Progress */}
+                            <div className="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-outline-variant/10 shadow-sm flex flex-col justify-between h-32">
+                                <div>
+                                    <span className="text-[9px] text-[#507c94] dark:text-[#87b3cd] uppercase tracking-wider font-extrabold">Progresso do Perfil</span>
+                                    <span className="text-2xl font-black text-primary dark:text-[#00D1FF] block font-headline mt-1">75%</span>
+                                </div>
+                                <div className="space-y-2">
+                                    <div className="w-full h-1.5 bg-[#f0f4f9] dark:bg-slate-850 rounded-full overflow-hidden">
+                                        <div className="h-full bg-primary" style={{ width: '75%' }}></div>
+                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={() => triggerToast('Mostrando detalhes do progresso')}
+                                        className="text-[10px] text-[#507c94] dark:text-[#87b3cd] font-bold hover:underline self-start cursor-pointer"
+                                    >
+                                        Ver detalhes
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Attendance Status */}
+                            <div className="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-outline-variant/10 shadow-sm flex flex-col justify-between h-32">
+                                <div>
+                                    <span className="text-[9px] text-[#507c94] dark:text-[#87b3cd] uppercase tracking-wider font-extrabold">Status Atendimento</span>
+                                    <div className="flex items-center gap-1.5 mt-2">
+                                        <span className="w-2.5 h-2.5 rounded-full bg-[#00a35c]"></span>
+                                        <span className="text-xs font-bold text-[#003346] dark:text-slate-200">Prioritário</span>
+                                    </div>
+                                    <span className="text-[10px] text-[#00a35c] dark:text-emerald-400 font-extrabold block mt-0.5">Boletos 100%</span>
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={() => triggerToast('Mostrando detalhes do atendimento')}
+                                    className="text-[10px] text-[#507c94] dark:text-[#87b3cd] font-bold hover:underline self-start cursor-pointer"
+                                >
+                                    Ver detalhes
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Save & Discard Buttons */}
+                        <div className="pt-4 border-t border-outline-variant/10 space-y-3">
+                            <button
+                                onClick={handleSave}
+                                disabled={processing}
+                                className="w-full bg-[#0050d4] hover:bg-[#0042bd] text-white font-bold py-4 px-6 rounded-2xl text-sm flex items-center justify-center gap-2 shadow-xl shadow-blue-500/10 active:scale-[0.98] transition-all select-none"
+                            >
+                                <span className="material-symbols-outlined text-lg" style={{ fontVariationSettings: "'FILL' 1" }}>save</span>
+                                <span>{processing ? 'Salvando...' : 'Salvar Alterações'}</span>
+                            </button>
+                            
+                            <Link
+                                href={route(isSchoolAdmin ? 'school-admin.students.index' : 'admin.students.index')}
+                                className="w-full text-center text-[#507c94] dark:text-[#87b3cd] hover:text-[#0050d4] dark:hover:text-[#00D1FF] font-bold py-2 block text-sm hover:underline select-none"
+                            >
+                                Descartar Mudanças
+                            </Link>
+                        </div>
+
+                    </div>

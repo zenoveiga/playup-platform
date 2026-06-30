@@ -61,6 +61,25 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
         return redirect()->route('admin.students.index');
     })->name('students.store');
 
+    Route::get('/alunos/{student}', function (\App\Models\User $student) {
+        return Inertia::render('Admin/ProfileDeAluno', [
+            'student' => $student
+        ]);
+    })->name('students.show');
+
+    Route::put('/alunos/{student}', function (\App\Models\User $student, \Illuminate\Http\Request $request) {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email,' . $student->id,
+            'phone' => 'nullable|string|max:20',
+            'status' => 'required|string|in:active,inactive',
+        ]);
+
+        $student->update($validated);
+
+        return redirect()->back()->with('success', 'Cadastro do aluno atualizado com sucesso!');
+    })->name('students.update');
+
     Route::get('/courses', function () {
         return Inertia::render('Admin/CoursesAndPackages');
     })->name('courses.index');
@@ -223,6 +242,25 @@ Route::middleware(['auth', 'role:school_admin'])->prefix('school-admin')->name('
 
         return redirect()->route('school-admin.students.index');
     })->name('students.store');
+
+    Route::get('/alunos/{student}', function (\App\Models\User $student) {
+        return Inertia::render('Admin/ProfileDeAluno', [
+            'student' => $student
+        ]);
+    })->name('students.show');
+
+    Route::put('/alunos/{student}', function (\App\Models\User $student, \Illuminate\Http\Request $request) {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email,' . $student->id,
+            'phone' => 'nullable|string|max:20',
+            'status' => 'required|string|in:active,inactive',
+        ]);
+
+        $student->update($validated);
+
+        return redirect()->back()->with('success', 'Cadastro do aluno atualizado com sucesso!');
+    })->name('students.update');
 
     Route::get('/polos', function () {
         $polos = \App\Models\Polo::orderBy('id', 'desc')->get();

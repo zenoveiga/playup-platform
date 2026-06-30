@@ -230,25 +230,27 @@ export default function Students({ students = [] }) {
                                             {/* Name and ID */}
                                             <td className="px-6 py-4 rounded-l-2xl border-y border-l border-outline-variant/10 dark:border-slate-800">
                                                 <div className="flex items-center gap-4">
-                                                    {student.avatar ? (
-                                                        <img
-                                                            alt={student.name}
-                                                            className="w-12 h-12 rounded-full object-cover ring-2 ring-transparent group-hover:ring-primary/20 dark:group-hover:ring-[#00D1FF]/20 transition-all shadow-sm"
-                                                            src={student.avatar}
-                                                        />
-                                                    ) : (
-                                                        <div className="w-12 h-12 rounded-full kinetic-gradient text-white flex items-center justify-center font-bold text-sm shadow-sm ring-2 ring-transparent group-hover:ring-primary/20">
-                                                            {getInitials(student.name)}
+                                                    <Link href={route(isSchoolAdmin ? 'school-admin.students.show' : 'admin.students.show', { student: student.id })} className="flex items-center gap-4 cursor-pointer group/link">
+                                                        {student.avatar ? (
+                                                            <img
+                                                                alt={student.name}
+                                                                className="w-12 h-12 rounded-full object-cover ring-2 ring-transparent group-hover/link:ring-primary/20 dark:group-hover/link:ring-[#00D1FF]/20 transition-all shadow-sm"
+                                                                src={student.avatar}
+                                                            />
+                                                        ) : (
+                                                            <div className="w-12 h-12 rounded-full kinetic-gradient text-white flex items-center justify-center font-bold text-sm shadow-sm ring-2 ring-transparent group-hover/link:ring-primary/20">
+                                                                {getInitials(student.name)}
+                                                            </div>
+                                                        )}
+                                                        <div>
+                                                            <div className="font-bold text-on-surface group-hover/link:text-primary dark:group-hover/link:text-[#00D1FF] transition-colors font-headline hover:underline">
+                                                                 {student.name}
+                                                             </div>
+                                                             <div className="text-xs font-semibold text-[#507c94] dark:text-[#87b3cd]/70 mt-0.5">
+                                                                 ID: #PUV-{student.id}-2026
+                                                             </div>
                                                         </div>
-                                                    )}
-                                                    <div>
-                                                        <div className="font-bold text-on-surface group-hover:text-primary dark:group-hover:text-[#00D1FF] transition-colors font-headline">
-                                                            {student.name}
-                                                        </div>
-                                                        <div className="text-xs font-semibold text-[#507c94] dark:text-[#87b3cd]/70 mt-0.5">
-                                                            ID: #PUV-{student.id}-2026
-                                                        </div>
-                                                    </div>
+                                                    </Link>
                                                 </div>
                                             </td>
 
@@ -274,9 +276,13 @@ export default function Students({ students = [] }) {
                                             {/* Actions */}
                                             <td className="px-6 py-4 rounded-r-2xl border-y border-r border-outline-variant/10 dark:border-slate-800 text-right">
                                                 <div className="flex justify-end gap-1 opacity-60 group-hover:opacity-100 transition-opacity">
-                                                    <button className="p-2 hover:bg-surface-container-low dark:hover:bg-slate-800 rounded-xl text-[#507c94] hover:text-primary dark:hover:text-[#00D1FF] transition-all hover:scale-105 active:scale-95" title="Visualizar">
+                                                    <Link 
+                                                        href={route(isSchoolAdmin ? 'school-admin.students.show' : 'admin.students.show', { student: student.id })} 
+                                                        className="p-2 hover:bg-surface-container-low dark:hover:bg-slate-800 rounded-xl text-[#507c94] hover:text-primary dark:hover:text-[#00D1FF] transition-all hover:scale-105 active:scale-95 flex items-center justify-center" 
+                                                        title="Visualizar"
+                                                    >
                                                         <span className="material-symbols-outlined text-lg">visibility</span>
-                                                    </button>
+                                                    </Link>
                                                     <button className="p-2 hover:bg-surface-container-low dark:hover:bg-slate-800 rounded-xl text-[#507c94] hover:text-primary dark:hover:text-[#00D1FF] transition-all hover:scale-105 active:scale-95" title="Editar">
                                                         <span className="material-symbols-outlined text-lg">edit</span>
                                                     </button>
