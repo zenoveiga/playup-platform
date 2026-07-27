@@ -112,9 +112,36 @@ export default function StudentLayout({ children }) {
                             }`}
                         >
                             <a className="block py-2 px-3 text-sm text-on-surface-variant hover:text-primary rounded-lg transition-colors" href="#">Meus Cursos</a>
-                            <a className="block py-2 px-3 text-sm text-on-surface-variant hover:text-primary rounded-lg transition-colors" href="#">Atividades</a>
-                            <a className="block py-2 px-3 text-sm text-on-surface-variant hover:text-primary rounded-lg transition-colors" href="#">Agenda</a>
-                            <a className="block py-2 px-3 text-sm text-on-surface-variant hover:text-primary rounded-lg transition-colors" href="#">Biblioteca</a>
+                            <Link 
+                                className={`block py-2 px-3 text-sm rounded-lg transition-colors ${
+                                    route().current('student.activities') 
+                                        ? 'text-primary font-bold bg-[#cfecff]/40 dark:bg-slate-800' 
+                                        : 'text-on-surface-variant hover:text-primary'
+                                }`} 
+                                href={route('student.activities')}
+                            >
+                                Atividades
+                            </Link>
+                            <Link 
+                                className={`block py-2 px-3 text-sm rounded-lg transition-colors ${
+                                    route().current('student.agenda') 
+                                        ? 'text-primary font-bold bg-[#cfecff]/40 dark:bg-slate-800' 
+                                        : 'text-on-surface-variant hover:text-primary'
+                                }`} 
+                                href={route('student.agenda')}
+                            >
+                                Agenda
+                            </Link>
+                            <Link 
+                                className={`block py-2 px-3 text-sm rounded-lg transition-colors ${
+                                    route().current('student.library') 
+                                        ? 'text-primary font-bold bg-[#cfecff]/40 dark:bg-slate-800' 
+                                        : 'text-on-surface-variant hover:text-primary'
+                                }`} 
+                                href={route('student.library')}
+                            >
+                                Biblioteca
+                            </Link>
                         </div>
                     </div>
 
@@ -135,9 +162,36 @@ export default function StudentLayout({ children }) {
                                 expanded.desempenho ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
                             }`}
                         >
-                            <a className="block py-2 px-3 text-sm text-on-surface-variant hover:text-primary rounded-lg transition-colors" href="#">Boletim</a>
-                            <a className="block py-2 px-3 text-sm text-on-surface-variant hover:text-primary rounded-lg transition-colors" href="#">Frequência</a>
-                            <a className="block py-2 px-3 text-sm text-on-surface-variant hover:text-primary rounded-lg transition-colors" href="#">Progresso</a>
+                            <Link 
+                                className={`block py-2 px-3 text-sm rounded-lg transition-colors ${
+                                    route().current('student.report-card') 
+                                        ? 'text-primary font-bold bg-[#cfecff]/40 dark:bg-slate-800' 
+                                        : 'text-on-surface-variant hover:text-primary'
+                                }`} 
+                                href={route('student.report-card')}
+                            >
+                                Boletim
+                            </Link>
+                            <Link 
+                                className={`block py-2 px-3 text-sm rounded-lg transition-colors ${
+                                    route().current('student.attendance') 
+                                        ? 'text-primary font-bold bg-[#cfecff]/40 dark:bg-slate-800' 
+                                        : 'text-on-surface-variant hover:text-primary'
+                                }`} 
+                                href={route('student.attendance')}
+                            >
+                                Frequência
+                            </Link>
+                            <Link 
+                                className={`block py-2 px-3 text-sm rounded-lg transition-colors ${
+                                    route().current('student.progress') 
+                                        ? 'text-primary font-bold bg-[#cfecff]/40 dark:bg-slate-800' 
+                                        : 'text-on-surface-variant hover:text-primary'
+                                }`} 
+                                href={route('student.progress')}
+                            >
+                                Progresso
+                            </Link>
                         </div>
                     </div>
 

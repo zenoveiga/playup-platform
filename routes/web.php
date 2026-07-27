@@ -393,6 +393,30 @@ Route::middleware(['auth', 'role:student'])->prefix('student')->name('student.')
     Route::get('/dashboard', function () {
         return Inertia::render('Student/Dashboard');
     })->name('dashboard');
+
+    Route::get('/atividades', function () {
+        return Inertia::render('Student/Activities');
+    })->name('activities');
+
+    Route::get('/agenda', function () {
+        return Inertia::render('Student/Agenda');
+    })->name('agenda');
+
+    Route::get('/biblioteca', function () {
+        return Inertia::render('Student/Library');
+    })->name('library');
+
+    Route::get('/boletim', function () {
+        return Inertia::render('Student/ReportCard');
+    })->name('report-card');
+
+    Route::get('/frequencia', function () {
+        return Inertia::render('Student/Attendance');
+    })->name('attendance');
+
+    Route::get('/progresso', function () {
+        return Inertia::render('Student/Progress');
+    })->name('progress');
 });
 
 Route::middleware('auth')->group(function () {
