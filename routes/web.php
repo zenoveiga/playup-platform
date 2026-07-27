@@ -417,6 +417,10 @@ Route::middleware(['auth', 'role:student'])->prefix('student')->name('student.')
     Route::get('/progresso', function () {
         return Inertia::render('Student/Progress');
     })->name('progress');
+
+    Route::get('/cursos', function () {
+        return Inertia::render('Student/Courses');
+    })->name('courses');
 });
 
 Route::middleware('auth')->group(function () {

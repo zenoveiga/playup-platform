@@ -111,7 +111,16 @@ export default function StudentLayout({ children }) {
                                 expanded.aprendizagem ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
                             }`}
                         >
-                            <a className="block py-2 px-3 text-sm text-on-surface-variant hover:text-primary rounded-lg transition-colors" href="#">Meus Cursos</a>
+                            <Link 
+                                className={`block py-2 px-3 text-sm rounded-lg transition-colors ${
+                                    route().current('student.courses') 
+                                        ? 'text-primary font-bold bg-[#cfecff]/40 dark:bg-slate-800' 
+                                        : 'text-on-surface-variant hover:text-primary'
+                                }`} 
+                                href={route('student.courses')}
+                            >
+                                Meus Cursos
+                            </Link>
                             <Link 
                                 className={`block py-2 px-3 text-sm rounded-lg transition-colors ${
                                     route().current('student.activities') 
