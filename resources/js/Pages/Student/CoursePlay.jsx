@@ -1,3 +1,4 @@
+import StudentLayout from '@/Layouts/StudentLayout';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 
@@ -77,11 +78,10 @@ export default function CoursePlay() {
     };
 
     return (
-        <div className="flex min-h-screen bg-[#F5F7FA] font-body text-[#003346] overflow-x-hidden">
+        <StudentLayout>
             <Head title="Ambiente de Aprendizagem | PlayUp Academy" />
             
             <style dangerouslySetInnerHTML={{ __html: `
-                body { background-color: #F5F7FA; font-family: 'Manrope', sans-serif; color: #003346; overflow-x: hidden; }
                 .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
                 .glass-effect { background: rgba(239, 248, 255, 0.7); backdrop-filter: blur(24px); }
                 .gradient-button { background: linear-gradient(135deg, #0050d4 0%, #7b9cff 100%); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
@@ -90,116 +90,8 @@ export default function CoursePlay() {
                 .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
             `}} />
 
-            {/* SideNavBar */}
-            <aside className="hidden md:flex flex-col h-screen w-64 fixed left-0 top-0 bg-surface-container-low dark:bg-surface-container py-8 px-4 z-50">
-                <div className="mb-10 px-4">
-                    <h1 className="font-headline text-lg font-extrabold text-on-surface">The Kinetic Academy</h1>
-                    <p className="text-xs text-on-surface-variant opacity-70">Estudante Premium</p>
-                </div>
-                <nav className="flex flex-col gap-2 flex-grow">
-                    {/* Painel */}
-                    <Link 
-                        className={`flex items-center gap-3 text-on-surface-variant px-4 py-3 hover:bg-surface-container-high transition-all duration-300 rounded-xl group`}
-                        href={route('student.dashboard')}
-                    >
-                        <span className="material-symbols-outlined" data-icon="dashboard">dashboard</span>
-                        <span className="font-body text-sm font-semibold">Painel</span>
-                    </Link>
-                    {/* Meus Cursos (Active) */}
-                    <Link 
-                        className={`flex items-center gap-3 bg-primary-container text-on-primary-container rounded-xl px-4 py-3 font-bold scale-95 transition-transform duration-200`}
-                        href={route('student.courses')}
-                    >
-                        <span className="material-symbols-outlined" data-icon="school" style={{ fontVariationSettings: "'FILL' 1" }}>school</span>
-                        <span className="font-body text-sm">Meus Cursos</span>
-                    </Link>
-                    {/* Atividades */}
-                    <Link 
-                        className="flex items-center gap-3 text-on-surface-variant px-4 py-3 hover:bg-surface-container-high transition-all duration-300 rounded-xl group"
-                        href={route('student.activities')}
-                    >
-                        <span className="material-symbols-outlined" data-icon="assignment">assignment</span>
-                        <span className="font-body text-sm font-semibold">Atividades</span>
-                    </Link>
-                    {/* Agenda */}
-                    <Link 
-                        className="flex items-center gap-3 text-on-surface-variant px-4 py-3 hover:bg-surface-container-high transition-all duration-300 rounded-xl group"
-                        href={route('student.agenda')}
-                    >
-                        <span className="material-symbols-outlined" data-icon="calendar_today">calendar_today</span>
-                        <span className="font-body text-sm font-semibold">Agenda</span>
-                    </Link>
-                    {/* Biblioteca */}
-                    <Link 
-                        className="flex items-center gap-3 text-on-surface-variant px-4 py-3 hover:bg-surface-container-high transition-all duration-300 rounded-xl group"
-                        href={route('student.library')}
-                    >
-                        <span className="material-symbols-outlined" data-icon="menu_book">menu_book</span>
-                        <span className="font-body text-sm font-semibold">Biblioteca</span>
-                    </Link>
-                    {/* Serviços */}
-                    <a className="flex items-center gap-3 text-on-surface-variant px-4 py-3 hover:bg-surface-container-high transition-all duration-300 rounded-xl group" href="#">
-                        <span className="material-symbols-outlined" data-icon="support_agent">support_agent</span>
-                        <span className="font-body text-sm font-semibold">Serviços</span>
-                    </a>
-                </nav>
-                <div className="mt-auto pt-6 border-t border-outline-variant border-opacity-10">
-                    <Link 
-                        href={route('student.activities')}
-                        className="w-full mb-4 py-3 px-4 gradient-button text-white rounded-xl font-bold flex items-center justify-center gap-2"
-                    >
-                        <span className="material-symbols-outlined text-sm" data-icon="add">add</span>
-                        Nova Atividade
-                    </Link>
-                    <Link 
-                        href={route('logout')}
-                        method="post"
-                        as="button"
-                        className="w-full flex items-center gap-3 text-on-surface-variant px-4 py-3 hover:bg-surface-container-high transition-all duration-300 rounded-xl text-left"
-                    >
-                        <span className="material-symbols-outlined" data-icon="logout">logout</span>
-                        <span className="font-body text-sm font-semibold">Sair</span>
-                    </Link>
-                </div>
-            </aside>
-
-            {/* Main Canvas */}
-            <main className="flex-grow md:ml-64 flex flex-col min-h-screen">
-                {/* TopNavBar */}
-                <header className="flex justify-between items-center px-6 w-full h-16 sticky top-0 z-40 bg-surface dark:bg-surface">
-                    <div className="flex items-center gap-4">
-                        <div className="md:hidden">
-                            <span className="material-symbols-outlined text-primary" data-icon="menu">menu</span>
-                        </div>
-                        <div className="font-headline font-bold text-primary dark:text-primary-fixed text-xl">PlayUp Academy</div>
-                    </div>
-                    <div className="hidden md:flex items-center gap-8">
-                        <div className="relative group">
-                            <input className="bg-surface-container-lowest border-none rounded-full px-10 py-2 text-sm focus:ring-2 focus:ring-primary w-64 transition-all" placeholder="Pesquisar curso ou aula..." type="text" />
-                            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm" data-icon="search">search</span>
-                        </div>
-                    </div>
-                    <div className="flex items-center gap-4">
-                        <div className="flex gap-2">
-                            <button className="p-2 text-on-surface-variant hover:text-primary transition-colors">
-                                <span className="material-symbols-outlined" data-icon="notifications">notifications</span>
-                            </button>
-                            <button className="p-2 text-on-surface-variant hover:text-primary transition-colors">
-                                <span className="material-symbols-outlined" data-icon="settings">settings</span>
-                            </button>
-                        </div>
-                        <div className="flex items-center gap-3 pl-4 border-l border-outline-variant border-opacity-20">
-                            <div className="text-right hidden sm:block">
-                                <p className="text-xs font-bold text-on-surface">{user.name}</p>
-                                <p className="text-[10px] text-on-surface-variant">Plano Velocity</p>
-                            </div>
-                            <img className="w-10 h-10 rounded-full border-2 border-primary object-cover" data-alt="A high-quality professional student avatar." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAle2jOAScRC_mYo8D24chaR5NO4vb_6HdLu_epPqMWm5C3DoBy0ZIYfC6w4I8-PU3NOCJpVWvzyYsV1VaGCBtOz02kpQf7oN8J0Gdo_Cn5sI2UBSxTl_FJeSRvgOyx5mNSaWTrlWIrs31vInO_tIRnyXRlP71bXlXKHS3iTUu9XjhBMcjilZADKVL0JqKuBJQWIKCzpKOBK5Wp-pQveniBS6fx5QJgc_t7Bt2gVr4SJKRrTBL_t153VQ" />
-                        </div>
-                    </div>
-                </header>
-
-                {/* Content Area */}
-                <div className="p-6 md:p-8 flex flex-col lg:flex-row gap-8">
+            {/* Content Area */}
+            <div className="p-6 md:p-8 flex flex-col lg:flex-row gap-8">
                     {/* Left/Center Column (Player & Details) */}
                     <section className="flex-grow flex flex-col gap-6 lg:w-2/3">
                         {/* Video Player Container */}
@@ -633,7 +525,6 @@ export default function CoursePlay() {
                         </div>
                     </aside>
                 </div>
-            </main>
-        </div>
+            </StudentLayout>
     );
 }
