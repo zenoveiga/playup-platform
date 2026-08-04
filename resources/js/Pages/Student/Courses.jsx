@@ -1,5 +1,5 @@
 import StudentLayout from '@/Layouts/StudentLayout';
-import { Head } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import { useState } from 'react';
 
 export default function Courses() {
@@ -154,10 +154,20 @@ export default function Courses() {
                                         </div>
                                     </div>
                                     
-                                    <button className="w-full py-3 bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-750 text-slate-700 dark:text-slate-350 font-bold text-xs rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform">
-                                        <span>Continuar Estudando</span>
-                                        <span className="material-symbols-outlined text-sm font-black">arrow_forward</span>
-                                    </button>
+                                    {course.title === 'Marketing Digital' ? (
+                                        <Link 
+                                            href={route('student.courses.play')}
+                                            className="w-full py-3 bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-750 text-slate-700 dark:text-slate-350 font-bold text-xs rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform"
+                                        >
+                                            <span>Continuar Estudando</span>
+                                            <span className="material-symbols-outlined text-sm font-black">arrow_forward</span>
+                                        </Link>
+                                    ) : (
+                                        <button className="w-full py-3 bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-750 text-slate-700 dark:text-slate-350 font-bold text-xs rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform">
+                                            <span>Continuar Estudando</span>
+                                            <span className="material-symbols-outlined text-sm font-black">arrow_forward</span>
+                                        </button>
+                                    )}
                                 </div>
                             </div>
                         ))}

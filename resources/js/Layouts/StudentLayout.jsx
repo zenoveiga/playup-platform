@@ -31,9 +31,9 @@ export default function StudentLayout({ children }) {
                 <div className="flex-1 flex justify-center max-w-xl">
                     <div className="flex items-center bg-[#f1f3f9] px-4 py-2.5 rounded-full gap-2 w-full max-w-md border border-slate-200/50">
                         <span className="material-symbols-outlined text-slate-400 text-xl">search</span>
-                        <input 
-                            className="bg-transparent border-none focus:ring-0 text-sm w-full placeholder-slate-400 text-slate-700 font-medium py-0 px-1" 
-                            placeholder="Pesquisar curso, aula, autdcodo..." 
+                        <input
+                            className="bg-transparent border-none focus:ring-0 text-sm w-full placeholder-slate-400 text-slate-700 font-medium py-0 px-1"
+                            placeholder="Pesquisar curso, aula, autdcodo..."
                             type="text"
                         />
                     </div>
@@ -53,10 +53,10 @@ export default function StudentLayout({ children }) {
                             </span>
                             <span className="material-symbols-outlined text-slate-400 text-xl select-none">expand_more</span>
                         </div>
-                        <Link 
-                            href={route('logout')} 
-                            method="post" 
-                            as="button" 
+                        <Link
+                            href={route('logout')}
+                            method="post"
+                            as="button"
                             className="ml-2 p-2 rounded-full hover:bg-red-50 dark:hover:bg-red-950/20 text-error flex items-center justify-center transition-colors"
                             title="Sair"
                         >
@@ -79,15 +79,14 @@ export default function StudentLayout({ children }) {
                         </div>
                     </div>
                 </div>
-                
+
                 <nav className="flex-1 space-y-1 overflow-y-auto no-scrollbar pr-2">
                     {/* Dashboard */}
-                    <Link 
-                        className={`flex items-center px-4 py-3 rounded-xl font-bold transition-all duration-200 ease-in-out ${
-                            route().current('student.dashboard') 
-                                ? 'bg-primary text-on-primary shadow-lg shadow-primary/20' 
-                                : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container'
-                        }`} 
+                    <Link
+                        className={`flex items-center px-4 py-3 rounded-xl font-bold transition-all duration-200 ease-in-out ${route().current('student.dashboard')
+                            ? 'bg-primary text-on-primary shadow-lg shadow-primary/20'
+                            : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container'
+                            }`}
                         href={route('student.dashboard')}
                     >
                         <span className="material-symbols-outlined mr-3" style={{ fontVariationSettings: route().current('student.dashboard') ? "'FILL' 1" : "'FILL' 0" }}>dashboard</span>
@@ -96,7 +95,7 @@ export default function StudentLayout({ children }) {
 
                     {/* 📚 Aprendizagem (Expandable category) */}
                     <div className="pt-2">
-                        <button 
+                        <button
                             className="w-full text-on-surface-variant hover:text-on-surface hover:bg-surface-container flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-200 ease-in-out"
                             onClick={() => toggleExpand('aprendizagem')}
                         >
@@ -106,22 +105,20 @@ export default function StudentLayout({ children }) {
                             </div>
                             <span className={`material-symbols-outlined text-sm transition-transform duration-200 ${expanded.aprendizagem ? 'rotate-180' : ''}`}>expand_more</span>
                         </button>
-                        <div 
-                            className={`pl-9 space-y-1 mt-1 transition-all duration-300 ease-in-out overflow-hidden ${
-                                expanded.aprendizagem ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
-                            }`}
+                        <div
+                            className={`pl-9 space-y-1 mt-1 transition-all duration-300 ease-in-out overflow-hidden ${expanded.aprendizagem ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+                                }`}
                         >
-                            <Link 
-                                className={`block py-2 px-3 text-sm rounded-lg transition-colors ${
-                                    route().current('student.courses') 
-                                        ? 'text-primary font-bold bg-[#cfecff]/40 dark:bg-slate-800' 
-                                        : 'text-on-surface-variant hover:text-primary'
-                                }`} 
+                            <Link
+                                className={`block py-2 px-3 text-sm rounded-lg transition-colors ${route().current('student.courses')
+                                    ? 'text-primary font-bold bg-[#cfecff]/40 dark:bg-slate-800'
+                                    : 'text-on-surface-variant hover:text-primary'
+                                    }`}
                                 href={route('student.courses')}
                             >
                                 Meus Cursos
                             </Link>
-                            <Link 
+                            {/* <Link 
                                 className={`block py-2 px-3 text-sm rounded-lg transition-colors ${
                                     route().current('student.activities') 
                                         ? 'text-primary font-bold bg-[#cfecff]/40 dark:bg-slate-800' 
@@ -130,18 +127,17 @@ export default function StudentLayout({ children }) {
                                 href={route('student.activities')}
                             >
                                 Atividades
-                            </Link>
-                            <Link 
-                                className={`block py-2 px-3 text-sm rounded-lg transition-colors ${
-                                    route().current('student.agenda') 
-                                        ? 'text-primary font-bold bg-[#cfecff]/40 dark:bg-slate-800' 
-                                        : 'text-on-surface-variant hover:text-primary'
-                                }`} 
+                            </Link> */}
+                            <Link
+                                className={`block py-2 px-3 text-sm rounded-lg transition-colors ${route().current('student.agenda')
+                                    ? 'text-primary font-bold bg-[#cfecff]/40 dark:bg-slate-800'
+                                    : 'text-on-surface-variant hover:text-primary'
+                                    }`}
                                 href={route('student.agenda')}
                             >
                                 Agenda
                             </Link>
-                            <Link 
+                            {/* <Link 
                                 className={`block py-2 px-3 text-sm rounded-lg transition-colors ${
                                     route().current('student.library') 
                                         ? 'text-primary font-bold bg-[#cfecff]/40 dark:bg-slate-800' 
@@ -150,13 +146,13 @@ export default function StudentLayout({ children }) {
                                 href={route('student.library')}
                             >
                                 Biblioteca
-                            </Link>
+                            </Link> */}
                         </div>
                     </div>
 
                     {/* 📈 Meu Desempenho (Expandable category) */}
                     <div className="pt-1">
-                        <button 
+                        <button
                             className="w-full text-on-surface-variant hover:text-on-surface hover:bg-surface-container flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-200 ease-in-out"
                             onClick={() => toggleExpand('desempenho')}
                         >
@@ -166,32 +162,29 @@ export default function StudentLayout({ children }) {
                             </div>
                             <span className={`material-symbols-outlined text-sm transition-transform duration-200 ${expanded.desempenho ? 'rotate-180' : ''}`}>expand_more</span>
                         </button>
-                        <div 
-                            className={`pl-9 space-y-1 mt-1 transition-all duration-300 ease-in-out overflow-hidden ${
-                                expanded.desempenho ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
-                            }`}
+                        <div
+                            className={`pl-9 space-y-1 mt-1 transition-all duration-300 ease-in-out overflow-hidden ${expanded.desempenho ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+                                }`}
                         >
-                            <Link 
-                                className={`block py-2 px-3 text-sm rounded-lg transition-colors ${
-                                    route().current('student.report-card') 
-                                        ? 'text-primary font-bold bg-[#cfecff]/40 dark:bg-slate-800' 
-                                        : 'text-on-surface-variant hover:text-primary'
-                                }`} 
+                            <Link
+                                className={`block py-2 px-3 text-sm rounded-lg transition-colors ${route().current('student.report-card')
+                                    ? 'text-primary font-bold bg-[#cfecff]/40 dark:bg-slate-800'
+                                    : 'text-on-surface-variant hover:text-primary'
+                                    }`}
                                 href={route('student.report-card')}
                             >
                                 Boletim
                             </Link>
-                            <Link 
-                                className={`block py-2 px-3 text-sm rounded-lg transition-colors ${
-                                    route().current('student.attendance') 
-                                        ? 'text-primary font-bold bg-[#cfecff]/40 dark:bg-slate-800' 
-                                        : 'text-on-surface-variant hover:text-primary'
-                                }`} 
+                            <Link
+                                className={`block py-2 px-3 text-sm rounded-lg transition-colors ${route().current('student.attendance')
+                                    ? 'text-primary font-bold bg-[#cfecff]/40 dark:bg-slate-800'
+                                    : 'text-on-surface-variant hover:text-primary'
+                                    }`}
                                 href={route('student.attendance')}
                             >
                                 Frequência
                             </Link>
-                            <Link 
+                            {/* <Link 
                                 className={`block py-2 px-3 text-sm rounded-lg transition-colors ${
                                     route().current('student.progress') 
                                         ? 'text-primary font-bold bg-[#cfecff]/40 dark:bg-slate-800' 
@@ -200,13 +193,13 @@ export default function StudentLayout({ children }) {
                                 href={route('student.progress')}
                             >
                                 Progresso
-                            </Link>
+                            </Link> */}
                         </div>
                     </div>
 
                     {/* 💬 Comunicação (Expandable category) */}
                     <div className="pt-1">
-                        <button 
+                        <button
                             className="w-full text-on-surface-variant hover:text-on-surface hover:bg-surface-container flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-200 ease-in-out"
                             onClick={() => toggleExpand('comunicacao')}
                         >
@@ -216,18 +209,25 @@ export default function StudentLayout({ children }) {
                             </div>
                             <span className={`material-symbols-outlined text-sm transition-transform duration-200 ${expanded.comunicacao ? 'rotate-180' : ''}`}>expand_more</span>
                         </button>
-                        <div 
-                            className={`pl-9 space-y-1 mt-1 transition-all duration-300 ease-in-out overflow-hidden ${
-                                expanded.comunicacao ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
-                            }`}
+                        <div
+                            className={`pl-9 space-y-1 mt-1 transition-all duration-300 ease-in-out overflow-hidden ${expanded.comunicacao ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+                                }`}
                         >
-                            <a className="block py-2 px-3 text-sm text-on-surface-variant hover:text-primary rounded-lg transition-colors" href="#">Mensagens</a>
+                            <Link
+                                className={`block py-2 px-3 text-sm rounded-lg transition-colors ${route().current('student.messages')
+                                    ? 'text-primary font-bold bg-[#cfecff]/40 dark:bg-slate-800'
+                                    : 'text-on-surface-variant hover:text-primary'
+                                    }`}
+                                href={route('student.messages')}
+                            >
+                                Mensagens
+                            </Link>
                         </div>
                     </div>
 
                     {/* 💼 Serviços (Expandable category) */}
                     <div className="pt-1">
-                        <button 
+                        <button
                             className="w-full text-on-surface-variant hover:text-on-surface hover:bg-surface-container flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-200 ease-in-out"
                             onClick={() => toggleExpand('servicos')}
                         >
@@ -237,26 +237,40 @@ export default function StudentLayout({ children }) {
                             </div>
                             <span className={`material-symbols-outlined text-sm transition-transform duration-200 ${expanded.servicos ? 'rotate-180' : ''}`}>expand_more</span>
                         </button>
-                        <div 
-                            className={`pl-9 space-y-1 mt-1 transition-all duration-300 ease-in-out overflow-hidden ${
-                                expanded.servicos ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
-                            }`}
+                        <div
+                            className={`pl-9 space-y-1 mt-1 transition-all duration-300 ease-in-out overflow-hidden ${expanded.servicos ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+                                }`}
                         >
                             <a className="block py-2 px-3 text-sm text-on-surface-variant hover:text-primary rounded-lg transition-colors" href="#">Matrículas</a>
-                            <a className="block py-2 px-3 text-sm text-on-surface-variant hover:text-primary rounded-lg transition-colors" href="#">Documentos</a>
-                            <a className="block py-2 px-3 text-sm text-on-surface-variant hover:text-primary rounded-lg transition-colors" href="#">Financeiro</a>
-                            <a className="block py-2 px-3 text-sm text-on-surface-variant hover:text-primary rounded-lg transition-colors" href="#">Solicitações</a>
+                            <Link
+                                className={`block py-2 px-3 text-sm rounded-lg transition-colors ${route().current('student.documents*')
+                                    ? 'text-primary font-bold bg-[#cfecff]/40 dark:bg-slate-800'
+                                    : 'text-on-surface-variant hover:text-primary'
+                                    }`}
+                                href={route('student.documents')}
+                            >
+                                Documentos
+                            </Link>
+                            <Link
+                                className={`block py-2 px-3 text-sm rounded-lg transition-colors ${route().current('student.financial*')
+                                    ? 'text-primary font-bold bg-[#cfecff]/40 dark:bg-slate-800'
+                                    : 'text-on-surface-variant hover:text-primary'
+                                    }`}
+                                href={route('student.financial')}
+                            >
+                                Financeiro
+                            </Link>
+                            {/* <a className="block py-2 px-3 text-sm text-on-surface-variant hover:text-primary rounded-lg transition-colors" href="#">Solicitações</a> */}
                         </div>
                     </div>
 
                     {/* Configurações */}
                     <div className="pt-1">
-                        <Link 
-                            className={`flex items-center px-4 py-3 rounded-xl font-bold transition-all duration-200 ease-in-out ${
-                                route().current('profile.edit') 
-                                    ? 'bg-primary text-on-primary shadow-lg shadow-primary/20' 
-                                    : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container'
-                            }`} 
+                        <Link
+                            className={`flex items-center px-4 py-3 rounded-xl font-bold transition-all duration-200 ease-in-out ${route().current('profile.edit')
+                                ? 'bg-primary text-on-primary shadow-lg shadow-primary/20'
+                                : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container'
+                                }`}
                             href={route('profile.edit')}
                         >
                             <span className="material-symbols-outlined mr-3">settings</span>
@@ -264,30 +278,6 @@ export default function StudentLayout({ children }) {
                         </Link>
                     </div>
                 </nav>
-
-                <div className="mt-auto space-y-4">
-                    <div className="bg-primary-container/10 p-4 rounded-xl border border-primary/10">
-                        <p className="text-xs font-bold text-primary mb-2 uppercase tracking-tighter">Pro Status</p>
-                        <button className="w-full kinetic-gradient text-on-primary py-2 px-4 rounded-xl text-sm font-bold shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all">
-                            Upgrade to Pro
-                        </button>
-                    </div>
-                    <div className="pt-4 space-y-1">
-                        <a className="text-on-surface-variant hover:text-on-surface flex items-center px-4 py-2 transition-colors" href="#">
-                            <span className="material-symbols-outlined mr-3 text-lg">help</span>
-                            <span className="text-sm">Help Center</span>
-                        </a>
-                        <Link 
-                            className="w-full text-on-surface-variant hover:text-on-surface flex items-center px-4 py-2 transition-colors text-left" 
-                            href={route('logout')}
-                            method="post"
-                            as="button"
-                        >
-                            <span className="material-symbols-outlined mr-3 text-lg">logout</span>
-                            <span className="text-sm">Logout</span>
-                        </Link>
-                    </div>
-                </div>
             </aside>
 
             {/* Main Content Canvas */}

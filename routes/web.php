@@ -421,6 +421,46 @@ Route::middleware(['auth', 'role:student'])->prefix('student')->name('student.')
     Route::get('/cursos', function () {
         return Inertia::render('Student/Courses');
     })->name('courses');
+
+    Route::get('/cursos/marketing-digital', function () {
+        return Inertia::render('Student/CoursePlay');
+    })->name('courses.play');
+
+    Route::get('/mensagens', function () {
+        return Inertia::render('Student/Messages');
+    })->name('messages');
+
+    Route::get('/documentos', function () {
+        return Inertia::render('Student/Documents');
+    })->name('documents');
+
+    Route::get('/documentos/certificados', function () {
+        return Inertia::render('Student/Certificates');
+    })->name('documents.certificates');
+
+    Route::get('/documentos/declaracoes', function () {
+        return Inertia::render('Student/Declarations');
+    })->name('documents.declarations');
+
+    Route::get('/documentos/contratos', function () {
+        return Inertia::render('Student/Contracts');
+    })->name('documents.contracts');
+
+    Route::get('/documentos/comprovantes', function () {
+        return Inertia::render('Student/Receipts');
+    })->name('documents.receipts');
+
+    Route::get('/financeiro', function () {
+        return Inertia::render('Student/Financial');
+    })->name('financial');
+
+    Route::get('/financeiro/mensalidades', function () {
+        return Inertia::render('Student/Installments');
+    })->name('financial.installments');
+
+    Route::get('/financeiro/pagamentos', function () {
+        return Inertia::render('Student/Payments');
+    })->name('financial.payments');
 });
 
 Route::middleware('auth')->group(function () {
