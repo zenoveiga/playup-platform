@@ -35,15 +35,30 @@ class RegisteredUserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'account_type' => 'nullable|in:student,licensee',
+            'phone' => 'nullable|string|max:20',
         ]);
+
+        $isLicensee = $request->input('account_type') === 'licensee';
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
+            'phone' => $request->phone,
             'password' => Hash::make($request->password),
+            'role' => $isLicensee ? User::ROLE_LICENSEE_SIGNUP : 'student',
+            'status' => $isLicensee ? User::STATUS_PENDING : User::STATUS_ACTIVE,
         ]);
 
         event(new Registered($user));
+
+        // Licenciado só acessa após aprovação do administrador da plataforma.
+        if ($isLicensee) {
+            return redirect()->route('login')->with(
+                'status',
+                'Cadastro de licenciado recebido! Você poderá acessar assim que o administrador aprovar sua conta.'
+            );
+        }
 
         Auth::login($user);
 

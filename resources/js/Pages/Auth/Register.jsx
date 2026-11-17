@@ -11,6 +11,7 @@ export default function Register() {
         email: '',
         password: '',
         password_confirmation: '',
+        account_type: 'student',
     });
 
     const submit = (e) => {
@@ -35,6 +36,40 @@ export default function Register() {
             </div>
 
             <form onSubmit={submit} className="space-y-4">
+                {/* Tipo de conta */}
+                <div className="space-y-1">
+                    <span className="block text-xs font-bold uppercase tracking-wider text-[#003346]/70 dark:text-white/75">
+                        Quero me cadastrar como
+                    </span>
+                    <div className="grid grid-cols-2 gap-3">
+                        {[
+                            { value: 'student', label: 'Aluno', icon: 'school' },
+                            { value: 'licensee', label: 'Licenciado', icon: 'storefront' },
+                        ].map((opt) => (
+                            <label key={opt.value} className="relative cursor-pointer select-none">
+                                <input
+                                    type="radio"
+                                    name="account_type"
+                                    value={opt.value}
+                                    checked={data.account_type === opt.value}
+                                    onChange={(e) => setData('account_type', e.target.value)}
+                                    className="peer sr-only"
+                                />
+                                <div className="flex items-center justify-center gap-2 p-3 rounded-xl bg-surface-container-low dark:bg-slate-900 border-2 border-transparent peer-checked:border-primary dark:peer-checked:border-[#00D1FF] peer-checked:bg-primary/5 transition-all text-sm font-bold text-[#003346] dark:text-white">
+                                    <span className="material-symbols-outlined text-lg text-primary dark:text-[#00D1FF]">{opt.icon}</span>
+                                    {opt.label}
+                                </div>
+                            </label>
+                        ))}
+                    </div>
+                    {data.account_type === 'licensee' && (
+                        <p className="text-[11px] text-[#507c94] dark:text-[#87b3cd] font-medium pt-1">
+                            Cadastros de licenciado passam por aprovação do administrador antes do primeiro acesso.
+                        </p>
+                    )}
+                    <InputError message={errors.account_type} className="mt-1" />
+                </div>
+
                 {/* Nome Field */}
                 <div className="space-y-1">
                     <label htmlFor="name" className="block text-xs font-bold uppercase tracking-wider text-[#003346]/70 dark:text-white/75">

@@ -8,6 +8,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -22,6 +23,36 @@ class AuthenticatedSessionController extends Controller
             'canResetPassword' => Route::has('password.request'),
             'status' => session('status'),
         ]);
+    }
+
+    /**
+     * Tela de login exclusiva do administrador da plataforma.
+     */
+    public function createPlatform(): Response
+    {
+        return Inertia::render('Platform/Auth/Login', [
+            'status' => session('status'),
+        ]);
+    }
+
+    /**
+     * Autenticação do administrador da plataforma.
+     */
+    public function storePlatform(LoginRequest $request): RedirectResponse
+    {
+        $request->authenticate();
+
+        if (! $request->user()->isPlatformAdmin()) {
+            Auth::guard('web')->logout();
+
+            throw ValidationException::withMessages([
+                'email' => 'Esta área é exclusiva para administradores da plataforma.',
+            ]);
+        }
+
+        $request->session()->regenerate();
+
+        return redirect()->intended(route('platform.dashboard', absolute: false));
     }
 
     /**
@@ -41,12 +72,14 @@ class AuthenticatedSessionController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
+        $wasPlatformAdmin = $request->user()?->isPlatformAdmin();
+
         Auth::guard('web')->logout();
 
         $request->session()->invalidate();
 
         $request->session()->regenerateToken();
 
-        return redirect('/');
+        return $wasPlatformAdmin ? redirect()->route('platform.login') : redirect('/');
     }
 }

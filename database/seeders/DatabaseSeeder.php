@@ -19,6 +19,12 @@ class DatabaseSeeder extends Seeder
 
         $users = [
             [
+                'name' => 'Administrador da Plataforma',
+                'email' => 'plataforma@playup.com',
+                'role' => 'super_admin',
+                'status' => 'active',
+            ],
+            [
                 'name' => 'First Test User',
                 'email' => 'firsttestuser@example.com',
                 'password' => bcrypt('password'),

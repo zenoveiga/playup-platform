@@ -17,7 +17,16 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(append: [
             \App\Http\Middleware\HandleInertiaRequests::class,
             \Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets::class,
+            \App\Http\Middleware\EnsureAccountIsActive::class,
         ]);
+
+        // Área do administrador da plataforma tem tela de login própria.
+        $middleware->redirectGuestsTo(fn (Request $request) => $request->is('administrador', 'administrador/*')
+            ? route('platform.login')
+            : route('login'));
+
+        // Usuário já logado acessando telas de visitante vai para o próprio painel.
+        $middleware->redirectUsersTo(fn () => route('dashboard'));
 
         $middleware->alias([
             'role' => \App\Http\Middleware\RoleMiddleware::class,

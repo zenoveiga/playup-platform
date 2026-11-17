@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Http\Middleware\EnsureAccountIsActive;
+use App\Models\User;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
@@ -51,6 +53,16 @@ class LoginRequest extends FormRequest
         }
 
         RateLimiter::clear($this->throttleKey());
+
+        $user = Auth::user();
+
+        if (in_array($user->status, [User::STATUS_PENDING, User::STATUS_BLOCKED, 'rejected'], true)) {
+            Auth::guard('web')->logout();
+
+            throw ValidationException::withMessages([
+                'email' => EnsureAccountIsActive::messageFor($user->status),
+            ]);
+        }
     }
 
     /**

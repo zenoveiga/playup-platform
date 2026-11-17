@@ -16,7 +16,9 @@ Route::get('/', function () {
 
 Route::get('/dashboard', function () {
     $user = auth()->user();
-    if ($user->role === 'admin') {
+    if ($user->isPlatformAdmin()) {
+        return redirect()->route('platform.dashboard');
+    } elseif ($user->role === 'admin') {
         return redirect()->route('admin.dashboard');
     } elseif ($user->role === 'school_admin') {
         return redirect()->route('school-admin.dashboard');
@@ -56,6 +58,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
             'status' => $validated['status'],
             'password' => bcrypt('password'), // default password
             'role' => 'student',
+            'licensee_id' => auth()->id(),
         ]);
 
         return redirect()->route('admin.students.index');
@@ -197,6 +200,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
             'status' => $validated['status'] === 'interested' ? 'inactive' : $validated['status'],
             'password' => bcrypt('password'),
             'role' => 'student',
+            'licensee_id' => auth()->id(),
         ]);
 
         return redirect()->route('admin.sales.index')->with('success', 'Interessado cadastrado com sucesso!');
@@ -238,6 +242,7 @@ Route::middleware(['auth', 'role:school_admin'])->prefix('school-admin')->name('
             'status' => $validated['status'],
             'password' => bcrypt('password'), // default password
             'role' => 'student',
+            'licensee_id' => auth()->id(),
         ]);
 
         return redirect()->route('school-admin.students.index');
@@ -379,6 +384,7 @@ Route::middleware(['auth', 'role:school_admin'])->prefix('school-admin')->name('
             'status' => $validated['status'] === 'interested' ? 'inactive' : $validated['status'],
             'password' => bcrypt('password'),
             'role' => 'student',
+            'licensee_id' => auth()->id(),
         ]);
 
         return redirect()->route('school-admin.sales.index')->with('success', 'Interessado cadastrado com sucesso!');
@@ -470,3 +476,4 @@ Route::middleware('auth')->group(function () {
 });
 
 require __DIR__.'/auth.php';
+require __DIR__.'/platform.php';

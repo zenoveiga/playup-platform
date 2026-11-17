@@ -34,6 +34,13 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user(),
             ],
+            'platform' => fn () => $request->user()?->isPlatformAdmin()
+                ? ['pendingLicensees' => \App\Models\User::licensees()->where('status', 'pending')->count()]
+                : null,
+            'flash' => [
+                'success' => fn () => $request->session()->get('success'),
+                'error' => fn () => $request->session()->get('error'),
+            ],
         ];
     }
 }
