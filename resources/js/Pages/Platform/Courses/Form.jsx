@@ -30,7 +30,8 @@ const MATERIAL_LABELS = { video: ['smart_display', 'Vídeo'], document: ['menu_b
 // Itens que compõem a trilha do curso livre, para a ordenação.
 function lessonItems(d) {
     return [
-        ...d.materials.map((m) => {
+        // Apostilas, links e arquivos ficam no cartão de materiais de apoio do aluno; só vídeos entram na trilha.
+        ...d.materials.filter((m) => m.type === 'video').map((m) => {
             const [icon, kind] = MATERIAL_LABELS[m.type] ?? MATERIAL_LABELS.file;
             return { token: `material:${m._key}`, icon, label: m.title || kind, sub: kind };
         }),
@@ -371,7 +372,7 @@ function CourseForm({ course, availableModules, suggestedInstallments }) {
                             <ExerciseBuilder sets={data.exercise_sets} onChange={(sets) => setData('exercise_sets', sets)} errors={errors} />
                         </Card>
 
-                        <Card icon="format_list_numbered" iconTone="secondary" title="Ordem das aulas" description="Defina o que o aluno vê primeiro: vídeos, apostilas ou exercícios">
+                        <Card icon="format_list_numbered" iconTone="secondary" title="Ordem das aulas" description="Defina o que o aluno vê primeiro: vídeos ou exercícios. Apostilas, links e arquivos ficam num cartão de materiais de apoio.">
                             <LessonOrder items={lessonItems(data)} order={data.outline} onChange={(order) => setData('outline', order)} />
                         </Card>
                     </>

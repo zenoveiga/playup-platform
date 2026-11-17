@@ -26,7 +26,6 @@ function buildOutline(course) {
                 ...(m.application_instructions
                     ? [{ key: `a${m.id}`, token: 'application', kind: 'application', title: 'Aplicação', subtitle: 'Atividade prática', minutes: m.application_minutes, item: m }]
                     : []),
-                ...(m.support.length ? [{ key: `s${m.id}`, token: 'support', kind: 'materials', title: 'Materiais de apoio', subtitle: `${m.support.length} arquivo(s)`, item: m.support }] : []),
                 ...m.exercise_sets.map(exerciseLesson),
             ], m.outline),
         }));
@@ -37,7 +36,7 @@ function buildOutline(course) {
             key: 'free',
             title: 'Conteúdo do curso',
             lessons: orderByOutline([
-                ...course.materials.map((v) => ({
+                ...course.materials.filter((v) => v.type === 'video').map((v) => ({
                     key: `v${v.id}`,
                     token: `material:${v.id}`,
                     kind: v.type === 'video' ? 'video' : 'material',
@@ -50,6 +49,71 @@ function buildOutline(course) {
             ], course.outline),
         },
     ];
+}
+
+/** Materiais de apoio ficam fora da trilha, num cartão próprio (agrupados por módulo). */
+function supportGroups(course) {
+    if (course.structure === 'modular') {
+        return course.modules
+            .map((m, mi) => ({ key: `m${m.id}`, title: `Módulo ${mi + 1}: ${m.title}`, items: m.support }))
+            .filter((g) => g.items.length);
+    }
+    const items = course.materials.filter((m) => m.type !== 'video');
+    return items.length ? [{ key: 'free', title: null, items }] : [];
+}
+
+const MATERIAL_KIND = { document: 'Apostila', link: 'Link', file: 'Arquivo', video: 'Vídeo' };
+
+function SupportCard({ groups }) {
+    const [open, setOpen] = useState(false);
+    const total = groups.reduce((s, g) => s + g.items.length, 0);
+    if (!total) return null;
+
+    return (
+        <div className="bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden">
+            <button
+                type="button"
+                onClick={() => setOpen((o) => !o)}
+                aria-expanded={open}
+                className="w-full flex items-center gap-3 p-4 text-left hover:bg-surface-container-low transition-colors"
+            >
+                <span className="w-9 h-9 shrink-0 rounded-xl bg-secondary/10 text-secondary flex items-center justify-center">
+                    <span className="material-symbols-outlined text-lg">folder_open</span>
+                </span>
+                <span className="flex-1 min-w-0">
+                    <span className="block font-bold text-sm text-on-surface">Materiais de apoio</span>
+                    <span className="block text-[11px] text-on-surface-variant">Apostilas, arquivos e links</span>
+                </span>
+                <span className="px-2 py-0.5 rounded-full bg-secondary/10 text-secondary text-[11px] font-black tabular-nums">{total}</span>
+                <span className={`material-symbols-outlined text-on-surface-variant transition-transform ${open ? 'rotate-180' : ''}`}>expand_more</span>
+            </button>
+            {open && (
+                <div className="px-4 pb-4 space-y-4">
+                    {groups.map((g) => (
+                        <div key={g.key} className="space-y-1">
+                            {g.title && <p className="text-[10px] font-black uppercase tracking-wider text-on-surface-variant px-1 pt-1">{g.title}</p>}
+                            {g.items.map((m) => (
+                                <a
+                                    key={m.id}
+                                    href={m.file_url || m.url}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-surface-container-low transition-colors group"
+                                >
+                                    <span className="material-symbols-outlined text-primary">{MATERIAL_ICONS[m.type] ?? 'attach_file'}</span>
+                                    <span className="flex-1 min-w-0">
+                                        <span className="block text-sm text-on-surface truncate group-hover:text-primary">{m.title}</span>
+                                        <span className="block text-[11px] text-on-surface-variant truncate">{m.description || MATERIAL_KIND[m.type] || 'Arquivo'}</span>
+                                    </span>
+                                    <span className="material-symbols-outlined text-base text-on-surface-variant group-hover:text-primary">{m.file_url ? 'download' : 'open_in_new'}</span>
+                                </a>
+                            ))}
+                        </div>
+                    ))}
+                </div>
+            )}
+        </div>
+    );
 }
 
 function MaterialLink({ material }) {
@@ -235,6 +299,8 @@ export default function CourseView({ course, access, answers: initialAnswers = {
                             {[course.category, course.workload_hours && `${course.workload_hours}h`, `${lessons.length} itens`].filter(Boolean).join(' · ')}
                         </p>
                     </div>
+
+                    <SupportCard groups={supportGroups(course)} />
 
                     {outline.map((section) => (
                         <div key={section.key} className="bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden">

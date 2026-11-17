@@ -29,7 +29,6 @@ function lessonItems(d) {
         ...(d.application_instructions?.trim()
             ? [{ token: 'application', icon: 'construction', label: 'Aplicação prática', sub: `${d.application_minutes || 0} min` }]
             : []),
-        ...(d.support.length ? [{ token: 'support', icon: 'folder_open', label: 'Materiais de apoio', sub: `${d.support.length} arquivo(s)` }] : []),
         ...d.exercise_sets.map((s) => ({
             token: `set:${s._key}`,
             icon: 'quiz',
@@ -192,7 +191,7 @@ function ModuleForm({ module, videoCategories }) {
                     <ExerciseBuilder sets={data.exercise_sets} onChange={(sets) => setData('exercise_sets', sets)} errors={errors} />
                 </Card>
 
-                <Card icon="format_list_numbered" iconTone="secondary" title="Ordem das aulas" description="Defina o que o aluno vê primeiro: vídeos, aplicação, materiais ou exercícios">
+                <Card icon="format_list_numbered" iconTone="secondary" title="Ordem das aulas" description="Defina o que o aluno vê primeiro: vídeos, aplicação ou exercícios. Materiais de apoio ficam num cartão à parte.">
                     <LessonOrder items={lessonItems(data)} order={data.outline} onChange={(order) => setData('outline', order)} />
                 </Card>
 
