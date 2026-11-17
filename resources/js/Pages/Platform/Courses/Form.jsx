@@ -1,6 +1,7 @@
 import ExerciseBuilder, { exerciseFromServer, exercisesForSubmit } from '@/Components/Platform/ExerciseBuilder';
 import MaterialList, { materialFromServer, materialsForSubmit } from '@/Components/Platform/MaterialList';
-import { Card, Field, IconButton, inputClass, PageHeader, PrimaryAction, StatusBadge } from '@/Components/Platform/UI';
+import { Card, Field, IconButton, inputClass, MoneyInput, PageHeader, PrimaryAction, StatusBadge } from '@/Components/Platform/UI';
+import { installmentText } from '@/lib/licensee';
 import PlatformLayout from '@/Layouts/PlatformLayout';
 import { uploadKindFor, useDirectUploads, withUploadKey } from '@/lib/directUpload';
 import { Head, Link, useForm } from '@inertiajs/react';
@@ -15,14 +16,14 @@ const LEVELS = [
 const CATEGORIES = ['Tecnologia', 'Negócios', 'Design', 'Marketing', 'Finanças', 'Idiomas', 'Desenvolvimento Pessoal'];
 
 // Remonta o formulário quando o servidor devolve nova versão do curso (após salvar).
-export default function CourseFormPage({ course, availableModules }) {
+export default function CourseFormPage({ course, availableModules, suggestedInstallments }) {
     const version = course
         ? [course.id, course.updated_at, ...(course.materials ?? []).map((m) => m.id), ...(course.exercises ?? []).map((e) => e.id)].join(':')
         : 'new';
-    return <CourseForm key={version} course={course} availableModules={availableModules} />;
+    return <CourseForm key={version} course={course} availableModules={availableModules} suggestedInstallments={suggestedInstallments} />;
 }
 
-function CourseForm({ course, availableModules }) {
+function CourseForm({ course, availableModules, suggestedInstallments }) {
     const isEdit = !!course;
     const coverInput = useRef(null);
     const [coverPreview, setCoverPreview] = useState(course?.cover_url ?? null);
@@ -34,6 +35,7 @@ function CourseForm({ course, availableModules }) {
         category: course?.category ?? '',
         level: course?.level ?? 'iniciante',
         workload_hours: course?.workload_hours ?? '',
+        suggested_price: course?.suggested_price ?? '',
         status: course?.status ?? 'draft',
         structure: course?.structure ?? 'modular',
         cover: null,
@@ -139,6 +141,18 @@ function CourseForm({ course, availableModules }) {
                             </Field>
                             <Field label="Carga Horária (horas)" error={errors.workload_hours}>
                                 <input type="number" min="1" className={inputClass} value={data.workload_hours} onChange={(e) => setData('workload_hours', e.target.value)} placeholder="Ex.: 40" />
+                            </Field>
+                            <Field
+                                label="Valor sugerido aos licenciados"
+                                error={errors.suggested_price}
+                                className="md:col-span-2"
+                                hint={
+                                    data.suggested_price
+                                        ? `${installmentText(data.suggested_price, suggestedInstallments)} · cada licenciado pode definir o próprio valor`
+                                        : 'Referência de preço para os licenciados; cada um pode definir o próprio valor.'
+                                }
+                            >
+                                <MoneyInput value={data.suggested_price} onChange={(v) => setData('suggested_price', v)} placeholder="0,00" className="max-w-xs" />
                             </Field>
                             <Field label="Nível de Dificuldade" error={errors.level} className="md:col-span-2">
                                 <div className="flex gap-4">

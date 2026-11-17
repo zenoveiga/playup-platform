@@ -118,6 +118,15 @@ export default function StudentLayout({ children }) {
                             >
                                 Meus Cursos
                             </Link>
+                            <Link
+                                className={`block py-2 px-3 text-sm rounded-lg transition-colors ${route().current('student.courses.available')
+                                    ? 'text-primary font-bold bg-[#cfecff]/40 dark:bg-slate-800'
+                                    : 'text-on-surface-variant hover:text-primary'
+                                    }`}
+                                href={route('student.courses.available')}
+                            >
+                                Cursos Disponíveis
+                            </Link>
                             {/* <Link 
                                 className={`block py-2 px-3 text-sm rounded-lg transition-colors ${
                                     route().current('student.activities') 

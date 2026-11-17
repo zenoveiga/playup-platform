@@ -1,11 +1,12 @@
 import { DangerButton, DialogShell, EmptyState, GhostButton, IconButton, PageHeader, PrimaryAction, StatusBadge } from '@/Components/Platform/UI';
 import PlatformLayout from '@/Layouts/PlatformLayout';
+import { brl, installmentText } from '@/lib/licensee';
 import { Head, Link, router } from '@inertiajs/react';
 import { useState } from 'react';
 
 const LEVELS = { iniciante: 'Iniciante', intermediario: 'Intermediário', avancado: 'Avançado' };
 
-export default function CoursesIndex({ courses }) {
+export default function CoursesIndex({ courses, suggestedPrices, suggestedInstallments }) {
     const [filter, setFilter] = useState('all');
     const [removing, setRemoving] = useState(null);
 
@@ -94,11 +95,26 @@ export default function CoursesIndex({ courses }) {
                                             </span>
                                         )}
                                     </div>
-                                    <div className="flex justify-end gap-1 mt-auto pt-4">
+                                    <div className="flex items-end justify-between gap-2 mt-auto pt-4">
+                                        <div>
+                                            <p className="text-[10px] font-black uppercase tracking-wider text-[#507c94]">Valor sugerido</p>
+                                            {suggestedPrices[c.id] ? (
+                                                <>
+                                                    <p className="text-lg font-black text-primary dark:text-[#00D1FF] font-headline leading-tight">{brl(suggestedPrices[c.id])}</p>
+                                                    <p className="text-[10px] text-[#507c94]">{installmentText(suggestedPrices[c.id], suggestedInstallments)}</p>
+                                                </>
+                                            ) : (
+                                                <Link href={route('platform.courses.edit', c.id)} className="text-xs font-bold text-amber-600 hover:underline">
+                                                    Definir valor
+                                                </Link>
+                                            )}
+                                        </div>
+                                        <div className="flex gap-1">
                                         <Link href={route('platform.courses.edit', c.id)} className="p-2 rounded-lg text-[#507c94] hover:text-primary hover:bg-primary/10 transition-colors" title="Editar">
                                             <span className="material-symbols-outlined text-lg">edit</span>
                                         </Link>
                                         <IconButton icon="delete" title="Remover" tone="danger" onClick={() => setRemoving(c)} />
+                                        </div>
                                     </div>
                                 </div>
                             </div>

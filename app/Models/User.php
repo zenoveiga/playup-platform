@@ -112,6 +112,36 @@ class User extends Authenticatable
         return $this->hasMany(User::class, 'licensee_id')->where('role', 'student');
     }
 
+    /** Cursos que o aluno adquiriu (acessos). */
+    public function enrollments(): HasMany
+    {
+        return $this->hasMany(Enrollment::class, 'student_id');
+    }
+
+    /** Vendas feitas pelo licenciado. */
+    public function sales(): HasMany
+    {
+        return $this->hasMany(Sale::class, 'licensee_id');
+    }
+
+    /** O aluno tem acesso válido ao curso agora? */
+    public function hasAccessTo(Course $course): bool
+    {
+        return $this->enrollments()->active()->where('course_id', $course->id)->exists();
+    }
+
+    /** Tabelas de preços do licenciado. */
+    public function priceTables(): HasMany
+    {
+        return $this->hasMany(PriceTable::class, 'owner_id');
+    }
+
+    /** Campanhas do licenciado. */
+    public function campaigns(): HasMany
+    {
+        return $this->hasMany(Campaign::class, 'licensee_id');
+    }
+
     public function approver(): BelongsTo
     {
         return $this->belongsTo(User::class, 'approved_by');

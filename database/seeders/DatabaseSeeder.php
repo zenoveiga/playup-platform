@@ -94,6 +94,10 @@ class DatabaseSeeder extends Seeder
             }
         }
 
+        // Alunos de exemplo pertencem ao licenciado de exemplo.
+        $licenseeId = User::where('email', 'school@playup.com')->value('id');
+        User::where('role', 'student')->whereNull('licensee_id')->update(['licensee_id' => $licenseeId]);
+
         $polos = [
             [
                 'code' => 'PL-001',

@@ -1,5 +1,6 @@
 import { Link, usePage } from '@inertiajs/react';
 import ApplicationLogo from '@/Components/ApplicationLogo';
+import FlashToast from '@/Components/Platform/FlashToast';
 
 export default function AdminLayout({ children }) {
     const { auth } = usePage().props;
@@ -108,6 +109,28 @@ export default function AdminLayout({ children }) {
                         <span className="material-symbols-outlined">auto_stories</span>
                         <span className="font-['Manrope'] text-sm">Cursos e Pacotes</span>
                     </Link>
+                    <Link
+                        className={`flex items-center gap-3 px-4 py-3 rounded-xl hover:translate-x-1 transition-all duration-200 ${
+                            route().current('admin.price-tables.*')
+                                ? 'bg-white dark:bg-slate-800 text-[#0050d4] dark:text-[#00D1FF] font-bold shadow-sm'
+                                : 'text-[#003346]/70 dark:text-white/70 hover:bg-white/40 dark:hover:bg-slate-800/40'
+                        }`}
+                        href={route('admin.price-tables.index')}
+                    >
+                        <span className="material-symbols-outlined" style={route().current('admin.price-tables.*') ? { fontVariationSettings: "'FILL' 1" } : {}}>sell</span>
+                        <span className="font-['Manrope'] text-sm">Tabelas de Preços</span>
+                    </Link>
+                    <Link
+                        className={`flex items-center gap-3 px-4 py-3 rounded-xl hover:translate-x-1 transition-all duration-200 ${
+                            route().current('admin.campaigns.*')
+                                ? 'bg-white dark:bg-slate-800 text-[#0050d4] dark:text-[#00D1FF] font-bold shadow-sm'
+                                : 'text-[#003346]/70 dark:text-white/70 hover:bg-white/40 dark:hover:bg-slate-800/40'
+                        }`}
+                        href={route('admin.campaigns.index')}
+                    >
+                        <span className="material-symbols-outlined" style={route().current('admin.campaigns.*') ? { fontVariationSettings: "'FILL' 1" } : {}}>campaign</span>
+                        <span className="font-['Manrope'] text-sm">Campanhas</span>
+                    </Link>
                     <Link 
                         className={`flex items-center gap-3 px-4 py-3 rounded-xl hover:translate-x-1 transition-all duration-200 ${
                             route().current('admin.classes.index') 
@@ -199,6 +222,8 @@ export default function AdminLayout({ children }) {
             <main className="ml-72 pt-16 min-h-screen bg-surface">
                 {children}
             </main>
+
+            <FlashToast />
         </div>
     );
 }

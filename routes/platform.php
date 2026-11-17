@@ -6,6 +6,7 @@ use App\Http\Controllers\Platform\DashboardController;
 use App\Http\Controllers\Platform\LicenseeController;
 use App\Http\Controllers\Platform\ModuleController;
 use App\Http\Controllers\Platform\PlatformUserController;
+use App\Http\Controllers\Platform\SuggestedPriceController;
 use App\Http\Controllers\Platform\UploadController;
 use Illuminate\Support\Facades\Route;
 
@@ -39,6 +40,10 @@ Route::prefix('administrador')->name('platform.')->group(function () {
         Route::post('usuarios/{user}/bloquear', [PlatformUserController::class, 'block'])->name('users.block');
         Route::post('usuarios/{user}/desbloquear', [PlatformUserController::class, 'unblock'])->name('users.unblock');
         Route::delete('usuarios/{user}', [PlatformUserController::class, 'destroy'])->name('users.destroy');
+
+        // Tabela de valores sugeridos (referência para os licenciados)
+        Route::get('precos-sugeridos', [SuggestedPriceController::class, 'index'])->name('pricing.index');
+        Route::put('precos-sugeridos', [SuggestedPriceController::class, 'update'])->name('pricing.update');
 
         // URL pré-assinada para envio direto de arquivos ao bucket S3
         Route::post('uploads', [UploadController::class, 'store'])->name('uploads.store');

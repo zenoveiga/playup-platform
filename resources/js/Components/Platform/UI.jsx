@@ -340,3 +340,22 @@ export function errorsFor(errors, prefix) {
         .filter(([k]) => k === prefix || k.startsWith(prefix + '.'))
         .map(([, v]) => v);
 }
+
+/** Campo de valor em reais. */
+export function MoneyInput({ value, onChange, placeholder, className = '' }) {
+    return (
+        <div className={`relative ${className}`}>
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-[#507c94] dark:text-[#87b3cd]">R$</span>
+            <input
+                type="number"
+                min="0"
+                step="0.01"
+                inputMode="decimal"
+                value={value ?? ''}
+                onChange={(e) => onChange(e.target.value)}
+                placeholder={placeholder}
+                className={`${inputClass} pl-10 py-2.5 text-right tabular-nums`}
+            />
+        </div>
+    );
+}

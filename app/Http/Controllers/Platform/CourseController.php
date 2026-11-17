@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Platform;
 use App\Http\Controllers\Controller;
 use App\Models\Course;
 use App\Models\CourseModule;
+use App\Models\PriceTable;
 use App\Services\ExerciseSync;
 use App\Services\MaterialSync;
 use Illuminate\Http\RedirectResponse;
@@ -28,6 +29,8 @@ class CourseController extends Controller
     {
         return Inertia::render('Platform/Courses/Index', [
             'courses' => Course::withCount(['modules', 'materials', 'exercises'])->latest()->get(),
+            'suggestedPrices' => (object) PriceTable::suggested()->priceMap(),
+            'suggestedInstallments' => PriceTable::suggested()->max_installments,
         ]);
     }
 
@@ -35,6 +38,7 @@ class CourseController extends Controller
     {
         return Inertia::render('Platform/Courses/Form', [
             'course' => null,
+            'suggestedInstallments' => PriceTable::suggested()->max_installments,
             'availableModules' => $this->availableModules(),
         ]);
     }
@@ -63,7 +67,11 @@ class CourseController extends Controller
         $course->load(['modules' => fn ($q) => $q->withCount(['exercises', 'videos', 'supportMaterials']), 'materials', 'exercises']);
 
         return Inertia::render('Platform/Courses/Form', [
-            'course' => $course,
+            'course' => [
+                ...$course->toArray(),
+                'suggested_price' => PriceTable::suggested()->items()->where('course_id', $course->id)->value('price'),
+            ],
+            'suggestedInstallments' => PriceTable::suggested()->max_installments,
             'availableModules' => $this->availableModules(),
         ]);
     }
@@ -115,6 +123,7 @@ class CourseController extends Controller
             'category' => 'nullable|string|max:100',
             'level' => 'required|in:iniciante,intermediario,avancado',
             'workload_hours' => 'nullable|integer|min:1|max:10000',
+            'suggested_price' => 'nullable|numeric|min:0|max:9999999',
             'status' => 'required|in:draft,published',
             'structure' => 'required|in:modular,free',
             'cover' => "nullable|image|max:{$maxCover}",
@@ -141,6 +150,7 @@ class CourseController extends Controller
             ...ExerciseSync::attributeNames(),
             'title' => 'título',
             'workload_hours' => 'carga horária',
+            'suggested_price' => 'valor sugerido',
             'cover' => 'capa',
             'module_ids' => 'módulos',
             'materials.*.title' => 'título do material',
@@ -222,6 +232,14 @@ class CourseController extends Controller
 
     private function syncContent(Course $course, array $data, Request $request): void
     {
+        // Valor sugerido do curso na tabela de valores sugeridos da plataforma.
+        $suggested = PriceTable::suggested();
+        if (filled($data['suggested_price'] ?? null)) {
+            $suggested->items()->updateOrCreate(['course_id' => $course->id], ['price' => $data['suggested_price']]);
+        } else {
+            $suggested->items()->where('course_id', $course->id)->delete();
+        }
+
         if (filled($data['cover_upload_key'] ?? null)) {
             Media::delete($course->cover_path);
             $course->update([

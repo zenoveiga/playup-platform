@@ -34,7 +34,10 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(
-            fn (Request $request) => $request->is('api/*') || $request->is('administrador/uploads'),
+            // API e chamadas JSON feitas via axios (envio direto, respostas, anotações) recebem erros em JSON;
+            // requisições do Inertia continuam com o fluxo normal de redirect.
+            fn (Request $request) => $request->is('api/*')
+                || ($request->expectsJson() && ! $request->header('X-Inertia')),
         );
 
         // Envio maior que o post_max_size do PHP: volta ao formulário com aviso, em vez da tela de erro.

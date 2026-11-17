@@ -33,7 +33,10 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     })->name('dashboard');
 
     Route::get('/alunos', function () {
-        $students = \App\Models\User::where('role', 'student')->get();
+        $students = \App\Models\User::where('role', 'student')
+            ->where('licensee_id', auth()->id())
+            ->latest()
+            ->get();
         return Inertia::render('Admin/Students', [
             'students' => $students
         ]);
@@ -54,7 +57,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
         \App\Models\User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
-            'phone' => $validated['phone'],
+            'phone' => $validated['phone'] ?? null,
             'status' => $validated['status'],
             'password' => bcrypt('password'), // default password
             'role' => 'student',
@@ -65,12 +68,16 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     })->name('students.store');
 
     Route::get('/alunos/{student}', function (\App\Models\User $student) {
+        abort_unless($student->role === 'student' && $student->licensee_id === auth()->id(), 404);
+
         return Inertia::render('Admin/ProfileDeAluno', [
             'student' => $student
         ]);
     })->name('students.show');
 
     Route::put('/alunos/{student}', function (\App\Models\User $student, \Illuminate\Http\Request $request) {
+        abort_unless($student->role === 'student' && $student->licensee_id === auth()->id(), 404);
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,' . $student->id,
@@ -83,9 +90,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
         return redirect()->back()->with('success', 'Cadastro do aluno atualizado com sucesso!');
     })->name('students.update');
 
-    Route::get('/courses', function () {
-        return Inertia::render('Admin/CoursesAndPackages');
-    })->name('courses.index');
+    require __DIR__.'/licensee.php';
 
     Route::get('/courses/cadastrar', function () {
         return Inertia::render('Admin/CourseCreate');
@@ -138,7 +143,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
             'code' => $code,
             'name' => $validated['name'],
             'responsible' => $validated['responsible'],
-            'phone' => $validated['phone'],
+            'phone' => $validated['phone'] ?? null,
             'email' => $validated['email'],
             'address' => $validated['address'],
             'status' => $validated['status'],
@@ -177,9 +182,6 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
         return Inertia::render('Admin/Financial');
     })->name('financial.index');
 
-    Route::get('/vendas', function () {
-        return Inertia::render('Admin/Sales');
-    })->name('sales.index');
 
     Route::get('/alunos/interessado/cadastrar', function () {
         return Inertia::render('Admin/StudentInterestedCreate');
@@ -196,7 +198,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
         \App\Models\User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
-            'phone' => $validated['phone'],
+            'phone' => $validated['phone'] ?? null,
             'status' => $validated['status'] === 'interested' ? 'inactive' : $validated['status'],
             'password' => bcrypt('password'),
             'role' => 'student',
@@ -217,7 +219,10 @@ Route::middleware(['auth', 'role:school_admin'])->prefix('school-admin')->name('
     })->name('dashboard');
 
     Route::get('/alunos', function () {
-        $students = \App\Models\User::where('role', 'student')->get();
+        $students = \App\Models\User::where('role', 'student')
+            ->where('licensee_id', auth()->id())
+            ->latest()
+            ->get();
         return Inertia::render('Admin/Students', [
             'students' => $students
         ]);
@@ -238,7 +243,7 @@ Route::middleware(['auth', 'role:school_admin'])->prefix('school-admin')->name('
         \App\Models\User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
-            'phone' => $validated['phone'],
+            'phone' => $validated['phone'] ?? null,
             'status' => $validated['status'],
             'password' => bcrypt('password'), // default password
             'role' => 'student',
@@ -249,12 +254,16 @@ Route::middleware(['auth', 'role:school_admin'])->prefix('school-admin')->name('
     })->name('students.store');
 
     Route::get('/alunos/{student}', function (\App\Models\User $student) {
+        abort_unless($student->role === 'student' && $student->licensee_id === auth()->id(), 404);
+
         return Inertia::render('Admin/ProfileDeAluno', [
             'student' => $student
         ]);
     })->name('students.show');
 
     Route::put('/alunos/{student}', function (\App\Models\User $student, \Illuminate\Http\Request $request) {
+        abort_unless($student->role === 'student' && $student->licensee_id === auth()->id(), 404);
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,' . $student->id,
@@ -298,7 +307,7 @@ Route::middleware(['auth', 'role:school_admin'])->prefix('school-admin')->name('
             'code' => $code,
             'name' => $validated['name'],
             'responsible' => $validated['responsible'],
-            'phone' => $validated['phone'],
+            'phone' => $validated['phone'] ?? null,
             'email' => $validated['email'],
             'address' => $validated['address'],
             'status' => $validated['status'],
@@ -329,9 +338,7 @@ Route::middleware(['auth', 'role:school_admin'])->prefix('school-admin')->name('
         return redirect()->route('school-admin.polos.index');
     })->name('polos.update');
 
-    Route::get('/courses', function () {
-        return Inertia::render('Admin/CoursesAndPackages');
-    })->name('courses.index');
+    require __DIR__.'/licensee.php';
 
     Route::get('/courses/cadastrar', function () {
         return Inertia::render('Admin/CourseCreate');
@@ -361,9 +368,6 @@ Route::middleware(['auth', 'role:school_admin'])->prefix('school-admin')->name('
         return Inertia::render('Admin/Financial');
     })->name('financial.index');
 
-    Route::get('/vendas', function () {
-        return Inertia::render('Admin/Sales');
-    })->name('sales.index');
 
     Route::get('/alunos/interessado/cadastrar', function () {
         return Inertia::render('Admin/StudentInterestedCreate');
@@ -380,7 +384,7 @@ Route::middleware(['auth', 'role:school_admin'])->prefix('school-admin')->name('
         \App\Models\User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
-            'phone' => $validated['phone'],
+            'phone' => $validated['phone'] ?? null,
             'status' => $validated['status'] === 'interested' ? 'inactive' : $validated['status'],
             'password' => bcrypt('password'),
             'role' => 'student',
@@ -424,13 +428,18 @@ Route::middleware(['auth', 'role:student'])->prefix('student')->name('student.')
         return Inertia::render('Student/Progress');
     })->name('progress');
 
-    Route::get('/cursos', function () {
-        return Inertia::render('Student/Courses');
-    })->name('courses');
+    Route::get('/cursos', [\App\Http\Controllers\Student\CourseController::class, 'index'])->name('courses');
+    Route::get('/cursos/disponiveis', [\App\Http\Controllers\Student\CourseController::class, 'available'])->name('courses.available');
 
     Route::get('/cursos/marketing-digital', function () {
         return Inertia::render('Student/CoursePlay');
     })->name('courses.play');
+
+    Route::get('/cursos/{course:slug}', [\App\Http\Controllers\Student\CourseController::class, 'show'])->name('courses.show');
+    Route::post('/cursos/{course:slug}/exercicios/{exercise}/responder', [\App\Http\Controllers\Student\LearningController::class, 'answer'])->name('exercises.answer');
+    Route::post('/cursos/{course:slug}/notas', [\App\Http\Controllers\Student\LearningController::class, 'storeNote'])->name('notes.store');
+    Route::put('/notas/{note}', [\App\Http\Controllers\Student\LearningController::class, 'updateNote'])->name('notes.update');
+    Route::delete('/notas/{note}', [\App\Http\Controllers\Student\LearningController::class, 'destroyNote'])->name('notes.destroy');
 
     Route::get('/mensagens', function () {
         return Inertia::render('Student/Messages');

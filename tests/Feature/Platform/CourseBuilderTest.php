@@ -228,6 +228,34 @@ class CourseBuilderTest extends TestCase
         $this->assertSame(1, Course::first()->exercises()->count());
     }
 
+    public function test_admin_sets_the_suggested_price_on_the_course_form(): void
+    {
+        $this->actingAs($this->admin)->post('/administrador/cursos', [
+            'title' => 'Com preço', 'level' => 'iniciante', 'status' => 'draft', 'structure' => 'modular',
+            'suggested_price' => '397.90',
+        ])->assertSessionHasNoErrors();
+
+        $course = Course::first();
+        $this->assertSame('397.90', \App\Models\PriceTable::suggested()->priceMap()[$course->id]);
+
+        $this->get("/administrador/cursos/{$course->id}/editar")
+            ->assertInertia(fn ($page) => $page->where('course.suggested_price', '397.90'));
+        $this->get('/administrador/cursos')
+            ->assertInertia(fn ($page) => $page->where("suggestedPrices.{$course->id}", '397.90'));
+
+        // Limpar o campo remove o valor sugerido.
+        $this->put("/administrador/cursos/{$course->id}", [
+            'title' => 'Com preço', 'level' => 'iniciante', 'status' => 'draft', 'structure' => 'modular',
+            'suggested_price' => '',
+        ])->assertSessionHasNoErrors();
+        $this->assertArrayNotHasKey($course->id, \App\Models\PriceTable::suggested()->priceMap());
+
+        $this->put("/administrador/cursos/{$course->id}", [
+            'title' => 'Com preço', 'level' => 'iniciante', 'status' => 'draft', 'structure' => 'modular',
+            'suggested_price' => '-5',
+        ])->assertSessionHasErrors('suggested_price');
+    }
+
     public function test_publishing_an_empty_course_is_rejected(): void
     {
         $this->actingAs($this->admin)->post('/administrador/cursos', [
