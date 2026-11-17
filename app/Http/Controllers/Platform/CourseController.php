@@ -125,6 +125,7 @@ class CourseController extends Controller
             'workload_hours' => 'nullable|integer|min:1|max:10000',
             'suggested_price' => 'nullable|numeric|min:0|max:9999999',
             'status' => 'required|in:draft,published',
+            ...\App\Support\Outline::rules(),
             'structure' => 'required|in:modular,free',
             'cover' => "nullable|image|max:{$maxCover}",
             'cover_upload_key' => 'nullable|string|max:500',
@@ -263,6 +264,7 @@ class CourseController extends Controller
             // Curso modular não mantém materiais nem exercícios avulsos.
             $this->materials->sync($course, [], "courses/{$course->id}/materials");
             $this->exercises->sync($course, []);
+            $course->update(['outline' => null]);
 
             return;
         }
@@ -278,5 +280,11 @@ class CourseController extends Controller
             $request->user()->id
         );
         $this->exercises->sync($course, $data['exercise_sets'] ?? []);
+
+        // Ordem das aulas: índices do formulário → ids gravados.
+        $course->update(['outline' => \App\Support\Outline::resolve($data['outline'] ?? null, [
+            'material' => $course->materials()->reorder('position')->pluck('id')->all(),
+            'set' => $course->exerciseSets()->pluck('id')->all(),
+        ])]);
     }
 }

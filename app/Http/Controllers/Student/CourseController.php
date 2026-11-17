@@ -80,6 +80,7 @@ class CourseController extends Controller
         return Inertia::render('Student/CourseView', [
             'course' => [
                 ...$course->only(['id', 'title', 'slug', 'description', 'category', 'level', 'workload_hours', 'structure', 'cover_url']),
+                'outline' => $course->outline ?? [],
                 'modules' => $course->modules->map(fn ($m) => [
                     'id' => $m->id,
                     'title' => $m->title,
@@ -87,6 +88,7 @@ class CourseController extends Controller
                     'objectives' => $m->objectives,
                     'application_minutes' => $m->application_minutes,
                     'application_instructions' => $m->application_instructions,
+                    'outline' => $m->outline ?? [],
                     'videos' => $m->materials->where('slot', 'video')->values()->map(fn ($v) => $this->material($v)),
                     'support' => $m->materials->where('slot', 'support')->values()->map(fn ($v) => $this->material($v)),
                     'exercise_sets' => $this->exerciseSets($m),

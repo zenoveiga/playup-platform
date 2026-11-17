@@ -1,5 +1,7 @@
 import ExerciseBuilder, { setFromServer, setsForSubmit } from '@/Components/Platform/ExerciseBuilder';
 import MaterialList, { materialFromServer, materialsForSubmit } from '@/Components/Platform/MaterialList';
+import LessonOrder from '@/Components/Platform/LessonOrder';
+import { orderByOutline, outlineForSubmit, outlineToClient } from '@/lib/outline';
 import { Card, Field, IconButton, inputClass, MoneyInput, PageHeader, PrimaryAction, StatusBadge } from '@/Components/Platform/UI';
 import { installmentText } from '@/lib/licensee';
 import PlatformLayout from '@/Layouts/PlatformLayout';
@@ -23,8 +25,28 @@ export default function CourseFormPage({ course, availableModules, suggestedInst
     return <CourseForm key={version} course={course} availableModules={availableModules} suggestedInstallments={suggestedInstallments} />;
 }
 
+const MATERIAL_LABELS = { video: ['smart_display', 'Vídeo'], document: ['menu_book', 'Apostila'], link: ['link', 'Link'], file: ['attach_file', 'Arquivo'] };
+
+// Itens que compõem a trilha do curso livre, para a ordenação.
+function lessonItems(d) {
+    return [
+        ...d.materials.map((m) => {
+            const [icon, kind] = MATERIAL_LABELS[m.type] ?? MATERIAL_LABELS.file;
+            return { token: `material:${m._key}`, icon, label: m.title || kind, sub: kind };
+        }),
+        ...d.exercise_sets.map((s) => ({
+            token: `set:${s._key}`,
+            icon: 'quiz',
+            label: s.title || 'Exercício sem título',
+            sub: `Exercício · ${s.questions.length} questão(ões)`,
+        })),
+    ];
+}
+
 function CourseForm({ course, availableModules, suggestedInstallments }) {
     const isEdit = !!course;
+    const initialMaterials = (course?.materials ?? []).map(materialFromServer);
+    const initialSets = (course?.exercise_sets ?? []).map(setFromServer);
     const coverInput = useRef(null);
     const [coverPreview, setCoverPreview] = useState(course?.cover_url ?? null);
     const [moduleSearch, setModuleSearch] = useState('');
@@ -41,8 +63,9 @@ function CourseForm({ course, availableModules, suggestedInstallments }) {
         cover: null,
         remove_cover: false,
         module_ids: (course?.modules ?? []).map((m) => m.id),
-        materials: (course?.materials ?? []).map(materialFromServer),
-        exercise_sets: (course?.exercise_sets ?? []).map(setFromServer),
+        materials: initialMaterials,
+        exercise_sets: initialSets,
+        outline: outlineToClient(course?.outline, { material: initialMaterials, set: initialSets }),
     });
 
     const modulesById = useMemo(() => Object.fromEntries(availableModules.map((m) => [m.id, m])), [availableModules]);
@@ -94,6 +117,10 @@ function CourseForm({ course, availableModules, suggestedInstallments }) {
             module_ids: d.structure === 'modular' ? d.module_ids : [],
             materials: d.structure === 'free' ? materialsForSubmit(d.materials.map(withUploadKey(keys))) : [],
             exercise_sets: d.structure === 'free' ? setsForSubmit(d.exercise_sets) : [],
+            outline:
+                d.structure === 'free'
+                    ? outlineForSubmit(orderByOutline(lessonItems(d), d.outline).map((i) => i.token), { material: d.materials, set: d.exercise_sets })
+                    : [],
         }));
         post(isEdit ? route('platform.courses.update', course.id) : route('platform.courses.store'), {
             forceFormData: true,
@@ -342,6 +369,10 @@ function CourseForm({ course, availableModules, suggestedInstallments }) {
 
                         <Card icon="quiz" iconTone="tertiary" title="Exercícios" description="Crie um ou mais exercícios com título, cada um com suas questões">
                             <ExerciseBuilder sets={data.exercise_sets} onChange={(sets) => setData('exercise_sets', sets)} errors={errors} />
+                        </Card>
+
+                        <Card icon="format_list_numbered" iconTone="secondary" title="Ordem das aulas" description="Defina o que o aluno vê primeiro: vídeos, apostilas ou exercícios">
+                            <LessonOrder items={lessonItems(data)} order={data.outline} onChange={(order) => setData('outline', order)} />
                         </Card>
                     </>
                 )}

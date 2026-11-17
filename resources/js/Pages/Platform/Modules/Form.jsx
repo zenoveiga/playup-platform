@@ -1,5 +1,7 @@
 import ExerciseBuilder, { setFromServer, setsForSubmit } from '@/Components/Platform/ExerciseBuilder';
 import MaterialList, { materialFromServer, materialsForSubmit } from '@/Components/Platform/MaterialList';
+import LessonOrder from '@/Components/Platform/LessonOrder';
+import { orderByOutline, outlineForSubmit, outlineToClient } from '@/lib/outline';
 import { Card, Field, inputClass, PageHeader, PrimaryAction, StatusBadge } from '@/Components/Platform/UI';
 import VideoList, { videoFromServer, videosForSubmit } from '@/Components/Platform/VideoList';
 import PlatformLayout from '@/Layouts/PlatformLayout';
@@ -15,8 +17,32 @@ export default function ModuleFormPage({ module, videoCategories }) {
     return <ModuleForm key={version} module={module} videoCategories={videoCategories} />;
 }
 
+// Itens que compõem a trilha do módulo, para a ordenação.
+function lessonItems(d) {
+    return [
+        ...d.videos.map((v) => ({
+            token: `video:${v._key}`,
+            icon: 'smart_display',
+            label: v.title || v.category || 'Vídeo',
+            sub: `Vídeo${v.category ? ` · ${v.category}` : ''}`,
+        })),
+        ...(d.application_instructions?.trim()
+            ? [{ token: 'application', icon: 'construction', label: 'Aplicação prática', sub: `${d.application_minutes || 0} min` }]
+            : []),
+        ...(d.support.length ? [{ token: 'support', icon: 'folder_open', label: 'Materiais de apoio', sub: `${d.support.length} arquivo(s)` }] : []),
+        ...d.exercise_sets.map((s) => ({
+            token: `set:${s._key}`,
+            icon: 'quiz',
+            label: s.title || 'Exercício sem título',
+            sub: `Exercício · ${s.questions.length} questão(ões)`,
+        })),
+    ];
+}
+
 function ModuleForm({ module, videoCategories }) {
     const isEdit = !!module;
+    const initialVideos = (module?.materials ?? []).filter((m) => m.slot === 'video').map(videoFromServer);
+    const initialSets = (module?.exercise_sets ?? []).map(setFromServer);
 
     const { data, setData, post, transform, processing, errors, progress, isDirty } = useForm({
         title: module?.title ?? '',
@@ -25,9 +51,10 @@ function ModuleForm({ module, videoCategories }) {
         application_minutes: module?.application_minutes ?? 10,
         application_instructions: module?.application_instructions ?? '',
         status: module?.status ?? 'draft',
-        videos: (module?.materials ?? []).filter((m) => m.slot === 'video').map(videoFromServer),
+        videos: initialVideos,
         support: (module?.materials ?? []).filter((m) => m.slot === 'support').map(materialFromServer),
-        exercise_sets: (module?.exercise_sets ?? []).map(setFromServer),
+        exercise_sets: initialSets,
+        outline: outlineToClient(module?.outline, { video: initialVideos, set: initialSets }),
     });
 
     const { run: uploadFiles, uploading, uploadError } = useDirectUploads();
@@ -56,6 +83,10 @@ function ModuleForm({ module, videoCategories }) {
             videos: videosForSubmit(d.videos.map(withUploadKey(keys))),
             support: materialsForSubmit(d.support.map(withUploadKey(keys))),
             exercise_sets: setsForSubmit(d.exercise_sets),
+            outline: outlineForSubmit(
+                orderByOutline(lessonItems(d), d.outline).map((i) => i.token),
+                { video: d.videos, set: d.exercise_sets },
+            ),
         }));
         post(isEdit ? route('platform.modules.update', module.id) : route('platform.modules.store'), {
             forceFormData: true,
@@ -159,6 +190,10 @@ function ModuleForm({ module, videoCategories }) {
                 {/* Exercícios */}
                 <Card icon="quiz" iconTone="tertiary" title="Exercícios" description="Crie um ou mais exercícios com título, cada um com suas questões">
                     <ExerciseBuilder sets={data.exercise_sets} onChange={(sets) => setData('exercise_sets', sets)} errors={errors} />
+                </Card>
+
+                <Card icon="format_list_numbered" iconTone="secondary" title="Ordem das aulas" description="Defina o que o aluno vê primeiro: vídeos, aplicação, materiais ou exercícios">
+                    <LessonOrder items={lessonItems(data)} order={data.outline} onChange={(order) => setData('outline', order)} />
                 </Card>
 
                 {isEdit && module.courses?.length > 0 && (

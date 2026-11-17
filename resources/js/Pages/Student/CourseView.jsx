@@ -2,6 +2,7 @@ import ExerciseList from '@/Components/Student/ExerciseList';
 import VideoNotes from '@/Components/Student/VideoNotes';
 import VideoPlayer from '@/Components/Student/VideoPlayer';
 import StudentLayout from '@/Layouts/StudentLayout';
+import { orderByOutline } from '@/lib/outline';
 import { Head, Link } from '@inertiajs/react';
 import { useMemo, useRef, useState } from 'react';
 
@@ -11,7 +12,7 @@ const formatDate = (d) => (d ? new Date(`${d}T00:00:00`).toLocaleDateString('pt-
 
 const MATERIAL_ICONS = { video: 'smart_display', document: 'menu_book', link: 'link', file: 'attach_file' };
 
-const exerciseLesson = (set) => ({ key: `es${set.id}`, kind: 'exercises', title: set.title, subtitle: `Exercício · ${set.questions.length} questão(ões)`, item: set });
+const exerciseLesson = (set) => ({ key: `es${set.id}`, token: `set:${set.id}`, kind: 'exercises', title: set.title, subtitle: `Exercício · ${set.questions.length} questão(ões)`, item: set });
 
 /** Monta a trilha do curso como uma lista de "aulas" navegáveis. */
 function buildOutline(course) {
@@ -20,14 +21,14 @@ function buildOutline(course) {
             key: `m${m.id}`,
             title: `Módulo ${mi + 1}: ${m.title}`,
             description: m.description,
-            lessons: [
-                ...m.videos.map((v) => ({ key: `v${v.id}`, kind: 'video', title: v.title, subtitle: v.category, minutes: v.duration_minutes, item: v })),
+            lessons: orderByOutline([
+                ...m.videos.map((v) => ({ key: `v${v.id}`, token: `video:${v.id}`, kind: 'video', title: v.title, subtitle: v.category, minutes: v.duration_minutes, item: v })),
                 ...(m.application_instructions
-                    ? [{ key: `a${m.id}`, kind: 'application', title: 'Aplicação', subtitle: 'Atividade prática', minutes: m.application_minutes, item: m }]
+                    ? [{ key: `a${m.id}`, token: 'application', kind: 'application', title: 'Aplicação', subtitle: 'Atividade prática', minutes: m.application_minutes, item: m }]
                     : []),
-                ...(m.support.length ? [{ key: `s${m.id}`, kind: 'materials', title: 'Materiais de apoio', subtitle: `${m.support.length} arquivo(s)`, item: m.support }] : []),
+                ...(m.support.length ? [{ key: `s${m.id}`, token: 'support', kind: 'materials', title: 'Materiais de apoio', subtitle: `${m.support.length} arquivo(s)`, item: m.support }] : []),
                 ...m.exercise_sets.map(exerciseLesson),
-            ],
+            ], m.outline),
         }));
     }
 
@@ -35,9 +36,10 @@ function buildOutline(course) {
         {
             key: 'free',
             title: 'Conteúdo do curso',
-            lessons: [
+            lessons: orderByOutline([
                 ...course.materials.map((v) => ({
                     key: `v${v.id}`,
+                    token: `material:${v.id}`,
                     kind: v.type === 'video' ? 'video' : 'material',
                     title: v.title,
                     subtitle: v.type === 'video' ? 'Vídeo' : v.type === 'document' ? 'Apostila' : v.type === 'link' ? 'Link' : 'Arquivo',
@@ -45,7 +47,7 @@ function buildOutline(course) {
                     item: v,
                 })),
                 ...course.exercise_sets.map(exerciseLesson),
-            ],
+            ], course.outline),
         },
     ];
 }

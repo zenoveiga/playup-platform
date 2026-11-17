@@ -105,6 +105,7 @@ class ModuleController extends Controller
             'application_minutes' => 'required|integer|min:1|max:240',
             'application_instructions' => 'nullable|string|max:20000',
             'status' => 'required|in:draft,published',
+            ...\App\Support\Outline::rules(),
 
             'videos' => 'nullable|array',
             'videos.*.id' => 'nullable|integer',
@@ -234,6 +235,12 @@ class ModuleController extends Controller
         $this->materials->sync($module, $items, "courses/modules/{$module->id}", auth()->id());
 
         $this->exercises->sync($module, $data['exercise_sets'] ?? []);
+
+        // Ordem das aulas: índices do formulário → ids gravados.
+        $module->update(['outline' => \App\Support\Outline::resolve($data['outline'] ?? null, [
+            'video' => $module->videos()->reorder('position')->pluck('id')->all(),
+            'set' => $module->exerciseSets()->pluck('id')->all(),
+        ])]);
     }
 
     private function attributeNames(): array

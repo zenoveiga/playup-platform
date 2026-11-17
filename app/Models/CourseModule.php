@@ -23,11 +23,13 @@ class CourseModule extends Model
         'application_instructions',
         'status',
         'created_by',
+        'outline',
     ];
 
     protected function casts(): array
     {
         return [
+            'outline' => 'array',
             'application_minutes' => 'integer',
         ];
     }

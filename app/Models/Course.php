@@ -25,7 +25,13 @@ class Course extends Model
         'structure',
         'status',
         'created_by',
+        'outline',
     ];
+
+    protected function casts(): array
+    {
+        return ['outline' => 'array'];
+    }
 
     protected $appends = ['cover_url'];
 

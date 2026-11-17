@@ -340,4 +340,30 @@ class CourseBuilderTest extends TestCase
             'exercise_sets.1.questions',
         ]);
     }
+
+    public function test_admin_defines_the_lesson_order_with_exercises_before_videos(): void
+    {
+        $this->actingAs($this->admin)
+            ->post('/administrador/modulos', $this->modulePayload(['outline' => ['set:1', 'video:2', 'application', 'video:0', 'support', 'video:9']]))
+            ->assertSessionHasNoErrors();
+
+        $module = CourseModule::first();
+        $videos = $module->videos()->reorder('position')->pluck('id');
+        $sets = $module->exerciseSets()->pluck('id');
+        // Índices viram ids; índice inexistente (video:9) é descartado.
+        $this->assertSame(["set:{$sets[1]}", "video:{$videos[2]}", 'application', "video:{$videos[0]}", 'support'], $module->outline);
+
+        // Token inválido é rejeitado.
+        $this->post('/administrador/modulos', $this->modulePayload(['outline' => ['qualquer:1']]))->assertSessionHasErrors('outline.0');
+
+        // Curso livre: exercício antes da apostila.
+        $this->post('/administrador/cursos', [
+            'title' => 'Livre', 'level' => 'iniciante', 'status' => 'published', 'structure' => 'free',
+            'materials' => [['type' => 'link', 'title' => 'Leitura', 'url' => 'https://example.com']],
+            'exercise_sets' => [['title' => 'Diagnóstico', 'questions' => [['type' => 'essay', 'statement' => 'X', 'points' => 1]]]],
+            'outline' => ['set:0', 'material:0'],
+        ])->assertSessionHasNoErrors();
+        $course = Course::where('title', 'Livre')->first();
+        $this->assertSame(['set:'.$course->exerciseSets()->value('id'), 'material:'.$course->materials()->value('id')], $course->outline);
+    }
 }
