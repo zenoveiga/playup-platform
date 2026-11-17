@@ -3,6 +3,7 @@ import MaterialList, { materialFromServer, materialsForSubmit } from '@/Componen
 import { Card, Field, inputClass, PageHeader, PrimaryAction, StatusBadge } from '@/Components/Platform/UI';
 import VideoList, { videoFromServer, videosForSubmit } from '@/Components/Platform/VideoList';
 import PlatformLayout from '@/Layouts/PlatformLayout';
+import { uploadKindFor, useDirectUploads, withUploadKey } from '@/lib/directUpload';
 import { Head, Link, useForm } from '@inertiajs/react';
 
 // Remonta o formulário sempre que o servidor devolve uma nova versão do módulo
@@ -29,14 +30,31 @@ function ModuleForm({ module, videoCategories }) {
         exercises: (module?.exercises ?? []).map(exerciseFromServer),
     });
 
-    const submit = (status) => (e) => {
+    const { run: uploadFiles, uploading, uploadError } = useDirectUploads();
+
+    const submit = (status) => async (e) => {
         e?.preventDefault();
+
+        // Vídeos e arquivos vão direto para o bucket; o formulário leva só as chaves.
+        const jobs = [
+            ...data.videos.filter((v) => v.source === 'upload' && v.file).map((v) => ({ id: v._key, file: v.file, kind: 'video' })),
+            ...data.support
+                .filter((m) => m.type !== 'link' && m.source !== 'url' && m.file)
+                .map((m) => ({ id: m._key, file: m.file, kind: uploadKindFor(m.type) })),
+        ];
+        let keys;
+        try {
+            keys = await uploadFiles(jobs);
+        } catch {
+            return;
+        }
+
         transform((d) => ({
             ...d,
             status,
             ...(isEdit ? { _method: 'put' } : {}),
-            videos: videosForSubmit(d.videos),
-            support: materialsForSubmit(d.support),
+            videos: videosForSubmit(d.videos.map(withUploadKey(keys))),
+            support: materialsForSubmit(d.support.map(withUploadKey(keys))),
             exercises: exercisesForSubmit(d.exercises),
         }));
         post(isEdit ? route('platform.modules.update', module.id) : route('platform.modules.store'), {
@@ -153,13 +171,22 @@ function ModuleForm({ module, videoCategories }) {
                 <div className="fixed bottom-0 left-72 right-0 z-30 bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl border-t border-outline-variant/10 dark:border-slate-800 px-8 py-4">
                     <div className="max-w-6xl mx-auto flex items-center justify-between gap-4">
                         <div className="flex-1">
-                            {progress ? (
+                            {uploading || progress ? (
                                 <div className="max-w-sm">
-                                    <p className="text-xs font-bold text-[#507c94] mb-1">Enviando arquivos... {progress.percentage}%</p>
+                                    <p className="text-xs font-bold text-[#507c94] mb-1 truncate">
+                                        {uploading
+                                            ? `Enviando ${uploading.current}/${uploading.total}: ${uploading.name} — ${uploading.percentage}%`
+                                            : `Salvando... ${progress.percentage}%`}
+                                    </p>
                                     <div className="h-2 bg-surface-container rounded-full overflow-hidden">
-                                        <div className="h-full kinetic-gradient transition-all" style={{ width: `${progress.percentage}%` }} />
+                                        <div className="h-full kinetic-gradient transition-all" style={{ width: `${(uploading ?? progress).percentage}%` }} />
                                     </div>
                                 </div>
+                            ) : uploadError ? (
+                                <p className="text-xs font-bold text-error flex items-center gap-2 max-w-md">
+                                    <span className="material-symbols-outlined text-base">error</span>
+                                    {uploadError}
+                                </p>
                             ) : (
                                 <Link href={route('platform.modules.index')} className="text-sm font-bold text-[#507c94] hover:text-primary">
                                     {isDirty ? 'Descartar alterações' : 'Voltar'}
@@ -169,12 +196,12 @@ function ModuleForm({ module, videoCategories }) {
                         <button
                             type="button"
                             onClick={submit('draft')}
-                            disabled={processing}
+                            disabled={processing || !!uploading}
                             className="px-6 py-3.5 rounded-xl font-bold text-primary dark:text-[#00D1FF] bg-surface-container-high dark:bg-slate-800 hover:bg-primary hover:text-white transition-all disabled:opacity-50"
                         >
                             Salvar rascunho
                         </button>
-                        <PrimaryAction type="button" icon="publish" onClick={submit('published')} disabled={processing}>
+                        <PrimaryAction type="button" icon="publish" onClick={submit('published')} disabled={processing || !!uploading}>
                             {module?.status === 'published' ? 'Salvar e manter publicado' : 'Publicar módulo'}
                         </PrimaryAction>
                     </div>

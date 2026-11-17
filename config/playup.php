@@ -29,5 +29,7 @@ return [
         'max_video_kb' => (int) env('PLAYUP_MAX_VIDEO_KB', 1024 * 1024), // 1 GB
         'max_file_kb' => (int) env('PLAYUP_MAX_FILE_KB', 100 * 1024),    // 100 MB
         'max_cover_kb' => (int) env('PLAYUP_MAX_COVER_KB', 5 * 1024),     // 5 MB
+        // Validade da URL pré-assinada para envio direto ao bucket.
+        'direct_url_ttl_minutes' => (int) env('PLAYUP_DIRECT_UPLOAD_TTL', 60),
     ],
 ];

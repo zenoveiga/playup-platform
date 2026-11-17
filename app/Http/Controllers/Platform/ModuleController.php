@@ -7,6 +7,7 @@ use App\Models\CourseMaterial;
 use App\Models\CourseModule;
 use App\Services\ExerciseSync;
 use App\Services\MaterialSync;
+use App\Support\Media;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -111,6 +112,7 @@ class ModuleController extends Controller
             'videos.*.source' => 'required|in:upload,url',
             'videos.*.title' => 'nullable|string|max:255',
             'videos.*.url' => 'nullable|required_if:videos.*.source,url|url|max:1000',
+            'videos.*.upload_key' => 'nullable|string|max:500',
             'videos.*.file' => "nullable|file|mimetypes:video/mp4,video/webm,video/quicktime,video/x-matroska,video/x-msvideo|max:{$maxVideo}",
             'videos.*.duration_minutes' => 'nullable|integer|min:1|max:600',
 
@@ -120,6 +122,7 @@ class ModuleController extends Controller
             'support.*.title' => 'required|string|max:255',
             'support.*.description' => 'nullable|string|max:2000',
             'support.*.url' => 'nullable|required_if:support.*.type,link|url|max:1000',
+            'support.*.upload_key' => 'nullable|string|max:500',
             'support.*.file' => "nullable|file|max:{$maxFile}",
 
             ...ExerciseSync::rules(),
@@ -144,7 +147,15 @@ class ModuleController extends Controller
             if (($video['source'] ?? null) === 'url') {
                 continue; // link obrigatório já validado pela regra required_if
             }
-            if (! $request->hasFile("videos.$i.file") && ! $this->existingHasFile($module, $video['id'] ?? null)) {
+            $key = $video['upload_key'] ?? null;
+            if ($key) {
+                $pending = Media::pendingUpload($key, $request->user()->id);
+                if (! $pending) {
+                    $v->errors()->add("videos.$i.file", "Vídeo $n: o envio expirou, selecione o arquivo novamente.");
+                } elseif ($pending['kind'] !== 'video') {
+                    $v->errors()->add("videos.$i.file", "Vídeo $n: o arquivo enviado não é um vídeo.");
+                }
+            } elseif (! $request->hasFile("videos.$i.file") && ! $this->existingHasFile($module, $video['id'] ?? null)) {
                 $v->errors()->add("videos.$i.file", "Vídeo $n: selecione o arquivo ou informe um link.");
             }
         }
@@ -174,6 +185,12 @@ class ModuleController extends Controller
     {
         foreach ($request->input('support', []) as $i => $item) {
             if (($item['type'] ?? null) === 'link') {
+                continue;
+            }
+            if (filled($item['upload_key'] ?? null)) {
+                if (! Media::pendingUpload($item['upload_key'], $request->user()->id)) {
+                    $v->errors()->add("support.$i.file", 'O envio deste arquivo expirou, selecione-o novamente.');
+                }
                 continue;
             }
             if (! $request->hasFile("support.$i.file") && ! $this->existingHasFile($module, $item['id'] ?? null)) {
@@ -214,7 +231,7 @@ class ModuleController extends Controller
             $items[] = [...$item, 'slot' => 'support', 'source' => $item['type'] === 'link' ? 'url' : 'upload'];
         }
 
-        $this->materials->sync($module, $items, "courses/modules/{$module->id}");
+        $this->materials->sync($module, $items, "courses/modules/{$module->id}", auth()->id());
 
         $this->exercises->sync($module->exercises(), $data['exercises'] ?? []);
     }
@@ -226,9 +243,11 @@ class ModuleController extends Controller
             'application_minutes' => 'duração da aplicação',
             'videos.*.category' => 'categoria do vídeo',
             'videos.*.url' => 'link do vídeo',
+            'videos.*.upload_key' => 'nullable|string|max:500',
             'videos.*.file' => 'arquivo de vídeo',
             'support.*.title' => 'título do material',
             'support.*.url' => 'link do material',
+            'support.*.upload_key' => 'nullable|string|max:500',
             'support.*.file' => 'arquivo do material',
         ];
     }

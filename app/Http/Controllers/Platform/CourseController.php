@@ -118,6 +118,7 @@ class CourseController extends Controller
             'status' => 'required|in:draft,published',
             'structure' => 'required|in:modular,free',
             'cover' => "nullable|image|max:{$maxCover}",
+            'cover_upload_key' => 'nullable|string|max:500',
             'remove_cover' => 'nullable|boolean',
 
             'module_ids' => 'nullable|array',
@@ -131,6 +132,7 @@ class CourseController extends Controller
             'materials.*.source' => 'nullable|in:upload,url',
             'materials.*.url' => 'nullable|url|max:1000',
             // Limite geral = vídeo; demais tipos são checados abaixo com o limite de arquivos.
+            'materials.*.upload_key' => 'nullable|string|max:500',
             'materials.*.file' => "nullable|file|max:{$maxVideo}",
             'materials.*.duration_minutes' => 'nullable|integer|min:1|max:600',
 
@@ -143,11 +145,20 @@ class CourseController extends Controller
             'module_ids' => 'módulos',
             'materials.*.title' => 'título do material',
             'materials.*.url' => 'link do material',
+            'materials.*.upload_key' => 'nullable|string|max:500',
             'materials.*.file' => 'arquivo do material',
         ]);
 
         $validator->after(function (Validator $v) use ($request, $course, $maxFile) {
             $published = $request->input('status') === 'published';
+            $userId = $request->user()->id;
+
+            if (filled($request->input('cover_upload_key'))) {
+                $pending = Media::pendingUpload($request->input('cover_upload_key'), $userId);
+                if (! $pending || $pending['kind'] !== 'image') {
+                    $v->errors()->add('cover', 'O envio da capa expirou, selecione a imagem novamente.');
+                }
+            }
 
             if ($request->input('structure') === Course::STRUCTURE_MODULAR) {
                 if ($published && empty($request->input('module_ids'))) {
@@ -169,6 +180,16 @@ class CourseController extends Controller
                 if ($usesUrl) {
                     if (blank($item['url'] ?? null)) {
                         $v->errors()->add("materials.$i.url", 'Informe o link deste material.');
+                    }
+                    continue;
+                }
+
+                if (filled($item['upload_key'] ?? null)) {
+                    $pending = Media::pendingUpload($item['upload_key'], $userId);
+                    if (! $pending) {
+                        $v->errors()->add("materials.$i.file", 'O envio deste arquivo expirou, selecione-o novamente.');
+                    } elseif (($item['type'] ?? null) === 'video' && $pending['kind'] !== 'video') {
+                        $v->errors()->add("materials.$i.file", 'O arquivo precisa ser um vídeo.');
                     }
                     continue;
                 }
@@ -201,7 +222,12 @@ class CourseController extends Controller
 
     private function syncContent(Course $course, array $data, Request $request): void
     {
-        if ($request->hasFile('cover')) {
+        if (filled($data['cover_upload_key'] ?? null)) {
+            Media::delete($course->cover_path);
+            $course->update([
+                'cover_path' => Media::claimDirectUpload($data['cover_upload_key'], $request->user()->id, 'courses/covers')['file_path'],
+            ]);
+        } elseif ($request->hasFile('cover')) {
             Media::delete($course->cover_path);
             $course->update(['cover_path' => Media::store($request->file('cover'), 'courses/covers')]);
         } elseif (! empty($data['remove_cover']) && $course->cover_path) {
@@ -230,7 +256,8 @@ class CourseController extends Controller
                 ...$m,
                 'source' => $m['type'] === 'link' ? 'url' : ($m['source'] ?? 'upload'),
             ])->all(),
-            "courses/{$course->id}/materials"
+            "courses/{$course->id}/materials",
+            $request->user()->id
         );
         $this->exercises->sync($course->exercises(), $data['exercises'] ?? []);
     }

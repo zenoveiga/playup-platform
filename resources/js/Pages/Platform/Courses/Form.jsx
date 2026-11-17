@@ -2,6 +2,7 @@ import ExerciseBuilder, { exerciseFromServer, exercisesForSubmit } from '@/Compo
 import MaterialList, { materialFromServer, materialsForSubmit } from '@/Components/Platform/MaterialList';
 import { Card, Field, IconButton, inputClass, PageHeader, PrimaryAction, StatusBadge } from '@/Components/Platform/UI';
 import PlatformLayout from '@/Layouts/PlatformLayout';
+import { uploadKindFor, useDirectUploads, withUploadKey } from '@/lib/directUpload';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { useMemo, useRef, useState } from 'react';
 
@@ -62,14 +63,34 @@ function CourseForm({ course, availableModules }) {
         setCoverPreview(URL.createObjectURL(file));
     };
 
-    const submit = (status) => (e) => {
+    const { run: uploadFiles, uploading, uploadError } = useDirectUploads();
+
+    const submit = (status) => async (e) => {
         e?.preventDefault();
+
+        // Capa, vídeos e apostilas vão direto para o bucket; o formulário leva só as chaves.
+        const jobs = [
+            ...(data.cover ? [{ id: 'cover', file: data.cover, kind: 'image' }] : []),
+            ...(data.structure === 'free'
+                ? data.materials
+                      .filter((m) => m.type !== 'link' && m.source !== 'url' && m.file)
+                      .map((m) => ({ id: m._key, file: m.file, kind: uploadKindFor(m.type) }))
+                : []),
+        ];
+        let keys;
+        try {
+            keys = await uploadFiles(jobs);
+        } catch {
+            return;
+        }
+
         transform((d) => ({
             ...d,
             status,
             ...(isEdit ? { _method: 'put' } : {}),
+            ...(keys?.cover ? { cover: null, cover_upload_key: keys.cover } : {}),
             module_ids: d.structure === 'modular' ? d.module_ids : [],
-            materials: d.structure === 'free' ? materialsForSubmit(d.materials) : [],
+            materials: d.structure === 'free' ? materialsForSubmit(d.materials.map(withUploadKey(keys))) : [],
             exercises: d.structure === 'free' ? exercisesForSubmit(d.exercises) : [],
         }));
         post(isEdit ? route('platform.courses.update', course.id) : route('platform.courses.store'), {
@@ -315,13 +336,22 @@ function CourseForm({ course, availableModules }) {
                 <div className="fixed bottom-0 left-72 right-0 z-30 bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl border-t border-outline-variant/10 dark:border-slate-800 px-8 py-4">
                     <div className="max-w-6xl mx-auto flex items-center justify-between gap-4">
                         <div className="flex-1">
-                            {progress ? (
+                            {uploading || progress ? (
                                 <div className="max-w-sm">
-                                    <p className="text-xs font-bold text-[#507c94] mb-1">Enviando arquivos... {progress.percentage}%</p>
+                                    <p className="text-xs font-bold text-[#507c94] mb-1 truncate">
+                                        {uploading
+                                            ? `Enviando ${uploading.current}/${uploading.total}: ${uploading.name} — ${uploading.percentage}%`
+                                            : `Salvando... ${progress.percentage}%`}
+                                    </p>
                                     <div className="h-2 bg-surface-container rounded-full overflow-hidden">
-                                        <div className="h-full kinetic-gradient transition-all" style={{ width: `${progress.percentage}%` }} />
+                                        <div className="h-full kinetic-gradient transition-all" style={{ width: `${(uploading ?? progress).percentage}%` }} />
                                     </div>
                                 </div>
+                            ) : uploadError ? (
+                                <p className="text-xs font-bold text-error flex items-center gap-2 max-w-md">
+                                    <span className="material-symbols-outlined text-base">error</span>
+                                    {uploadError}
+                                </p>
                             ) : (
                                 <Link href={route('platform.courses.index')} className="text-sm font-bold text-[#507c94] hover:text-primary">
                                     {isDirty ? 'Descartar alterações' : 'Voltar'}
@@ -331,12 +361,12 @@ function CourseForm({ course, availableModules }) {
                         <button
                             type="button"
                             onClick={submit('draft')}
-                            disabled={processing}
+                            disabled={processing || !!uploading}
                             className="px-6 py-3.5 rounded-xl font-bold text-primary dark:text-[#00D1FF] bg-surface-container-high dark:bg-slate-800 hover:bg-primary hover:text-white transition-all disabled:opacity-50"
                         >
                             Salvar rascunho
                         </button>
-                        <PrimaryAction type="button" icon="publish" onClick={submit('published')} disabled={processing}>
+                        <PrimaryAction type="button" icon="publish" onClick={submit('published')} disabled={processing || !!uploading}>
                             {course?.status === 'published' ? 'Salvar e manter publicado' : 'Publicar curso'}
                         </PrimaryAction>
                     </div>

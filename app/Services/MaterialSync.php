@@ -11,7 +11,8 @@ use App\Support\Media;
  * Sincroniza a lista de materiais (vídeos, apostilas, links, arquivos) de um módulo
  * ou de um curso livre: cria, atualiza, substitui arquivos e remove os itens ausentes.
  *
- * Cada item: id?, slot?, category?, type, title, description?, source (upload|url), url?, file?, duration_minutes?
+ * Cada item: id?, slot?, category?, type, title, description?, source (upload|url), url?,
+ * file? (upload pelo PHP) ou upload_key? (envio direto ao bucket), duration_minutes?
  */
 class MaterialSync
 {
@@ -19,7 +20,7 @@ class MaterialSync
      * @param  Model  $owner  Modelo com relação morphMany materials()
      * @param  array<int, array<string, mixed>>  $items
      */
-    public function sync(Model $owner, array $items, string $directory): void
+    public function sync(Model $owner, array $items, string $directory, ?int $userId = null): void
     {
         $keep = [];
 
@@ -44,10 +45,15 @@ class MaterialSync
             ]);
 
             $file = $item['file'] ?? null;
+            $uploadKey = $item['upload_key'] ?? null;
 
             if ($source === 'url') {
                 $this->forgetFile($material);
                 $material->url = $item['url'] ?? null;
+            } elseif ($uploadKey && $userId) {
+                $this->forgetFile($material);
+                $material->fill(Media::claimDirectUpload($uploadKey, $userId, $directory));
+                $material->url = null;
             } elseif ($file instanceof UploadedFile) {
                 $this->forgetFile($material);
                 $material->file_path = Media::store($file, $directory);

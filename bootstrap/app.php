@@ -34,6 +34,16 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(
-            fn (Request $request) => $request->is('api/*'),
+            fn (Request $request) => $request->is('api/*') || $request->is('administrador/uploads'),
         );
+
+        // Envio maior que o post_max_size do PHP: volta ao formulário com aviso, em vez da tela de erro.
+        $exceptions->render(function (\Illuminate\Http\Exceptions\PostTooLargeException $e, Request $request) {
+            if ($request->expectsJson() && ! $request->header('X-Inertia')) {
+                return null;
+            }
+
+            return back()->with('error', 'Os arquivos enviados excedem o limite do servidor ('
+                .ini_get('post_max_size').'). Envie vídeos grandes pelo envio direto ao armazenamento ou reduza o tamanho dos arquivos.');
+        });
     })->create();
