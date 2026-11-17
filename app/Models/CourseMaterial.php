@@ -41,6 +41,9 @@ class CourseMaterial extends Model
 
     public function getFileUrlAttribute(): ?string
     {
-        return Media::url($this->file_path);
+        // Vídeos tocam no player; PDFs abrem no navegador; os demais arquivos baixam com o nome original.
+        return $this->type === 'video'
+            ? Media::url($this->file_path)
+            : Media::viewUrl($this->file_path, $this->file_name, $this->mime_type);
     }
 }

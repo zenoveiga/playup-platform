@@ -62,6 +62,10 @@ function supportGroups(course) {
     return items.length ? [{ key: 'free', title: null, items }] : [];
 }
 
+// PDFs abrem numa nova aba do navegador; outros arquivos baixam.
+const isPdf = (m) => m.mime_type === 'application/pdf' || /\.pdf$/i.test(m.file_name ?? '');
+const openIcon = (m) => (m.file_url && !isPdf(m) ? 'download' : 'open_in_new');
+
 const MATERIAL_KIND = { document: 'Apostila', link: 'Link', file: 'Arquivo', video: 'Vídeo' };
 
 function SupportCard({ groups }) {
@@ -103,9 +107,9 @@ function SupportCard({ groups }) {
                                     <span className="material-symbols-outlined text-primary">{MATERIAL_ICONS[m.type] ?? 'attach_file'}</span>
                                     <span className="flex-1 min-w-0">
                                         <span className="block text-sm text-on-surface truncate group-hover:text-primary">{m.title}</span>
-                                        <span className="block text-[11px] text-on-surface-variant truncate">{m.description || MATERIAL_KIND[m.type] || 'Arquivo'}</span>
+                                        <span className="block text-[11px] text-on-surface-variant truncate">{m.description || (isPdf(m) ? 'PDF · abre em nova aba' : MATERIAL_KIND[m.type] || 'Arquivo')}</span>
                                     </span>
-                                    <span className="material-symbols-outlined text-base text-on-surface-variant group-hover:text-primary">{m.file_url ? 'download' : 'open_in_new'}</span>
+                                    <span className="material-symbols-outlined text-base text-on-surface-variant group-hover:text-primary" title={isPdf(m) ? 'Abrir em nova aba' : m.file_url ? 'Baixar' : 'Abrir link'}>{openIcon(m)}</span>
                                 </a>
                             ))}
                         </div>
@@ -130,7 +134,7 @@ function MaterialLink({ material }) {
                 <p className="text-sm font-bold text-on-surface truncate">{material.title}</p>
                 {material.description && <p className="text-xs text-on-surface-variant truncate">{material.description}</p>}
             </div>
-            <span className="material-symbols-outlined text-on-surface-variant">{material.file_url ? 'download' : 'open_in_new'}</span>
+            <span className="material-symbols-outlined text-on-surface-variant">{openIcon(material)}</span>
         </a>
     );
 }
@@ -188,8 +192,8 @@ function Player({ lesson, playerRef, courseSlug, answers, onAnswer, onPlayback, 
                     rel="noreferrer"
                     className="kinetic-gradient text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2"
                 >
-                    <span className="material-symbols-outlined">{lesson.item.file_url ? 'download' : 'open_in_new'}</span>
-                    {lesson.item.file_url ? 'Abrir material' : 'Acessar link'}
+                    <span className="material-symbols-outlined">{openIcon(lesson.item)}</span>
+                    {isPdf(lesson.item) ? 'Abrir PDF' : lesson.item.file_url ? 'Baixar material' : 'Acessar link'}
                 </a>
             </div>
         );

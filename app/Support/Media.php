@@ -45,8 +45,10 @@ class Media
 
     /**
      * URL para exibir/baixar o arquivo. Em bucket privado, gera uma URL assinada temporária.
+     *
+     * @param  array<string, string>  $headers  Cabeçalhos da resposta do S3, ex.: ResponseContentDisposition
      */
-    public static function url(?string $path): ?string
+    public static function url(?string $path, array $headers = []): ?string
     {
         if (! $path) {
             return null;
@@ -55,10 +57,30 @@ class Media
         $disk = static::disk();
 
         if (config('playup.media.visibility') === 'private' && $disk->providesTemporaryUrls()) {
-            return $disk->temporaryUrl($path, now()->addMinutes(config('playup.media.url_ttl_minutes')));
+            return $disk->temporaryUrl($path, now()->addMinutes(config('playup.media.url_ttl_minutes')), $headers);
         }
 
         return $disk->url($path);
+    }
+
+    /**
+     * URL que abre o arquivo no navegador quando ele sabe exibir (PDF) e baixa os demais
+     * com o nome original.
+     */
+    public static function viewUrl(?string $path, ?string $fileName = null, ?string $mimeType = null): ?string
+    {
+        if (! $path) {
+            return null;
+        }
+
+        $name = $fileName ?: basename($path);
+        $isPdf = $mimeType === 'application/pdf' || str_ends_with(strtolower($name), '.pdf') || str_ends_with(strtolower($path), '.pdf');
+        $encoded = rawurlencode($name);
+        $ascii = str_replace(['"', '\\'], '', \Illuminate\Support\Str::ascii($name));
+
+        return static::url($path, $isPdf
+            ? ['ResponseContentType' => 'application/pdf', 'ResponseContentDisposition' => "inline; filename=\"{$ascii}\"; filename*=UTF-8''{$encoded}"]
+            : ['ResponseContentDisposition' => "attachment; filename=\"{$ascii}\"; filename*=UTF-8''{$encoded}"]);
     }
 
     /*
