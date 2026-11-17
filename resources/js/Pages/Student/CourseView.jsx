@@ -69,7 +69,7 @@ function MaterialLink({ material }) {
     );
 }
 
-function Player({ lesson, playerRef, courseSlug, answers, onAnswer, onPlayback }) {
+function Player({ lesson, playerRef, courseSlug, answers, onAnswer, onPlayback, notes = [] }) {
     if (!lesson) return null;
 
     if (lesson.kind === 'video') {
@@ -77,6 +77,7 @@ function Player({ lesson, playerRef, courseSlug, answers, onAnswer, onPlayback }
             <VideoPlayer
                 ref={playerRef}
                 video={lesson.item}
+                markers={notes.filter((n) => n.course_material_id === lesson.item.id).map((n) => ({ id: n.id, time: n.timestamp_seconds, label: n.body }))}
                 onTime={(time) => onPlayback((p) => (Math.floor(p.time) === Math.floor(time) ? p : { ...p, time }))}
                 onPlayState={(paused) => onPlayback((p) => (p.paused === paused ? p : { ...p, paused }))}
             />
@@ -172,6 +173,7 @@ export default function CourseView({ course, access, answers: initialAnswers = {
                             answers={answers}
                             onAnswer={(result) => setAnswers((a) => ({ ...a, [result.exercise_id]: result }))}
                             onPlayback={setPlayback}
+                            notes={notes}
                         />
                     ) : (
                         <div className="w-full aspect-video bg-surface-container-lowest rounded-xl flex items-center justify-center text-on-surface-variant">
