@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
-use Illuminate\Support\Facades\Storage;
+use App\Support\Media;
 
 class CourseMaterial extends Model
 {
@@ -12,6 +12,7 @@ class CourseMaterial extends Model
 
     protected $fillable = [
         'slot',
+        'category',
         'type',
         'title',
         'description',
@@ -29,9 +30,7 @@ class CourseMaterial extends Model
     protected static function booted(): void
     {
         static::deleting(function (CourseMaterial $material) {
-            if ($material->file_path) {
-                Storage::disk('public')->delete($material->file_path);
-            }
+            Media::delete($material->file_path);
         });
     }
 
@@ -42,6 +41,6 @@ class CourseMaterial extends Model
 
     public function getFileUrlAttribute(): ?string
     {
-        return $this->file_path ? Storage::disk('public')->url($this->file_path) : null;
+        return Media::url($this->file_path);
     }
 }

@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Platform;
 
 use App\Http\Controllers\Controller;
+use App\Models\CourseMaterial;
 use App\Models\CourseModule;
+use App\Services\ExerciseSync;
 use App\Services\MaterialSync;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -13,19 +15,13 @@ use Inertia\Inertia;
 use Inertia\Response;
 
 /**
- * Biblioteca de módulos. Estrutura de cada módulo:
- * vídeo conceito (~6 min) → vídeo exemplo → aplicação (~10 min) → vídeo de erros comuns,
- * mais materiais de apoio (apostilas etc.) e exercícios.
+ * Biblioteca de módulos. Cada módulo tem uma lista ordenada de vídeos, cada um com uma
+ * categoria livre (Conceito, Exemplo, Erros comuns...), o bloco de aplicação (~10 min),
+ * materiais de apoio (apostilas etc.) e exercícios.
  */
 class ModuleController extends Controller
 {
-    public const VIDEO_LABELS = [
-        'concept' => 'Vídeo conceito',
-        'example' => 'Vídeo exemplo',
-        'common_errors' => 'Vídeo de erros comuns',
-    ];
-
-    public function __construct(private MaterialSync $materials) {}
+    public function __construct(private MaterialSync $materials, private ExerciseSync $exercises) {}
 
     public function index(): Response
     {
@@ -39,7 +35,10 @@ class ModuleController extends Controller
 
     public function create(): Response
     {
-        return Inertia::render('Platform/Modules/Form', ['module' => null]);
+        return Inertia::render('Platform/Modules/Form', [
+            'module' => null,
+            'videoCategories' => $this->videoCategories(),
+        ]);
     }
 
     public function store(Request $request): RedirectResponse
@@ -64,7 +63,10 @@ class ModuleController extends Controller
     {
         $module->load(['materials', 'exercises', 'courses:id,title']);
 
-        return Inertia::render('Platform/Modules/Form', ['module' => $module]);
+        return Inertia::render('Platform/Modules/Form', [
+            'module' => $module,
+            'videoCategories' => $this->videoCategories(),
+        ]);
     }
 
     public function update(Request $request, CourseModule $module): RedirectResponse
@@ -105,6 +107,7 @@ class ModuleController extends Controller
 
             'videos' => 'nullable|array',
             'videos.*.id' => 'nullable|integer',
+            'videos.*.category' => 'required|string|max:60',
             'videos.*.source' => 'required|in:upload,url',
             'videos.*.title' => 'nullable|string|max:255',
             'videos.*.url' => 'nullable|required_if:videos.*.source,url|url|max:1000',
@@ -119,40 +122,52 @@ class ModuleController extends Controller
             'support.*.url' => 'nullable|required_if:support.*.type,link|url|max:1000',
             'support.*.file' => "nullable|file|max:{$maxFile}",
 
-            'exercises' => 'nullable|array',
-            'exercises.*.type' => 'required|in:multiple_choice,true_false,short_answer,essay',
-            'exercises.*.statement' => 'required|string|max:10000',
-            'exercises.*.options' => 'nullable|array',
-            'exercises.*.options.*.text' => 'required|string|max:1000',
-            'exercises.*.options.*.correct' => 'nullable|boolean',
-            'exercises.*.expected_answer' => 'nullable|string|max:5000',
-            'exercises.*.points' => 'required|integer|min:0|max:1000',
-            'exercises.*.explanation' => 'nullable|string|max:5000',
-        ], [], $this->attributeNames());
+            ...ExerciseSync::rules(),
+        ], [], [...$this->attributeNames(), ...ExerciseSync::attributeNames()]);
 
         $validator->after(function (Validator $v) use ($request, $module) {
             $this->validateVideos($v, $request, $module);
             $this->validateSupportFiles($v, $request, $module);
-            $this->validateExercises($v, $request->input('exercises', []));
+            ExerciseSync::validate($v, $request->input('exercises', []));
         });
 
         return $validator->validate();
     }
 
-    /** Vídeos só são obrigatórios para publicar; rascunhos podem ficar incompletos. */
+    /** Cada vídeo precisa de arquivo ou link; publicar exige ao menos um vídeo. */
     private function validateVideos(Validator $v, Request $request, ?CourseModule $module): void
     {
-        foreach (self::VIDEO_LABELS as $slot => $label) {
-            $video = $request->input("videos.$slot");
-            $hasContent = $video && (
-                ($video['source'] ?? null) === 'url' ? filled($video['url'] ?? null)
-                    : ($request->hasFile("videos.$slot.file") || $this->existingHasFile($module, $video['id'] ?? null))
-            );
+        $videos = $request->input('videos', []);
 
-            if (! $hasContent && $request->input('status') === 'published') {
-                $v->errors()->add("videos.$slot", "$label é obrigatório para publicar o módulo.");
+        foreach ($videos as $i => $video) {
+            $n = $i + 1;
+            if (($video['source'] ?? null) === 'url') {
+                continue; // link obrigatório já validado pela regra required_if
+            }
+            if (! $request->hasFile("videos.$i.file") && ! $this->existingHasFile($module, $video['id'] ?? null)) {
+                $v->errors()->add("videos.$i.file", "Vídeo $n: selecione o arquivo ou informe um link.");
             }
         }
+
+        if (empty($videos) && $request->input('status') === 'published') {
+            $v->errors()->add('videos', 'Adicione ao menos um vídeo para publicar o módulo.');
+        }
+    }
+
+    /** Sugestões de categoria: as padrão + as já usadas em outros módulos. */
+    private function videoCategories(): array
+    {
+        return collect(config('playup.video_categories'))
+            ->merge(
+                CourseMaterial::where('slot', CourseModule::VIDEO_SLOT)
+                    ->whereNotNull('category')
+                    ->distinct()
+                    ->pluck('category')
+            )
+            ->map(fn ($c) => trim($c))
+            ->unique(fn ($c) => mb_strtolower($c))
+            ->values()
+            ->all();
     }
 
     private function validateSupportFiles(Validator $v, Request $request, ?CourseModule $module): void
@@ -163,28 +178,6 @@ class ModuleController extends Controller
             }
             if (! $request->hasFile("support.$i.file") && ! $this->existingHasFile($module, $item['id'] ?? null)) {
                 $v->errors()->add("support.$i.file", 'Selecione um arquivo para este material.');
-            }
-        }
-    }
-
-    private function validateExercises(Validator $v, array $exercises): void
-    {
-        foreach ($exercises as $i => $exercise) {
-            $n = $i + 1;
-            switch ($exercise['type'] ?? null) {
-                case 'multiple_choice':
-                    $options = $exercise['options'] ?? [];
-                    if (count($options) < 2) {
-                        $v->errors()->add("exercises.$i.options", "Exercício $n: informe ao menos 2 alternativas.");
-                    } elseif (! collect($options)->contains(fn ($o) => filter_var($o['correct'] ?? false, FILTER_VALIDATE_BOOLEAN))) {
-                        $v->errors()->add("exercises.$i.options", "Exercício $n: marque a alternativa correta.");
-                    }
-                    break;
-                case 'true_false':
-                    if (! in_array($exercise['expected_answer'] ?? null, ['true', 'false'], true)) {
-                        $v->errors()->add("exercises.$i.expected_answer", "Exercício $n: indique se a afirmação é verdadeira ou falsa.");
-                    }
-                    break;
             }
         }
     }
@@ -206,22 +199,14 @@ class ModuleController extends Controller
     {
         $items = [];
 
-        foreach (array_keys(self::VIDEO_LABELS) as $slot) {
-            $video = $data['videos'][$slot] ?? null;
-            if (! $video) {
-                continue;
-            }
-            $hasContent = ($video['source'] === 'url' && filled($video['url'] ?? null))
-                || ($video['file'] ?? null)
-                || ! empty($video['id']);
-            if (! $hasContent) {
-                continue;
-            }
+        foreach (array_values($data['videos'] ?? []) as $video) {
+            $category = trim($video['category']);
             $items[] = [
                 ...$video,
-                'slot' => $slot,
+                'slot' => CourseModule::VIDEO_SLOT,
+                'category' => $category,
                 'type' => 'video',
-                'title' => ($video['title'] ?? null) ?: self::VIDEO_LABELS[$slot],
+                'title' => ($video['title'] ?? null) ?: $category,
             ];
         }
 
@@ -231,27 +216,7 @@ class ModuleController extends Controller
 
         $this->materials->sync($module, $items, "courses/modules/{$module->id}");
 
-        // Exercícios são recriados na ordem enviada pelo formulário.
-        $module->exercises()->delete();
-        foreach (array_values($data['exercises'] ?? []) as $position => $exercise) {
-            $type = $exercise['type'];
-            $module->exercises()->create([
-                'position' => $position,
-                'type' => $type,
-                'statement' => $exercise['statement'],
-                'options' => $type === 'multiple_choice'
-                    ? collect($exercise['options'] ?? [])->map(fn ($o) => [
-                        'text' => $o['text'],
-                        'correct' => filter_var($o['correct'] ?? false, FILTER_VALIDATE_BOOLEAN),
-                    ])->values()->all()
-                    : null,
-                'expected_answer' => in_array($type, ['true_false', 'short_answer', 'essay'], true)
-                    ? ($exercise['expected_answer'] ?? null)
-                    : null,
-                'points' => $exercise['points'],
-                'explanation' => $exercise['explanation'] ?? null,
-            ]);
-        }
+        $this->exercises->sync($module->exercises(), $data['exercises'] ?? []);
     }
 
     private function attributeNames(): array
@@ -259,14 +224,12 @@ class ModuleController extends Controller
         return [
             'title' => 'título',
             'application_minutes' => 'duração da aplicação',
+            'videos.*.category' => 'categoria do vídeo',
             'videos.*.url' => 'link do vídeo',
             'videos.*.file' => 'arquivo de vídeo',
             'support.*.title' => 'título do material',
             'support.*.url' => 'link do material',
             'support.*.file' => 'arquivo do material',
-            'exercises.*.statement' => 'enunciado',
-            'exercises.*.options.*.text' => 'texto da alternativa',
-            'exercises.*.points' => 'pontuação',
         ];
     }
 }

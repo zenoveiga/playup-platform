@@ -8,12 +8,12 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 /**
- * Módulo de curso: 1 vídeo conceito (~6 min), 1 vídeo exemplo, aplicação (~10 min),
- * 1 vídeo de erros comuns, materiais de apoio e exercícios.
+ * Módulo de curso: lista ordenada de vídeos categorizados (conceito, exemplo, erros comuns...),
+ * bloco de aplicação (~10 min), materiais de apoio e exercícios.
  */
 class CourseModule extends Model
 {
-    public const VIDEO_SLOTS = ['concept', 'example', 'common_errors'];
+    public const VIDEO_SLOT = 'video';
 
     protected $fillable = [
         'title',
@@ -39,7 +39,7 @@ class CourseModule extends Model
 
     public function videos(): MorphMany
     {
-        return $this->materials()->whereIn('slot', self::VIDEO_SLOTS);
+        return $this->materials()->where('slot', self::VIDEO_SLOT);
     }
 
     public function supportMaterials(): MorphMany

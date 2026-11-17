@@ -4,8 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
-use Illuminate\Support\Facades\Storage;
+use App\Support\Media;
 use Illuminate\Support\Str;
 
 class Course extends Model
@@ -41,9 +42,15 @@ class Course extends Model
         return $this->morphMany(CourseMaterial::class, 'materialable')->orderBy('position');
     }
 
+    /** Exercícios avulsos (cursos sem módulos). */
+    public function exercises(): HasMany
+    {
+        return $this->hasMany(ModuleExercise::class)->orderBy('position');
+    }
+
     public function getCoverUrlAttribute(): ?string
     {
-        return $this->cover_path ? Storage::disk('public')->url($this->cover_path) : null;
+        return Media::url($this->cover_path);
     }
 
     public static function uniqueSlug(string $title, ?int $ignoreId = null): string

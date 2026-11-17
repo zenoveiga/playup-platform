@@ -1,5 +1,6 @@
 import { newKey } from '@/Components/Platform/ExerciseBuilder';
 import { FileDrop, IconButton, inputClass, Segmented } from '@/Components/Platform/UI';
+import { useRef } from 'react';
 
 /* Lista dinâmica de materiais: vídeos, apostilas/documentos, links e arquivos diversos.
  * Usada nos materiais de apoio do módulo e no curso livre (sem módulos). */
@@ -34,7 +35,30 @@ export function materialsForSubmit(list) {
     return list.map(({ _key, _existing, ...m }) => ({ ...m, file: m.source === 'upload' ? m.file : null }));
 }
 
-export default function MaterialList({ items, onChange, errors, prefix, allowedTypes = ['video', 'document', 'link', 'file'], emptyText }) {
+const DOCUMENT_EXT = /\.(pdf|docx?|pptx?|xlsx?|odt|txt|epub)$/i;
+
+/** Deduz o tipo do material pelo arquivo (vídeo, apostila ou arquivo genérico). */
+function typeForFile(file) {
+    if (file.type.startsWith('video/')) return 'video';
+    if (DOCUMENT_EXT.test(file.name)) return 'document';
+    return 'file';
+}
+
+export default function MaterialList({ items, onChange, errors, prefix, allowedTypes = ['video', 'document', 'link', 'file'], emptyText, multiUpload = false }) {
+    const multiInput = useRef(null);
+
+    const addFiles = (fileList) => {
+        const added = [...(fileList ?? [])].map((file) => {
+            const type = typeForFile(file);
+            return {
+                ...blankMaterial(allowedTypes.includes(type) ? type : 'file'),
+                file,
+                title: file.name.replace(/\.[^.]+$/, ''),
+            };
+        });
+        if (added.length) onChange([...items, ...added]);
+    };
+
     const update = (i, patch) => onChange(items.map((m, idx) => (idx === i ? { ...m, ...patch } : m)));
     const move = (i, dir) => {
         const j = i + dir;
@@ -142,6 +166,35 @@ export default function MaterialList({ items, onChange, errors, prefix, allowedT
                     </div>
                 );
             })}
+
+            {multiUpload && (
+                <>
+                    <input
+                        ref={multiInput}
+                        type="file"
+                        multiple
+                        className="hidden"
+                        onChange={(e) => {
+                            addFiles(e.target.files);
+                            e.target.value = '';
+                        }}
+                    />
+                    <button
+                        type="button"
+                        onClick={() => multiInput.current?.click()}
+                        onDragOver={(e) => e.preventDefault()}
+                        onDrop={(e) => {
+                            e.preventDefault();
+                            addFiles(e.dataTransfer.files);
+                        }}
+                        className="w-full border-2 border-dashed border-outline-variant/30 dark:border-slate-800 rounded-2xl py-6 flex flex-col items-center justify-center hover:bg-surface dark:hover:bg-slate-950 transition-all"
+                    >
+                        <span className="material-symbols-outlined text-3xl text-primary dark:text-[#00D1FF] mb-1">cloud_upload</span>
+                        <span className="text-sm font-bold text-primary dark:text-[#00D1FF]">Enviar vários vídeos e apostilas de uma vez</span>
+                        <span className="text-[10px] text-[#507c94] dark:text-[#87b3cd] mt-1">Clique ou arraste os arquivos aqui — o tipo é identificado automaticamente</span>
+                    </button>
+                </>
+            )}
 
             <div className="flex flex-wrap gap-2">
                 {allowedTypes.map((type) => (

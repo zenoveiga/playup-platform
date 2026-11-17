@@ -1,39 +1,20 @@
 import ExerciseBuilder, { exerciseFromServer, exercisesForSubmit } from '@/Components/Platform/ExerciseBuilder';
 import MaterialList, { materialFromServer, materialsForSubmit } from '@/Components/Platform/MaterialList';
-import { Card, Field, FileDrop, inputClass, PageHeader, PrimaryAction, Segmented, StatusBadge } from '@/Components/Platform/UI';
+import { Card, Field, inputClass, PageHeader, PrimaryAction, StatusBadge } from '@/Components/Platform/UI';
+import VideoList, { videoFromServer, videosForSubmit } from '@/Components/Platform/VideoList';
 import PlatformLayout from '@/Layouts/PlatformLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 
-const VIDEO_SLOTS = [
-    { slot: 'concept', step: 1, label: 'Vídeo conceito', hint: 'Apresenta o conceito central do módulo', suggested: 6, icon: 'lightbulb' },
-    { slot: 'example', step: 2, label: 'Vídeo exemplo', hint: 'Demonstra o conceito aplicado em um caso real', suggested: null, icon: 'play_lesson' },
-    { slot: 'common_errors', step: 4, label: 'Vídeo de erros comuns', hint: 'Mostra os erros mais frequentes e como evitá-los', suggested: null, icon: 'report' },
-];
-
-function videoFromServer(module, slot, suggested) {
-    const m = module?.materials?.find((x) => x.slot === slot);
-    if (!m) return { id: null, source: 'upload', url: '', title: '', duration_minutes: suggested ?? '', file: null, _existing: null };
-    return {
-        id: m.id,
-        source: m.file_path ? 'upload' : 'url',
-        url: m.url ?? '',
-        title: m.title ?? '',
-        duration_minutes: m.duration_minutes ?? '',
-        file: null,
-        _existing: m.file_path ? { name: m.file_name, size: m.file_size, url: m.file_url } : null,
-    };
-}
-
 // Remonta o formulário sempre que o servidor devolve uma nova versão do módulo
 // (ex.: após salvar), para que IDs de materiais recém-criados sejam usados no próximo envio.
-export default function ModuleFormPage({ module }) {
+export default function ModuleFormPage({ module, videoCategories }) {
     const version = module
         ? [module.id, module.updated_at, ...(module.materials ?? []).map((m) => m.id), ...(module.exercises ?? []).map((e) => e.id)].join(':')
         : 'new';
-    return <ModuleForm key={version} module={module} />;
+    return <ModuleForm key={version} module={module} videoCategories={videoCategories} />;
 }
 
-function ModuleForm({ module }) {
+function ModuleForm({ module, videoCategories }) {
     const isEdit = !!module;
 
     const { data, setData, post, transform, processing, errors, progress, isDirty } = useForm({
@@ -43,12 +24,10 @@ function ModuleForm({ module }) {
         application_minutes: module?.application_minutes ?? 10,
         application_instructions: module?.application_instructions ?? '',
         status: module?.status ?? 'draft',
-        videos: Object.fromEntries(VIDEO_SLOTS.map((v) => [v.slot, videoFromServer(module, v.slot, v.suggested)])),
+        videos: (module?.materials ?? []).filter((m) => m.slot === 'video').map(videoFromServer),
         support: (module?.materials ?? []).filter((m) => m.slot === 'support').map(materialFromServer),
         exercises: (module?.exercises ?? []).map(exerciseFromServer),
     });
-
-    const setVideo = (slot, patch) => setData('videos', { ...data.videos, [slot]: { ...data.videos[slot], ...patch } });
 
     const submit = (status) => (e) => {
         e?.preventDefault();
@@ -56,9 +35,7 @@ function ModuleForm({ module }) {
             ...d,
             status,
             ...(isEdit ? { _method: 'put' } : {}),
-            videos: Object.fromEntries(
-                Object.entries(d.videos).map(([slot, { _existing, ...v }]) => [slot, { ...v, file: v.source === 'upload' ? v.file : null }]),
-            ),
+            videos: videosForSubmit(d.videos),
             support: materialsForSubmit(d.support),
             exercises: exercisesForSubmit(d.exercises),
         }));
@@ -68,10 +45,8 @@ function ModuleForm({ module }) {
         });
     };
 
-    const videoReady = (v) => (v.source === 'url' ? !!v.url : !!(v.file || v._existing));
-    const readyCount = VIDEO_SLOTS.filter((v) => videoReady(data.videos[v.slot])).length;
-    const totalMinutes =
-        VIDEO_SLOTS.reduce((s, v) => s + (Number(data.videos[v.slot].duration_minutes) || 0), 0) + (Number(data.application_minutes) || 0);
+    const videoMinutes = data.videos.reduce((s, v) => s + (Number(v.duration_minutes) || 0), 0);
+    const totalMinutes = videoMinutes + (Number(data.application_minutes) || 0);
 
     const errorCount = Object.keys(errors).length;
 
@@ -86,7 +61,7 @@ function ModuleForm({ module }) {
                         { label: isEdit ? 'Editar' : 'Novo módulo' },
                     ]}
                     title={isEdit ? module.title : 'Novo Módulo'}
-                    subtitle="Conceito → Exemplo → Aplicação → Erros comuns, com materiais de apoio e exercícios"
+                    subtitle="Vídeos categorizados, aplicação prática, materiais de apoio e exercícios"
                     actions={isEdit && <StatusBadge status={module.status} />}
                 />
 
@@ -112,50 +87,43 @@ function ModuleForm({ module }) {
                     </div>
                 </Card>
 
-                {/* Trilha do módulo */}
+                {/* Vídeos */}
                 <Card
-                    icon="route"
-                    title="Estrutura do módulo"
-                    description={`${readyCount}/3 vídeos configurados · duração estimada de ${totalMinutes} min`}
+                    icon="smart_display"
+                    title="Vídeos do módulo"
+                    description={`${data.videos.length} vídeo(s) · ${videoMinutes} min de vídeo · duração estimada do módulo: ${totalMinutes} min`}
                 >
-                    <div className="space-y-4">
-                        {VIDEO_SLOTS.slice(0, 2).map((v) => (
-                            <VideoSlot key={v.slot} config={v} value={data.videos[v.slot]} onChange={(patch) => setVideo(v.slot, patch)} errors={errors} />
-                        ))}
+                    <VideoList videos={data.videos} onChange={(videos) => setData('videos', videos)} errors={errors} suggestions={videoCategories} />
+                </Card>
 
-                        {/* Aplicação */}
-                        <div className="rounded-2xl border border-tertiary/20 bg-tertiary-container/10 p-5">
-                            <div className="flex flex-wrap items-center gap-3 mb-4">
-                                <span className="w-8 h-8 rounded-xl bg-tertiary text-white flex items-center justify-center font-black text-sm">3</span>
-                                <div className="flex-1">
-                                    <p className="font-headline font-bold text-[#003346] dark:text-white">Aplicação</p>
-                                    <p className="text-xs text-[#507c94] dark:text-[#87b3cd]">Atividade prática guiada para o aluno aplicar o conceito</p>
-                                </div>
-                                <div className="flex items-center gap-2 bg-white dark:bg-slate-900 rounded-xl px-3 py-2">
-                                    <span className="material-symbols-outlined text-base text-tertiary">timer</span>
-                                    <input
-                                        type="number"
-                                        min="1"
-                                        value={data.application_minutes}
-                                        onChange={(e) => setData('application_minutes', e.target.value)}
-                                        className="w-14 bg-transparent border-none p-0 text-sm font-bold text-[#003346] dark:text-white focus:ring-0"
-                                    />
-                                    <span className="text-xs font-bold text-[#507c94]">min</span>
-                                </div>
-                            </div>
-                            <Field error={errors.application_minutes || errors.application_instructions}>
-                                <textarea
-                                    rows="4"
-                                    value={data.application_instructions}
-                                    onChange={(e) => setData('application_instructions', e.target.value)}
-                                    className={`${inputClass} bg-white dark:bg-slate-900 resize-y`}
-                                    placeholder="Descreva o passo a passo da atividade prática (aprox. 10 minutos)..."
-                                />
-                            </Field>
+                <Card
+                    icon="construction"
+                    iconTone="tertiary"
+                    title="Aplicação"
+                    description="Atividade prática guiada para o aluno aplicar o conteúdo"
+                    actions={
+                        <div className="flex items-center gap-2 bg-surface dark:bg-slate-950 rounded-xl px-3 py-2">
+                            <span className="material-symbols-outlined text-base text-tertiary">timer</span>
+                            <input
+                                type="number"
+                                min="1"
+                                value={data.application_minutes}
+                                onChange={(e) => setData('application_minutes', e.target.value)}
+                                className="w-14 bg-transparent border-none p-0 text-sm font-bold text-[#003346] dark:text-white focus:ring-0"
+                            />
+                            <span className="text-xs font-bold text-[#507c94]">min</span>
                         </div>
-
-                        <VideoSlot config={VIDEO_SLOTS[2]} value={data.videos.common_errors} onChange={(patch) => setVideo('common_errors', patch)} errors={errors} />
-                    </div>
+                    }
+                >
+                    <Field error={errors.application_minutes || errors.application_instructions}>
+                        <textarea
+                            rows="4"
+                            value={data.application_instructions}
+                            onChange={(e) => setData('application_instructions', e.target.value)}
+                            className={`${inputClass} resize-y`}
+                            placeholder="Descreva o passo a passo da atividade prática (aprox. 10 minutos)..."
+                        />
+                    </Field>
                 </Card>
 
                 {/* Materiais de apoio */}
@@ -213,79 +181,5 @@ function ModuleForm({ module }) {
                 </div>
             </form>
         </PlatformLayout>
-    );
-}
-
-function VideoSlot({ config, value, onChange, errors }) {
-    const prefix = `videos.${config.slot}`;
-    const slotError = errors[prefix] || errors[`${prefix}.file`] || errors[`${prefix}.url`] || errors[`${prefix}.source`];
-
-    return (
-        <div className={`rounded-2xl border p-5 ${slotError ? 'border-error/40 bg-error/5' : 'border-outline-variant/20 dark:border-slate-800 bg-surface/50 dark:bg-slate-950/50'}`}>
-            <div className="flex flex-wrap items-center gap-3 mb-4">
-                <span className="w-8 h-8 rounded-xl kinetic-gradient text-white flex items-center justify-center font-black text-sm">{config.step}</span>
-                <div className="flex-1 min-w-[200px]">
-                    <p className="font-headline font-bold text-[#003346] dark:text-white flex items-center gap-2">
-                        <span className="material-symbols-outlined text-lg text-primary dark:text-[#00D1FF]">{config.icon}</span>
-                        {config.label}
-                        {config.suggested && <span className="text-[10px] font-black uppercase tracking-wider text-[#507c94] bg-white dark:bg-slate-900 px-2 py-0.5 rounded-full">~{config.suggested} min</span>}
-                    </p>
-                    <p className="text-xs text-[#507c94] dark:text-[#87b3cd]">{config.hint}</p>
-                </div>
-                <Segmented
-                    value={value.source}
-                    onChange={(source) => onChange({ source })}
-                    options={[
-                        { value: 'upload', label: 'Upload', icon: 'upload' },
-                        { value: 'url', label: 'Link', icon: 'link' },
-                    ]}
-                />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-3">
-                <div className="md:col-span-8">
-                    {value.source === 'url' ? (
-                        <input
-                            type="url"
-                            value={value.url}
-                            onChange={(e) => onChange({ url: e.target.value })}
-                            className={`${inputClass} bg-white dark:bg-slate-900`}
-                            placeholder="https://youtube.com/... ou https://vimeo.com/..."
-                        />
-                    ) : (
-                        <FileDrop
-                            compact
-                            accept="video/*"
-                            file={value.file}
-                            existing={value._existing}
-                            onChange={(file) => onChange({ file })}
-                            label="Enviar vídeo"
-                            hint="MP4, WEBM ou MOV"
-                            icon="video_call"
-                        />
-                    )}
-                </div>
-                <div className="md:col-span-4 grid grid-cols-3 gap-3">
-                    <input
-                        value={value.title}
-                        onChange={(e) => onChange({ title: e.target.value })}
-                        className={`${inputClass} bg-white dark:bg-slate-900 col-span-2`}
-                        placeholder="Título (opcional)"
-                    />
-                    <div className="flex items-center gap-1 bg-white dark:bg-slate-900 rounded-xl px-3">
-                        <input
-                            type="number"
-                            min="1"
-                            value={value.duration_minutes}
-                            onChange={(e) => onChange({ duration_minutes: e.target.value })}
-                            className="w-full bg-transparent border-none p-0 text-sm font-bold text-[#003346] dark:text-white focus:ring-0"
-                            placeholder="min"
-                        />
-                        <span className="text-[10px] font-bold text-[#507c94]">min</span>
-                    </div>
-                </div>
-            </div>
-            {slotError && <p className="text-xs text-error mt-2">{slotError}</p>}
-        </div>
     );
 }

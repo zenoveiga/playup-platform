@@ -1,3 +1,4 @@
+import ExerciseBuilder, { exerciseFromServer, exercisesForSubmit } from '@/Components/Platform/ExerciseBuilder';
 import MaterialList, { materialFromServer, materialsForSubmit } from '@/Components/Platform/MaterialList';
 import { Card, Field, IconButton, inputClass, PageHeader, PrimaryAction, StatusBadge } from '@/Components/Platform/UI';
 import PlatformLayout from '@/Layouts/PlatformLayout';
@@ -14,7 +15,9 @@ const CATEGORIES = ['Tecnologia', 'Negócios', 'Design', 'Marketing', 'Finanças
 
 // Remonta o formulário quando o servidor devolve nova versão do curso (após salvar).
 export default function CourseFormPage({ course, availableModules }) {
-    const version = course ? [course.id, course.updated_at, ...(course.materials ?? []).map((m) => m.id)].join(':') : 'new';
+    const version = course
+        ? [course.id, course.updated_at, ...(course.materials ?? []).map((m) => m.id), ...(course.exercises ?? []).map((e) => e.id)].join(':')
+        : 'new';
     return <CourseForm key={version} course={course} availableModules={availableModules} />;
 }
 
@@ -36,6 +39,7 @@ function CourseForm({ course, availableModules }) {
         remove_cover: false,
         module_ids: (course?.modules ?? []).map((m) => m.id),
         materials: (course?.materials ?? []).map(materialFromServer),
+        exercises: (course?.exercises ?? []).map(exerciseFromServer),
     });
 
     const modulesById = useMemo(() => Object.fromEntries(availableModules.map((m) => [m.id, m])), [availableModules]);
@@ -66,6 +70,7 @@ function CourseForm({ course, availableModules }) {
             ...(isEdit ? { _method: 'put' } : {}),
             module_ids: d.structure === 'modular' ? d.module_ids : [],
             materials: d.structure === 'free' ? materialsForSubmit(d.materials) : [],
+            exercises: d.structure === 'free' ? exercisesForSubmit(d.exercises) : [],
         }));
         post(isEdit ? route('platform.courses.update', course.id) : route('platform.courses.store'), {
             forceFormData: true,
@@ -179,13 +184,13 @@ function CourseForm({ course, availableModules }) {
                                 value: 'modular',
                                 icon: 'view_module',
                                 title: 'Compilado de módulos',
-                                text: 'O curso é composto por módulos da biblioteca (conceito, exemplo, aplicação, erros comuns e exercícios).',
+                                text: 'O curso é composto por módulos da biblioteca (vídeos, aplicação, materiais de apoio e exercícios).',
                             },
                             {
                                 value: 'free',
                                 icon: 'perm_media',
                                 title: 'Curso livre',
-                                text: 'Adicione vídeos, apostilas, links e arquivos diretamente, sem necessidade de módulos.',
+                                text: 'Adicione vários vídeos, apostilas, arquivos e exercícios diretamente, sem necessidade de módulos.',
                             },
                         ].map((opt) => (
                             <label key={opt.value} className="relative cursor-pointer select-none">
@@ -229,7 +234,7 @@ function CourseForm({ course, availableModules }) {
                                             <div className="flex-1 min-w-0">
                                                 <p className="font-bold text-sm text-[#003346] dark:text-white truncate">{m.title}</p>
                                                 <p className="text-[11px] text-[#507c94] dark:text-[#87b3cd]">
-                                                    {m.videos_count}/3 vídeos · {m.application_minutes} min aplicação · {m.exercises_count} exercícios · {m.support_materials_count} materiais
+                                                    {m.videos_count} vídeo(s) · {m.application_minutes} min aplicação · {m.exercises_count} exercícios · {m.support_materials_count} materiais
                                                 </p>
                                             </div>
                                             {m.status === 'draft' && <StatusBadge status="draft" />}
@@ -271,7 +276,7 @@ function CourseForm({ course, availableModules }) {
                                             <div className="flex-1 min-w-0">
                                                 <p className="font-bold text-sm text-[#003346] dark:text-white truncate">{m.title}</p>
                                                 <p className="text-[11px] text-[#507c94]">
-                                                    {m.videos_count}/3 vídeos · {m.exercises_count} exercícios
+                                                    {m.videos_count} vídeo(s) · {m.exercises_count} exercícios
                                                     {m.status === 'draft' ? ' · rascunho' : ''}
                                                 </p>
                                             </div>
@@ -283,20 +288,27 @@ function CourseForm({ course, availableModules }) {
                         </Card>
                     </div>
                 ) : (
-                    <Card
-                        icon="perm_media"
-                        title="Conteúdo do curso"
-                        description={`${data.materials.length} item(ns)${estimatedMinutes ? ` · ${estimatedMinutes} min de vídeo` : ''}`}
-                    >
-                        <MaterialList
-                            items={data.materials}
-                            onChange={(materials) => setData('materials', materials)}
-                            errors={errors}
-                            prefix="materials"
-                            emptyText="Adicione vídeos, apostilas, links ou arquivos para compor o curso."
-                        />
-                        {errors.materials && <p className="text-xs text-error mt-3">{errors.materials}</p>}
-                    </Card>
+                    <>
+                        <Card
+                            icon="perm_media"
+                            title="Vídeos, apostilas e materiais"
+                            description={`${data.materials.filter((m) => m.type === 'video').length} vídeo(s) · ${data.materials.filter((m) => m.type === 'document').length} apostila(s) · ${data.materials.length} item(ns) no total${estimatedMinutes ? ` · ${estimatedMinutes} min de vídeo` : ''}`}
+                        >
+                            <MaterialList
+                                items={data.materials}
+                                onChange={(materials) => setData('materials', materials)}
+                                errors={errors}
+                                prefix="materials"
+                                multiUpload
+                                emptyText="Adicione quantos vídeos, apostilas, links ou arquivos quiser para compor o curso."
+                            />
+                            {errors.materials && <p className="text-xs text-error mt-3">{errors.materials}</p>}
+                        </Card>
+
+                        <Card icon="quiz" iconTone="tertiary" title="Exercícios" description="Monte a lista de exercícios do curso">
+                            <ExerciseBuilder exercises={data.exercises} onChange={(exercises) => setData('exercises', exercises)} errors={errors} />
+                        </Card>
+                    </>
                 )}
 
                 {/* Barra de ações fixa */}

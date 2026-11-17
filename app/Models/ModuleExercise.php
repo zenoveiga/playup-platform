@@ -31,4 +31,10 @@ class ModuleExercise extends Model
     {
         return $this->belongsTo(CourseModule::class, 'course_module_id');
     }
+
+    /** Curso livre ao qual o exercício pertence (quando não está em um módulo). */
+    public function course(): BelongsTo
+    {
+        return $this->belongsTo(Course::class);
+    }
 }

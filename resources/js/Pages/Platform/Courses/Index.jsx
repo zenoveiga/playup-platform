@@ -85,7 +85,7 @@ export default function CoursesIndex({ courses }) {
                                     <div className="flex items-center gap-4 mt-4 text-xs font-bold text-[#507c94] dark:text-[#87b3cd]">
                                         <span className="flex items-center gap-1">
                                             <span className="material-symbols-outlined text-base">{c.structure === 'modular' ? 'view_module' : 'perm_media'}</span>
-                                            {c.structure === 'modular' ? `${c.modules_count} módulos` : `${c.materials_count} materiais`}
+                                            {c.structure === 'modular' ? `${c.modules_count} módulos` : `${c.materials_count} materiais · ${c.exercises_count} exercícios`}
                                         </span>
                                         {c.workload_hours && (
                                             <span className="flex items-center gap-1">

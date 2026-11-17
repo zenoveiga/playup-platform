@@ -5,11 +5,12 @@ namespace App\Http\Controllers\Platform;
 use App\Http\Controllers\Controller;
 use App\Models\Course;
 use App\Models\CourseModule;
+use App\Services\ExerciseSync;
 use App\Services\MaterialSync;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
+use App\Support\Media;
 use Illuminate\Validation\Validator;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -17,16 +18,16 @@ use Inertia\Response;
 /**
  * Cursos podem ser:
  *  - modular: um compilado ordenado de módulos da biblioteca;
- *  - free (livre): vídeos, apostilas, links e arquivos organizados diretamente, sem módulos.
+ *  - free (livre): vídeos, apostilas, links, arquivos e exercícios organizados diretamente, sem módulos.
  */
 class CourseController extends Controller
 {
-    public function __construct(private MaterialSync $materials) {}
+    public function __construct(private MaterialSync $materials, private ExerciseSync $exercises) {}
 
     public function index(): Response
     {
         return Inertia::render('Platform/Courses/Index', [
-            'courses' => Course::withCount(['modules', 'materials'])->latest()->get(),
+            'courses' => Course::withCount(['modules', 'materials', 'exercises'])->latest()->get(),
         ]);
     }
 
@@ -59,7 +60,7 @@ class CourseController extends Controller
 
     public function edit(Course $course): Response
     {
-        $course->load(['modules' => fn ($q) => $q->withCount(['exercises', 'videos', 'supportMaterials']), 'materials']);
+        $course->load(['modules' => fn ($q) => $q->withCount(['exercises', 'videos', 'supportMaterials']), 'materials', 'exercises']);
 
         return Inertia::render('Platform/Courses/Form', [
             'course' => $course,
@@ -88,9 +89,7 @@ class CourseController extends Controller
     {
         DB::transaction(function () use ($course) {
             $course->materials()->get()->each->delete();
-            if ($course->cover_path) {
-                Storage::disk('public')->delete($course->cover_path);
-            }
+            Media::delete($course->cover_path);
             $course->delete();
         });
 
@@ -134,7 +133,10 @@ class CourseController extends Controller
             // Limite geral = vídeo; demais tipos são checados abaixo com o limite de arquivos.
             'materials.*.file' => "nullable|file|max:{$maxVideo}",
             'materials.*.duration_minutes' => 'nullable|integer|min:1|max:600',
+
+            ...ExerciseSync::rules(),
         ], [], [
+            ...ExerciseSync::attributeNames(),
             'title' => 'título',
             'workload_hours' => 'carga horária',
             'cover' => 'capa',
@@ -155,9 +157,11 @@ class CourseController extends Controller
                 return;
             }
 
+            ExerciseSync::validate($v, $request->input('exercises', []));
+
             $materials = $request->input('materials', []);
-            if ($published && empty($materials)) {
-                $v->errors()->add('materials', 'Adicione ao menos um material para publicar o curso.');
+            if ($published && empty($materials) && empty($request->input('exercises'))) {
+                $v->errors()->add('materials', 'Adicione ao menos um material ou exercício para publicar o curso.');
             }
 
             foreach ($materials as $i => $item) {
@@ -198,12 +202,10 @@ class CourseController extends Controller
     private function syncContent(Course $course, array $data, Request $request): void
     {
         if ($request->hasFile('cover')) {
-            if ($course->cover_path) {
-                Storage::disk('public')->delete($course->cover_path);
-            }
-            $course->update(['cover_path' => $request->file('cover')->store('courses/covers', 'public')]);
+            Media::delete($course->cover_path);
+            $course->update(['cover_path' => Media::store($request->file('cover'), 'courses/covers')]);
         } elseif (! empty($data['remove_cover']) && $course->cover_path) {
-            Storage::disk('public')->delete($course->cover_path);
+            Media::delete($course->cover_path);
             $course->update(['cover_path' => null]);
         }
 
@@ -214,8 +216,9 @@ class CourseController extends Controller
                     ->mapWithKeys(fn ($id, $position) => [$id => ['position' => $position]])
                     ->all()
             );
-            // Curso modular não mantém materiais avulsos.
+            // Curso modular não mantém materiais nem exercícios avulsos.
             $this->materials->sync($course, [], "courses/{$course->id}/materials");
+            $course->exercises()->delete();
 
             return;
         }
@@ -229,5 +232,6 @@ class CourseController extends Controller
             ])->all(),
             "courses/{$course->id}/materials"
         );
+        $this->exercises->sync($course->exercises(), $data['exercises'] ?? []);
     }
 }

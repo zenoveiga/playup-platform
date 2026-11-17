@@ -5,13 +5,13 @@ namespace App\Services;
 use App\Models\CourseMaterial;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Storage;
+use App\Support\Media;
 
 /**
  * Sincroniza a lista de materiais (vídeos, apostilas, links, arquivos) de um módulo
  * ou de um curso livre: cria, atualiza, substitui arquivos e remove os itens ausentes.
  *
- * Cada item: id?, slot?, type, title, description?, source (upload|url), url?, file?, duration_minutes?
+ * Cada item: id?, slot?, category?, type, title, description?, source (upload|url), url?, file?, duration_minutes?
  */
 class MaterialSync
 {
@@ -35,6 +35,7 @@ class MaterialSync
 
             $material->fill([
                 'slot' => $item['slot'] ?? null,
+                'category' => $item['category'] ?? null,
                 'type' => $type,
                 'title' => $item['title'] ?? '',
                 'description' => $item['description'] ?? null,
@@ -49,7 +50,7 @@ class MaterialSync
                 $material->url = $item['url'] ?? null;
             } elseif ($file instanceof UploadedFile) {
                 $this->forgetFile($material);
-                $material->file_path = $file->store($directory, 'public');
+                $material->file_path = Media::store($file, $directory);
                 $material->file_name = $file->getClientOriginalName();
                 $material->mime_type = $file->getClientMimeType();
                 $material->file_size = $file->getSize();
@@ -65,9 +66,7 @@ class MaterialSync
 
     private function forgetFile(CourseMaterial $material): void
     {
-        if ($material->file_path) {
-            Storage::disk('public')->delete($material->file_path);
-        }
+        Media::delete($material->file_path);
 
         $material->file_path = null;
         $material->file_name = null;

@@ -17,7 +17,7 @@ export default function ModulesIndex({ modules }) {
                 <PageHeader
                     breadcrumb={[{ label: 'Administração', href: route('platform.dashboard') }, { label: 'Módulos' }]}
                     title="Biblioteca de Módulos"
-                    subtitle="Cada módulo reúne vídeo conceito, vídeo exemplo, aplicação, erros comuns, materiais de apoio e exercícios"
+                    subtitle="Cada módulo reúne vídeos categorizados, aplicação prática, materiais de apoio e exercícios"
                     actions={
                         <PrimaryAction as="link" href={route('platform.modules.create')} icon="add">
                             Novo módulo
@@ -61,7 +61,7 @@ export default function ModulesIndex({ modules }) {
 
                                 <div className="grid grid-cols-4 gap-2 mt-5 text-center">
                                     {[
-                                        { icon: 'smart_display', value: `${m.videos_count}/3`, label: 'vídeos' },
+                                        { icon: 'smart_display', value: m.videos_count, label: 'vídeos' },
                                         { icon: 'timer', value: `${m.application_minutes}'`, label: 'aplicação' },
                                         { icon: 'attach_file', value: m.support_materials_count, label: 'apoio' },
                                         { icon: 'quiz', value: m.exercises_count, label: 'exercícios' },
