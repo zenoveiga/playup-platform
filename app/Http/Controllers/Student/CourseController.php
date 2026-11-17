@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Student;
 
 use App\Http\Controllers\Controller;
 use App\Models\Course;
+use App\Models\CourseModule;
 use App\Models\Enrollment;
 use App\Models\ModuleExercise;
 use Illuminate\Http\Request;
@@ -38,7 +39,7 @@ class CourseController extends Controller
         ])->sortBy(fn ($c) => [$c['access_status'] !== 'active', $c['title']])->values();
 
         $available = Course::where('status', 'published')
-            ->withCount(['modules', 'materials', 'exercises'])
+            ->withCount(['modules', 'materials', 'exerciseSets as exercises_count'])
             ->orderBy('title')
             ->get()
             ->map(fn (Course $c) => [
@@ -70,8 +71,9 @@ class CourseController extends Controller
         abort_unless($enrollment, 403, 'Você não tem acesso a este curso.');
 
         $course->load([
-            'modules' => fn ($q) => $q->with(['materials', 'exercises']),
+            'modules' => fn ($q) => $q->with(['materials', 'exerciseSets.questions', 'exercises']),
             'materials',
+            'exerciseSets.questions',
             'exercises',
         ]);
 
@@ -87,10 +89,10 @@ class CourseController extends Controller
                     'application_instructions' => $m->application_instructions,
                     'videos' => $m->materials->where('slot', 'video')->values()->map(fn ($v) => $this->material($v)),
                     'support' => $m->materials->where('slot', 'support')->values()->map(fn ($v) => $this->material($v)),
-                    'exercises' => $m->exercises->map(fn ($e) => $this->exercise($e)),
+                    'exercise_sets' => $this->exerciseSets($m),
                 ]),
                 'materials' => $course->materials->map(fn ($v) => $this->material($v)),
-                'exercises' => $course->exercises->map(fn ($e) => $this->exercise($e)),
+                'exercise_sets' => $this->exerciseSets($course),
             ],
             'access' => [
                 'starts_at' => $enrollment->starts_at->toDateString(),
@@ -134,15 +136,26 @@ class CourseController extends Controller
         ];
     }
 
-    /** Sem gabarito: o aluno vê o enunciado e as alternativas. */
-    private function exercise(ModuleExercise $e): array
+    /** Exercícios com suas questões, sem gabarito. Questões soltas (sem exercício) entram num grupo próprio. */
+    private function exerciseSets(Course|CourseModule $owner): array
     {
-        return [
-            'id' => $e->id,
-            'type' => $e->type,
-            'statement' => $e->statement,
-            'points' => $e->points,
-            'options' => collect($e->options ?? [])->pluck('text')->values(),
-        ];
+        $sets = $owner->exerciseSets->map(fn ($set) => [
+            'id' => $set->id,
+            'title' => $set->title,
+            'description' => $set->description,
+            'questions' => $set->questions->map(fn (ModuleExercise $q) => $q->forStudent())->values(),
+        ]);
+
+        $loose = $owner->exercises->whereNull('exercise_set_id');
+        if ($loose->isNotEmpty()) {
+            $sets->push([
+                'id' => 'loose-'.$owner->id,
+                'title' => 'Exercícios',
+                'description' => null,
+                'questions' => $loose->map(fn (ModuleExercise $q) => $q->forStudent())->values(),
+            ]);
+        }
+
+        return $sets->filter(fn ($s) => count($s['questions']) > 0)->values()->all();
     }
 }

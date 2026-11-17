@@ -17,7 +17,7 @@ class LicenseePricing
     public function catalog(User $licensee): array
     {
         $courses = Course::where('status', 'published')
-            ->withCount(['modules', 'materials', 'exercises'])
+            ->withCount(['modules', 'materials', 'exerciseSets as exercises_count'])
             ->orderBy('title')
             ->get();
 

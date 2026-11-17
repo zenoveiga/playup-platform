@@ -21,16 +21,24 @@ class LearningController extends Controller
         $this->ensureAccess($request, $course);
         abort_unless($exercise->belongsToCourse($course), 404);
 
+        $count = count($exercise->options ?? []);
+        $index = ['integer', 'min:0', 'max:'.max($count - 1, 0)];
         $rules = match ($exercise->type) {
-            'multiple_choice' => [
-                'answer' => 'required|array|min:1',
-                'answer.*' => ['integer', 'min:0', 'max:'.(count($exercise->options ?? []) - 1)],
-            ],
+            'single_choice' => ['answer' => ['required', ...$index]],
+            'multiple_choice' => ['answer' => 'required|array|min:1', 'answer.*' => $index],
             'true_false' => ['answer' => 'required|in:true,false'],
+            'statements' => ['answer' => "required|array|size:$count", 'answer.*' => 'required|in:true,false'],
+            'fill_blanks' => ['answer' => 'required|array|size:'.count($exercise->blanks()), 'answer.*' => 'nullable|string|max:1000'],
+            'matching' => ['answer' => "required|array|size:$count", 'answer.*' => ['required', ...$index]],
+            'ordering' => ['answer' => "required|array|size:$count", 'answer.*' => ['required', 'distinct', ...$index]],
+            'numeric' => ['answer' => ['required', 'string', 'max:50', 'regex:/^\s*-?[\d\s.]*[.,]?\d+\s*$/']],
             default => ['answer' => 'required|string|max:20000'],
         };
         $data = $request->validate($rules, [
             'answer.required' => 'Responda o exercício antes de enviar.',
+            'answer.size' => 'Responda todos os itens antes de enviar.',
+            'answer.*.required' => 'Responda todos os itens antes de enviar.',
+            'answer.regex' => 'Informe um número válido.',
         ]);
 
         [$isCorrect, $score] = $exercise->grade($data['answer']);
@@ -41,9 +49,13 @@ class LearningController extends Controller
         ]);
         $answer->fill([
             'course_id' => $course->id,
-            'answer' => $exercise->type === 'multiple_choice'
-                ? collect($data['answer'])->map(fn ($v) => (int) $v)->unique()->sort()->values()->all()
-                : $data['answer'],
+            'answer' => match ($exercise->type) {
+                'multiple_choice' => collect($data['answer'])->map(fn ($v) => (int) $v)->unique()->sort()->values()->all(),
+                'single_choice' => (int) $data['answer'],
+                'matching', 'ordering' => collect($data['answer'])->map(fn ($v) => (int) $v)->values()->all(),
+                'fill_blanks' => collect($data['answer'])->map(fn ($v) => (string) $v)->values()->all(),
+                default => $data['answer'],
+            },
             'is_correct' => $isCorrect,
             'score' => $score,
             'attempts' => $answer->exists ? $answer->attempts + 1 : 1,
@@ -98,6 +110,7 @@ class LearningController extends Controller
             'answer' => $answer->answer,
             'is_correct' => $answer->is_correct,
             'score' => $answer->score,
+            'max_score' => $exercise->points,
             'attempts' => $answer->attempts,
             'answered_at' => $answer->answered_at->toDateTimeString(),
             'explanation' => $exercise->explanation,

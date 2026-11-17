@@ -28,7 +28,7 @@ class CourseController extends Controller
     public function index(): Response
     {
         return Inertia::render('Platform/Courses/Index', [
-            'courses' => Course::withCount(['modules', 'materials', 'exercises'])->latest()->get(),
+            'courses' => Course::withCount(['modules', 'materials', 'exerciseSets as exercises_count'])->latest()->get(),
             'suggestedPrices' => (object) PriceTable::suggested()->priceMap(),
             'suggestedInstallments' => PriceTable::suggested()->max_installments,
         ]);
@@ -64,7 +64,7 @@ class CourseController extends Controller
 
     public function edit(Course $course): Response
     {
-        $course->load(['modules' => fn ($q) => $q->withCount(['exercises', 'videos', 'supportMaterials']), 'materials', 'exercises']);
+        $course->load(['modules' => fn ($q) => $q->withCount(['exerciseSets as exercises_count', 'videos', 'supportMaterials']), 'materials', 'exerciseSets.questions']);
 
         return Inertia::render('Platform/Courses/Form', [
             'course' => [
@@ -106,7 +106,7 @@ class CourseController extends Controller
 
     private function availableModules()
     {
-        return CourseModule::withCount(['exercises', 'videos', 'supportMaterials'])
+        return CourseModule::withCount(['exerciseSets as exercises_count', 'videos', 'supportMaterials'])
             ->orderBy('title')
             ->get(['id', 'title', 'description', 'status', 'application_minutes']);
     }
@@ -178,10 +178,10 @@ class CourseController extends Controller
                 return;
             }
 
-            ExerciseSync::validate($v, $request->input('exercises', []));
+            ExerciseSync::validate($v, $request->input('exercise_sets', []));
 
             $materials = $request->input('materials', []);
-            if ($published && empty($materials) && empty($request->input('exercises'))) {
+            if ($published && empty($materials) && empty($request->input('exercise_sets'))) {
                 $v->errors()->add('materials', 'Adicione ao menos um material ou exercício para publicar o curso.');
             }
 
@@ -262,7 +262,7 @@ class CourseController extends Controller
             );
             // Curso modular não mantém materiais nem exercícios avulsos.
             $this->materials->sync($course, [], "courses/{$course->id}/materials");
-            $course->exercises()->delete();
+            $this->exercises->sync($course, []);
 
             return;
         }
@@ -277,6 +277,6 @@ class CourseController extends Controller
             "courses/{$course->id}/materials",
             $request->user()->id
         );
-        $this->exercises->sync($course->exercises(), $data['exercises'] ?? []);
+        $this->exercises->sync($course, $data['exercise_sets'] ?? []);
     }
 }

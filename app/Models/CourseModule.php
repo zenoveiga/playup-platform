@@ -52,6 +52,12 @@ class CourseModule extends Model
         return $this->hasMany(ModuleExercise::class)->orderBy('position');
     }
 
+    /** Exercícios (com título), cada um com suas questões. */
+    public function exerciseSets(): HasMany
+    {
+        return $this->hasMany(ExerciseSet::class)->orderBy('position');
+    }
+
     public function courses(): BelongsToMany
     {
         return $this->belongsToMany(Course::class)->withPivot('position');

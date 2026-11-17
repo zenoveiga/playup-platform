@@ -27,7 +27,7 @@ class ModuleController extends Controller
     public function index(): Response
     {
         $modules = CourseModule::query()
-            ->withCount(['exercises', 'supportMaterials', 'videos', 'courses'])
+            ->withCount(['exerciseSets as exercises_count', 'supportMaterials', 'videos', 'courses'])
             ->latest()
             ->get();
 
@@ -62,7 +62,7 @@ class ModuleController extends Controller
 
     public function edit(CourseModule $module): Response
     {
-        $module->load(['materials', 'exercises', 'courses:id,title']);
+        $module->load(['materials', 'exerciseSets.questions', 'courses:id,title']);
 
         return Inertia::render('Platform/Modules/Form', [
             'module' => $module,
@@ -131,7 +131,7 @@ class ModuleController extends Controller
         $validator->after(function (Validator $v) use ($request, $module) {
             $this->validateVideos($v, $request, $module);
             $this->validateSupportFiles($v, $request, $module);
-            ExerciseSync::validate($v, $request->input('exercises', []));
+            ExerciseSync::validate($v, $request->input('exercise_sets', []));
         });
 
         return $validator->validate();
@@ -233,7 +233,7 @@ class ModuleController extends Controller
 
         $this->materials->sync($module, $items, "courses/modules/{$module->id}", auth()->id());
 
-        $this->exercises->sync($module->exercises(), $data['exercises'] ?? []);
+        $this->exercises->sync($module, $data['exercise_sets'] ?? []);
     }
 
     private function attributeNames(): array

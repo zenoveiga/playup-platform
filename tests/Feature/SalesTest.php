@@ -164,7 +164,7 @@ class SalesTest extends TestCase
         $this->sell();
 
         $props = $this->actingAs($this->student)->get('/student/cursos/excel')->viewData('page')['props'];
-        $exercise = $props['course']['exercises'][0];
+        $exercise = $props['course']['exercise_sets'][0]['questions'][0];
         $this->assertSame(['A', 'B'], collect($exercise['options'])->all());
         $this->assertArrayNotHasKey('explanation', $exercise);
         $this->assertArrayNotHasKey('expected_answer', $exercise);

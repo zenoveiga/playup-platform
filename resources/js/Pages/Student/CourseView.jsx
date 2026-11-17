@@ -11,6 +11,8 @@ const formatDate = (d) => (d ? new Date(`${d}T00:00:00`).toLocaleDateString('pt-
 
 const MATERIAL_ICONS = { video: 'smart_display', document: 'menu_book', link: 'link', file: 'attach_file' };
 
+const exerciseLesson = (set) => ({ key: `es${set.id}`, kind: 'exercises', title: set.title, subtitle: `Exercício · ${set.questions.length} questão(ões)`, item: set });
+
 /** Monta a trilha do curso como uma lista de "aulas" navegáveis. */
 function buildOutline(course) {
     if (course.structure === 'modular') {
@@ -24,7 +26,7 @@ function buildOutline(course) {
                     ? [{ key: `a${m.id}`, kind: 'application', title: 'Aplicação', subtitle: 'Atividade prática', minutes: m.application_minutes, item: m }]
                     : []),
                 ...(m.support.length ? [{ key: `s${m.id}`, kind: 'materials', title: 'Materiais de apoio', subtitle: `${m.support.length} arquivo(s)`, item: m.support }] : []),
-                ...(m.exercises.length ? [{ key: `e${m.id}`, kind: 'exercises', title: 'Exercícios', subtitle: `${m.exercises.length} questão(ões)`, item: m.exercises }] : []),
+                ...m.exercise_sets.map(exerciseLesson),
             ],
         }));
     }
@@ -42,9 +44,7 @@ function buildOutline(course) {
                     minutes: v.duration_minutes,
                     item: v,
                 })),
-                ...(course.exercises.length
-                    ? [{ key: 'ex', kind: 'exercises', title: 'Exercícios', subtitle: `${course.exercises.length} questão(ões)`, item: course.exercises }]
-                    : []),
+                ...course.exercise_sets.map(exerciseLesson),
             ],
         },
     ];
@@ -129,7 +129,7 @@ function Player({ lesson, playerRef, courseSlug, answers, onAnswer, onPlayback }
     }
 
     // exercícios
-    return <ExerciseList exercises={lesson.item} courseSlug={courseSlug} answers={answers} onAnswer={onAnswer} />;
+    return <ExerciseList key={lesson.key} exerciseSet={lesson.item} courseSlug={courseSlug} answers={answers} onAnswer={onAnswer} />;
 }
 
 export default function CourseView({ course, access, answers: initialAnswers = {}, notes: initialNotes = [] }) {

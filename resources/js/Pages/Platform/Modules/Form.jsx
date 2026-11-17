@@ -1,4 +1,4 @@
-import ExerciseBuilder, { exerciseFromServer, exercisesForSubmit } from '@/Components/Platform/ExerciseBuilder';
+import ExerciseBuilder, { setFromServer, setsForSubmit } from '@/Components/Platform/ExerciseBuilder';
 import MaterialList, { materialFromServer, materialsForSubmit } from '@/Components/Platform/MaterialList';
 import { Card, Field, inputClass, PageHeader, PrimaryAction, StatusBadge } from '@/Components/Platform/UI';
 import VideoList, { videoFromServer, videosForSubmit } from '@/Components/Platform/VideoList';
@@ -10,7 +10,7 @@ import { Head, Link, useForm } from '@inertiajs/react';
 // (ex.: após salvar), para que IDs de materiais recém-criados sejam usados no próximo envio.
 export default function ModuleFormPage({ module, videoCategories }) {
     const version = module
-        ? [module.id, module.updated_at, ...(module.materials ?? []).map((m) => m.id), ...(module.exercises ?? []).map((e) => e.id)].join(':')
+        ? [module.id, module.updated_at, ...(module.materials ?? []).map((m) => m.id), ...(module.exercise_sets ?? []).flatMap((s) => [s.id, ...(s.questions ?? []).map((q) => q.id)])].join(':')
         : 'new';
     return <ModuleForm key={version} module={module} videoCategories={videoCategories} />;
 }
@@ -27,7 +27,7 @@ function ModuleForm({ module, videoCategories }) {
         status: module?.status ?? 'draft',
         videos: (module?.materials ?? []).filter((m) => m.slot === 'video').map(videoFromServer),
         support: (module?.materials ?? []).filter((m) => m.slot === 'support').map(materialFromServer),
-        exercises: (module?.exercises ?? []).map(exerciseFromServer),
+        exercise_sets: (module?.exercise_sets ?? []).map(setFromServer),
     });
 
     const { run: uploadFiles, uploading, uploadError } = useDirectUploads();
@@ -55,7 +55,7 @@ function ModuleForm({ module, videoCategories }) {
             ...(isEdit ? { _method: 'put' } : {}),
             videos: videosForSubmit(d.videos.map(withUploadKey(keys))),
             support: materialsForSubmit(d.support.map(withUploadKey(keys))),
-            exercises: exercisesForSubmit(d.exercises),
+            exercise_sets: setsForSubmit(d.exercise_sets),
         }));
         post(isEdit ? route('platform.modules.update', module.id) : route('platform.modules.store'), {
             forceFormData: true,
@@ -157,8 +157,8 @@ function ModuleForm({ module, videoCategories }) {
                 </Card>
 
                 {/* Exercícios */}
-                <Card icon="quiz" iconTone="tertiary" title="Exercícios" description="Monte a lista de exercícios do módulo">
-                    <ExerciseBuilder exercises={data.exercises} onChange={(exercises) => setData('exercises', exercises)} errors={errors} />
+                <Card icon="quiz" iconTone="tertiary" title="Exercícios" description="Crie um ou mais exercícios com título, cada um com suas questões">
+                    <ExerciseBuilder sets={data.exercise_sets} onChange={(sets) => setData('exercise_sets', sets)} errors={errors} />
                 </Card>
 
                 {isEdit && module.courses?.length > 0 && (

@@ -1,4 +1,4 @@
-import ExerciseBuilder, { exerciseFromServer, exercisesForSubmit } from '@/Components/Platform/ExerciseBuilder';
+import ExerciseBuilder, { setFromServer, setsForSubmit } from '@/Components/Platform/ExerciseBuilder';
 import MaterialList, { materialFromServer, materialsForSubmit } from '@/Components/Platform/MaterialList';
 import { Card, Field, IconButton, inputClass, MoneyInput, PageHeader, PrimaryAction, StatusBadge } from '@/Components/Platform/UI';
 import { installmentText } from '@/lib/licensee';
@@ -18,7 +18,7 @@ const CATEGORIES = ['Tecnologia', 'Negócios', 'Design', 'Marketing', 'Finanças
 // Remonta o formulário quando o servidor devolve nova versão do curso (após salvar).
 export default function CourseFormPage({ course, availableModules, suggestedInstallments }) {
     const version = course
-        ? [course.id, course.updated_at, ...(course.materials ?? []).map((m) => m.id), ...(course.exercises ?? []).map((e) => e.id)].join(':')
+        ? [course.id, course.updated_at, ...(course.materials ?? []).map((m) => m.id), ...(course.exercise_sets ?? []).flatMap((s) => [s.id, ...(s.questions ?? []).map((q) => q.id)])].join(':')
         : 'new';
     return <CourseForm key={version} course={course} availableModules={availableModules} suggestedInstallments={suggestedInstallments} />;
 }
@@ -42,7 +42,7 @@ function CourseForm({ course, availableModules, suggestedInstallments }) {
         remove_cover: false,
         module_ids: (course?.modules ?? []).map((m) => m.id),
         materials: (course?.materials ?? []).map(materialFromServer),
-        exercises: (course?.exercises ?? []).map(exerciseFromServer),
+        exercise_sets: (course?.exercise_sets ?? []).map(setFromServer),
     });
 
     const modulesById = useMemo(() => Object.fromEntries(availableModules.map((m) => [m.id, m])), [availableModules]);
@@ -93,7 +93,7 @@ function CourseForm({ course, availableModules, suggestedInstallments }) {
             ...(keys?.cover ? { cover: null, cover_upload_key: keys.cover } : {}),
             module_ids: d.structure === 'modular' ? d.module_ids : [],
             materials: d.structure === 'free' ? materialsForSubmit(d.materials.map(withUploadKey(keys))) : [],
-            exercises: d.structure === 'free' ? exercisesForSubmit(d.exercises) : [],
+            exercise_sets: d.structure === 'free' ? setsForSubmit(d.exercise_sets) : [],
         }));
         post(isEdit ? route('platform.courses.update', course.id) : route('platform.courses.store'), {
             forceFormData: true,
@@ -340,8 +340,8 @@ function CourseForm({ course, availableModules, suggestedInstallments }) {
                             {errors.materials && <p className="text-xs text-error mt-3">{errors.materials}</p>}
                         </Card>
 
-                        <Card icon="quiz" iconTone="tertiary" title="Exercícios" description="Monte a lista de exercícios do curso">
-                            <ExerciseBuilder exercises={data.exercises} onChange={(exercises) => setData('exercises', exercises)} errors={errors} />
+                        <Card icon="quiz" iconTone="tertiary" title="Exercícios" description="Crie um ou mais exercícios com título, cada um com suas questões">
+                            <ExerciseBuilder sets={data.exercise_sets} onChange={(sets) => setData('exercise_sets', sets)} errors={errors} />
                         </Card>
                     </>
                 )}

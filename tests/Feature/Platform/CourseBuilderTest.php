@@ -40,13 +40,17 @@ class CourseBuilderTest extends TestCase
                 ['type' => 'document', 'title' => 'Apostila', 'file' => UploadedFile::fake()->create('apostila.pdf', 200, 'application/pdf')],
                 ['type' => 'link', 'title' => 'Documentação', 'url' => 'https://support.microsoft.com'],
             ],
-            'exercises' => [
-                ['type' => 'multiple_choice', 'statement' => 'Qual função soma?', 'points' => 2, 'options' => [
-                    ['text' => 'SOMA', 'correct' => true],
-                    ['text' => 'MÉDIA', 'correct' => false],
+            'exercise_sets' => [
+                ['title' => 'Fixação', 'description' => 'Responda após o vídeo conceito.', 'questions' => [
+                    ['type' => 'multiple_choice', 'statement' => 'Qual função soma?', 'points' => 2, 'options' => [
+                        ['text' => 'SOMA', 'correct' => true],
+                        ['text' => 'MÉDIA', 'correct' => false],
+                    ]],
+                    ['type' => 'true_false', 'statement' => 'PROCV busca valores.', 'points' => 1, 'expected_answer' => 'true'],
                 ]],
-                ['type' => 'true_false', 'statement' => 'PROCV busca valores.', 'points' => 1, 'expected_answer' => 'true'],
-                ['type' => 'essay', 'statement' => 'Explique o uso de SE.', 'points' => 3],
+                ['title' => 'Desafio', 'questions' => [
+                    ['type' => 'essay', 'statement' => 'Explique o uso de SE.', 'points' => 3],
+                ]],
             ],
         ], $overrides);
     }
@@ -62,6 +66,8 @@ class CourseBuilderTest extends TestCase
         $this->assertSame(3, $module->videos()->count());
         $this->assertSame(2, $module->supportMaterials()->count());
         $this->assertSame(3, $module->exercises()->count());
+        $this->assertSame(['Fixação', 'Desafio'], $module->exerciseSets()->pluck('title')->all());
+        $this->assertSame(2, $module->exerciseSets[0]->questions()->count());
         $this->assertSame([['text' => 'SOMA', 'correct' => true], ['text' => 'MÉDIA', 'correct' => false]], $module->exercises[0]->options);
 
         $this->assertSame(['Conceito', 'Exemplo', 'Erros comuns'], $module->videos()->pluck('category')->all());
@@ -98,19 +104,19 @@ class CourseBuilderTest extends TestCase
                 ['source' => 'url', 'url' => 'https://vimeo.com/1'],
                 ['category' => 'Conceito', 'source' => 'upload'],
             ],
-            'exercises' => [['type' => 'multiple_choice', 'statement' => 'X?', 'points' => 1, 'options' => [
+            'exercise_sets' => [['title' => '', 'questions' => [['type' => 'multiple_choice', 'statement' => 'X?', 'points' => 1, 'options' => [
                 ['text' => 'A', 'correct' => false], ['text' => 'B', 'correct' => false],
-            ]]],
+            ]]]]],
         ]);
 
         $this->actingAs($this->admin)->post('/administrador/modulos', $payload)
-            ->assertSessionHasErrors(['videos.0.category', 'videos.1.file', 'exercises.0.options']);
+            ->assertSessionHasErrors(['videos.0.category', 'videos.1.file', 'exercise_sets.0.title', 'exercise_sets.0.questions.0.options']);
 
         $this->post('/administrador/modulos', $this->modulePayload(['videos' => []]))
             ->assertSessionHasErrors('videos');
 
         // Rascunho pode ser salvo sem vídeos.
-        $this->post('/administrador/modulos', $this->modulePayload(['status' => 'draft', 'videos' => [], 'exercises' => []]))
+        $this->post('/administrador/modulos', $this->modulePayload(['status' => 'draft', 'videos' => [], 'exercise_sets' => []]))
             ->assertSessionHasNoErrors();
     }
 
@@ -191,11 +197,11 @@ class CourseBuilderTest extends TestCase
                 ['type' => 'document', 'title' => 'Apostila 1', 'file' => UploadedFile::fake()->create('ap1.pdf', 100, 'application/pdf')],
                 ['type' => 'document', 'title' => 'Apostila 2', 'file' => UploadedFile::fake()->create('ap2.pdf', 100, 'application/pdf')],
             ],
-            'exercises' => [
-                ['type' => 'multiple_choice', 'statement' => 'Qual?', 'points' => 2, 'options' => [
+            'exercise_sets' => [
+                ['title' => 'Lista 1', 'questions' => [['type' => 'multiple_choice', 'statement' => 'Qual?', 'points' => 2, 'options' => [
                     ['text' => 'A', 'correct' => true], ['text' => 'B', 'correct' => false],
-                ]],
-                ['type' => 'essay', 'statement' => 'Explique.', 'points' => 5],
+                ]]]],
+                ['title' => 'Lista 2', 'questions' => [['type' => 'essay', 'statement' => 'Explique.', 'points' => 5]]],
             ],
         ])->assertSessionHasNoErrors();
 
@@ -207,14 +213,15 @@ class CourseBuilderTest extends TestCase
         // Exercícios inválidos são barrados também no curso livre.
         $this->put("/administrador/cursos/{$course->id}", [
             'title' => 'Curso Livre Completo', 'level' => 'iniciante', 'status' => 'draft', 'structure' => 'free',
-            'exercises' => [['type' => 'true_false', 'statement' => 'X', 'points' => 1]],
-        ])->assertSessionHasErrors('exercises.0.expected_answer');
+            'exercise_sets' => [['title' => 'L', 'questions' => [['type' => 'true_false', 'statement' => 'X', 'points' => 1]]]],
+        ])->assertSessionHasErrors('exercise_sets.0.questions.0.expected_answer');
 
         // Ao virar curso modular, materiais e exercícios avulsos são removidos.
         $this->put("/administrador/cursos/{$course->id}", [
             'title' => 'Curso Livre Completo', 'level' => 'iniciante', 'status' => 'draft', 'structure' => 'modular',
         ])->assertSessionHasNoErrors();
         $this->assertSame(0, $course->exercises()->count());
+        $this->assertSame(0, $course->exerciseSets()->count());
         $this->assertSame(0, $course->materials()->count());
     }
 
@@ -222,7 +229,7 @@ class CourseBuilderTest extends TestCase
     {
         $this->actingAs($this->admin)->post('/administrador/cursos', [
             'title' => 'Simulado', 'level' => 'iniciante', 'status' => 'published', 'structure' => 'free',
-            'exercises' => [['type' => 'short_answer', 'statement' => '2+2?', 'expected_answer' => '4', 'points' => 1]],
+            'exercise_sets' => [['title' => 'Simulado 1', 'questions' => [['type' => 'short_answer', 'statement' => '2+2?', 'expected_answer' => '4', 'points' => 1]]]],
         ])->assertSessionHasNoErrors();
 
         $this->assertSame(1, Course::first()->exercises()->count());
@@ -273,5 +280,64 @@ class CourseBuilderTest extends TestCase
 
         $this->actingAs($licensee)->get('/administrador/cursos')->assertForbidden();
         $this->actingAs($licensee)->post('/administrador/modulos', [])->assertForbidden();
+    }
+
+    public function test_editing_exercises_keeps_ids_and_validates_new_question_types(): void
+    {
+        $this->actingAs($this->admin)->post('/administrador/modulos', $this->modulePayload())->assertSessionHasNoErrors();
+        $module = CourseModule::first();
+        $set = $module->exerciseSets()->first();
+        $question = $set->questions()->first();
+
+        $payload = $this->modulePayload([
+            'videos' => [['category' => 'Exemplo', 'source' => 'url', 'url' => 'https://vimeo.com/123']],
+            'exercise_sets' => [
+                ['id' => $set->id, 'title' => 'Fixação (revisado)', 'questions' => [
+                    ['id' => $question->id, 'type' => 'single_choice', 'statement' => 'Qual função soma?', 'points' => 2, 'options' => [
+                        ['text' => 'SOMA', 'correct' => true], ['text' => 'MÉDIA', 'correct' => false],
+                    ]],
+                    ['type' => 'statements', 'statement' => 'Julgue', 'points' => 2, 'options' => [
+                        ['text' => 'SOMA soma', 'correct' => true], ['text' => 'MÉDIA soma', 'correct' => false],
+                    ]],
+                    ['type' => 'fill_blanks', 'statement' => 'A função [[SOMA]] soma.', 'points' => 1],
+                    ['type' => 'matching', 'statement' => 'Associe', 'points' => 2, 'options' => [
+                        ['text' => 'SOMA', 'match' => 'Adiciona'], ['text' => 'MÉDIA', 'match' => 'Média'],
+                    ]],
+                    ['type' => 'ordering', 'statement' => 'Ordene', 'points' => 1, 'options' => [['text' => '1'], ['text' => '2']]],
+                    ['type' => 'numeric', 'statement' => '10/4?', 'points' => 1, 'expected_answer' => '2,5', 'tolerance' => '0.01'],
+                ]],
+            ],
+        ]);
+
+        $this->put("/administrador/modulos/{$module->id}", $payload)->assertSessionHasNoErrors();
+
+        $module->refresh();
+        $this->assertSame([$set->id], $module->exerciseSets()->pluck('id')->all());
+        $this->assertSame('Fixação (revisado)', $set->fresh()->title);
+        $this->assertSame('single_choice', $question->fresh()->type); // mesma questão, atualizada
+        $this->assertSame(6, $module->exercises()->count());
+        $this->assertSame(['tolerance' => 0.01], $module->exercises()->where('type', 'numeric')->first()->settings);
+        $this->assertSame([['text' => 'SOMA', 'match' => 'Adiciona'], ['text' => 'MÉDIA', 'match' => 'Média']], $module->exercises()->where('type', 'matching')->first()->options);
+
+        // Regras específicas de cada tipo.
+        $invalid = $this->modulePayload([
+            'videos' => [['category' => 'Exemplo', 'source' => 'url', 'url' => 'https://vimeo.com/123']],
+            'exercise_sets' => [
+                ['title' => 'Inválido', 'questions' => [
+                    ['type' => 'single_choice', 'statement' => 'X', 'points' => 1, 'options' => [['text' => 'A', 'correct' => true], ['text' => 'B', 'correct' => true]]],
+                    ['type' => 'fill_blanks', 'statement' => 'Sem lacuna', 'points' => 1],
+                    ['type' => 'matching', 'statement' => 'X', 'points' => 1, 'options' => [['text' => 'A', 'match' => 'a'], ['text' => 'B', 'match' => '']]],
+                    ['type' => 'numeric', 'statement' => 'X', 'points' => 1, 'expected_answer' => 'abc'],
+                ]],
+                ['title' => 'Vazio', 'questions' => []],
+            ],
+        ]);
+        $this->put("/administrador/modulos/{$module->id}", $invalid)->assertSessionHasErrors([
+            'exercise_sets.0.questions.0.options',
+            'exercise_sets.0.questions.1.statement',
+            'exercise_sets.0.questions.2.options',
+            'exercise_sets.0.questions.3.expected_answer',
+            'exercise_sets.1.questions',
+        ]);
     }
 }
