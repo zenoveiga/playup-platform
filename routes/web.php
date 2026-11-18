@@ -71,7 +71,9 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
         abort_unless($student->role === 'student' && $student->licensee_id === auth()->id(), 404);
 
         return Inertia::render('Admin/ProfileDeAluno', [
-            'student' => $student
+            'student' => $student,
+            // Engajamento, ritmo e boletim reais (aba Pedagógico).
+            'insights' => app(\App\Services\StudentInsights::class)->for($student),
         ]);
     })->name('students.show');
 
@@ -257,7 +259,9 @@ Route::middleware(['auth', 'role:school_admin'])->prefix('school-admin')->name('
         abort_unless($student->role === 'student' && $student->licensee_id === auth()->id(), 404);
 
         return Inertia::render('Admin/ProfileDeAluno', [
-            'student' => $student
+            'student' => $student,
+            // Engajamento, ritmo e boletim reais (aba Pedagógico).
+            'insights' => app(\App\Services\StudentInsights::class)->for($student),
         ]);
     })->name('students.show');
 
@@ -437,6 +441,7 @@ Route::middleware(['auth', 'role:student'])->prefix('student')->name('student.')
 
     Route::get('/cursos/{course:slug}', [\App\Http\Controllers\Student\CourseController::class, 'show'])->name('courses.show');
     Route::post('/cursos/{course:slug}/exercicios/{exercise}/responder', [\App\Http\Controllers\Student\LearningController::class, 'answer'])->name('exercises.answer');
+    Route::post('/cursos/{course:slug}/progresso', [\App\Http\Controllers\Student\LearningController::class, 'track'])->name('progress.track');
     Route::post('/cursos/{course:slug}/notas', [\App\Http\Controllers\Student\LearningController::class, 'storeNote'])->name('notes.store');
     Route::put('/notas/{note}', [\App\Http\Controllers\Student\LearningController::class, 'updateNote'])->name('notes.update');
     Route::delete('/notas/{note}', [\App\Http\Controllers\Student\LearningController::class, 'destroyNote'])->name('notes.destroy');

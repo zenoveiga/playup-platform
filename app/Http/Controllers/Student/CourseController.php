@@ -7,6 +7,7 @@ use App\Models\Course;
 use App\Models\CourseModule;
 use App\Models\Enrollment;
 use App\Models\ModuleExercise;
+use App\Services\CourseProgress;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -31,8 +32,10 @@ class CourseController extends Controller
                 $e->expires_at?->timestamp ?? PHP_INT_MAX,
             ])->first());
 
+        $progress = app(CourseProgress::class);
         $myCourses = $enrollments->map(fn (Enrollment $e) => [
             ...$this->courseCard($e->course),
+            'progress' => collect($progress->forStudent($e->course, $student))->only(['percent', 'completed', 'total', 'last_seen_at']),
             'access_status' => $e->access_status,
             'starts_at' => $e->starts_at->toDateString(),
             'expires_at' => $e->expires_at?->toDateString(),
@@ -108,6 +111,8 @@ class CourseController extends Controller
                 ->filter(fn ($a) => $a->exercise)
                 ->mapWithKeys(fn ($a) => [$a->module_exercise_id => LearningController::answerPayload($a, $a->exercise)])
                 ->all(),
+            // Progresso e engajamento por aula.
+            'progress' => app(CourseProgress::class)->forStudent($course, $student),
             // Anotações do aluno nos vídeos deste curso.
             'notes' => \App\Models\VideoNote::where('student_id', $student->id)
                 ->where('course_id', $course->id)

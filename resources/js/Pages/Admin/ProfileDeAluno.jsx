@@ -13,8 +13,9 @@ import Mensagem from '@/Components/StudentProfile/Mensagem';
 import Notas from '@/Components/StudentProfile/Notas';
 import Historico from '@/Components/StudentProfile/Historico';
 import Frequencia from '@/Components/StudentProfile/Frequencia';
+import Engajamento from '@/Components/StudentProfile/Engajamento';
 
-export default function ProfileDeAluno({ student }) {
+export default function ProfileDeAluno({ student, insights }) {
     const { auth } = usePage().props;
     const user = auth.user;
     const isSchoolAdmin = user.role === 'school_admin';
@@ -22,7 +23,7 @@ export default function ProfileDeAluno({ student }) {
 
     // React state for page messaging and active tabs
     const [activeTab, setActiveTab] = useState('pessoal'); // pedagogico, pessoal, financeiro
-    const [activePedagogicoSubTab, setActivePedagogicoSubTab] = useState('boletim'); // boletim, notas, etc.
+    const [activePedagogicoSubTab, setActivePedagogicoSubTab] = useState('engajamento'); // engajamento, boletim, notas, etc.
     const [successToast, setSuccessToast] = useState(null);
 
     // Form initialization using Inertia's useForm hook
@@ -163,6 +164,10 @@ export default function ProfileDeAluno({ student }) {
 
                                     {/* Report Subtabs Bar */}
                                     <div className="flex flex-wrap gap-2 pb-4 border-b border-outline-variant/10">
+                                        <button onClick={() => setActivePedagogicoSubTab('engajamento')} className={getSubTabClass('engajamento')}>
+                                            <span className="material-symbols-outlined text-md">monitoring</span>
+                                            <span>Engajamento</span>
+                                        </button>
                                         <button onClick={() => setActivePedagogicoSubTab('boletim')} className={getSubTabClass('boletim')}>
                                             <span className="material-symbols-outlined text-md">assignment</span>
                                             <span>Boletim</span>
@@ -197,18 +202,13 @@ export default function ProfileDeAluno({ student }) {
                                         </button>
                                     </div>
 
-                                    {/* Subtab Content: Boletim */}
-                                    {activePedagogicoSubTab === 'boletim' && (
-                                        <Boletim
-                                            student={student}
-                                            data={data}
-                                            setData={setData}
-                                            processing={processing}
-                                            handleSave={handleSave}
-                                            isSchoolAdmin={isSchoolAdmin}
-                                            triggerToast={triggerToast}
-                                        />
+                                    {/* Subtab Content: Engajamento */}
+                                    {activePedagogicoSubTab === 'engajamento' && (
+                                        <Engajamento student={student} insights={insights} routePrefix={isSchoolAdmin ? 'school-admin.' : 'admin.'} />
                                     )}
+
+                                    {/* Subtab Content: Boletim */}
+                                    {activePedagogicoSubTab === 'boletim' && <Boletim insights={insights} />}
 
                                     {/* Subtab Content: Notas */}
                                     {activePedagogicoSubTab === 'notas' && (
@@ -235,7 +235,7 @@ export default function ProfileDeAluno({ student }) {
                                     )}
 
                                     {/* Simulated other Pedagogico tabs */}
-                                    {activePedagogicoSubTab !== 'boletim' && activePedagogicoSubTab !== 'notas' && activePedagogicoSubTab !== 'historico' && activePedagogicoSubTab !== 'frequencia' && (
+                                    {activePedagogicoSubTab !== 'engajamento' && activePedagogicoSubTab !== 'boletim' && activePedagogicoSubTab !== 'notas' && activePedagogicoSubTab !== 'historico' && activePedagogicoSubTab !== 'frequencia' && (
                                         <div className="py-12 text-center text-[#507c94] dark:text-[#87b3cd]/70 font-semibold space-y-2">
                                             <span className="material-symbols-outlined text-4xl opacity-50 block">auto_awesome</span>
                                             <p className="text-sm">Painel de "{activePedagogicoSubTab.toUpperCase()}" simulado com sucesso.</p>

@@ -166,9 +166,11 @@ const VideoPlayer = forwardRef(function VideoPlayer({ video, onTime, onPlayState
     const onPlayStateRef = useRef(onPlayState);
     onTimeRef.current = onTime;
     onPlayStateRef.current = onPlayState;
-    const reportTime = (t) => {
+    const durationRef = useRef(null);
+    const reportTime = (t, d) => {
         timeRef.current = t;
-        onTimeRef.current?.(t);
+        if (d && Number.isFinite(d)) durationRef.current = d;
+        onTimeRef.current?.(t, durationRef.current);
     };
     const reportPaused = (paused) => onPlayStateRef.current?.(paused);
     const embed = video.file_url ? null : parseEmbed(video.url);
@@ -180,6 +182,7 @@ const VideoPlayer = forwardRef(function VideoPlayer({ video, onTime, onPlayState
 
     // Acompanha o tempo atual dos players incorporados.
     useEffect(() => {
+        durationRef.current = null;
         reportTime(0);
         reportPaused(true);
         if (!embed) return undefined;
@@ -195,13 +198,13 @@ const VideoPlayer = forwardRef(function VideoPlayer({ video, onTime, onPlayState
                 }
             }
             if (embed.provider === 'youtube' && data?.info) {
-                if (typeof data.info.currentTime === 'number') reportTime(data.info.currentTime);
+                if (typeof data.info.currentTime === 'number') reportTime(data.info.currentTime, data.info.duration);
                 // playerState: 1 = tocando, 2 = pausado, 0 = terminou
                 if (typeof data.info.playerState === 'number') reportPaused(data.info.playerState !== 1 && data.info.playerState !== 3);
             }
             if (embed.provider === 'vimeo') {
                 if (data?.event === 'ready') subscribeVimeo();
-                if (data?.event === 'timeupdate' && data.data) reportTime(data.data.seconds);
+                if (data?.event === 'timeupdate' && data.data) reportTime(data.data.seconds, data.data.duration);
                 if (data?.event === 'play') reportPaused(false);
                 if (data?.event === 'pause' || data?.event === 'ended') reportPaused(true);
             }
@@ -268,7 +271,7 @@ const VideoPlayer = forwardRef(function VideoPlayer({ video, onTime, onPlayState
                             if (b.length) sync({ buffered: b.end(b.length - 1) });
                         }}
                         onTimeUpdate={(e) => {
-                            reportTime(e.currentTarget.currentTime);
+                            reportTime(e.currentTarget.currentTime, e.currentTarget.duration);
                             sync({ time: e.currentTarget.currentTime });
                         }}
                         onSeeked={(e) => {

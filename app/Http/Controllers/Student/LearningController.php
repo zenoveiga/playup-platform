@@ -7,6 +7,8 @@ use App\Models\Course;
 use App\Models\CourseMaterial;
 use App\Models\CourseModule;
 use App\Models\ExerciseAnswer;
+use App\Models\LessonProgress;
+use App\Services\CourseProgress;
 use App\Models\ModuleExercise;
 use App\Models\VideoNote;
 use Illuminate\Http\JsonResponse;
@@ -63,6 +65,75 @@ class LearningController extends Controller
         ])->save();
 
         return response()->json(self::answerPayload($answer, $exercise));
+    }
+
+    /**
+     * Registra engajamento numa aula (chamado periodicamente pela tela do curso).
+     * seconds = tempo ativo desde o último envio; watched = segundos do vídeo reproduzidos.
+     */
+    public function track(Request $request, Course $course, CourseProgress $progress): JsonResponse
+    {
+        $this->ensureAccess($request, $course);
+
+        $data = $request->validate([
+            'lesson_type' => ['required', Rule::in(LessonProgress::TYPES)],
+            'lesson_id' => 'required|integer',
+            'seconds' => 'nullable|integer|min:0|max:3600',
+            'watched' => 'nullable|numeric|min:0|max:3600',
+            'position' => 'nullable|numeric|min:0|max:86400',
+            'duration' => 'nullable|numeric|min:0|max:86400',
+            'open' => 'nullable|boolean',
+            'complete' => 'nullable|boolean',
+        ]);
+
+        abort_unless($progress->lessonBelongsTo($course, $data['lesson_type'], $data['lesson_id']), 404);
+
+        $row = LessonProgress::firstOrNew([
+            'student_id' => $request->user()->id,
+            'course_id' => $course->id,
+            'lesson_type' => $data['lesson_type'],
+            'lesson_id' => $data['lesson_id'],
+        ]);
+
+        // Limita cada envio ao tempo real decorrido desde o anterior (+ folga), contra envios inflados.
+        $elapsed = $row->last_seen_at ? max(0, (int) $row->last_seen_at->diffInSeconds(now(), true)) + 5 : 60;
+        $seconds = min((int) ($data['seconds'] ?? 0), $elapsed, 120);
+        $watched = min((int) round($data['watched'] ?? 0), $elapsed * 2, 240); // vídeo pode estar em 2x
+
+        $row->fill([
+            'time_spent_seconds' => $row->time_spent_seconds + $seconds,
+            'watched_seconds' => $row->watched_seconds + $watched,
+            'views' => $row->views + ($request->boolean('open') ? 1 : 0),
+            'first_seen_at' => $row->first_seen_at ?? now(),
+            'last_seen_at' => now(),
+        ]);
+        if (! empty($data['duration'])) {
+            $row->duration_seconds = (int) round($data['duration']);
+        }
+        if (isset($data['position'])) {
+            $row->last_position_seconds = (int) round($data['position']);
+        }
+
+        if (! $row->completed_at) {
+            $done = match ($data['lesson_type']) {
+                'video' => $row->duration_seconds && $row->watched_seconds >= $row->duration_seconds * LessonProgress::VIDEO_COMPLETION,
+                'application' => $request->boolean('complete'),
+                'material' => $row->views > 0,
+                default => false, // exercícios: concluídos quando todas as questões são respondidas
+            };
+            if ($done) {
+                $row->completed_at = now();
+            }
+        }
+        $row->save();
+        \App\Models\StudyDay::add($request->user()->id, $course->id, $seconds);
+
+        return response()->json([
+            'key' => $row->key(),
+            'completed' => (bool) $row->completed_at,
+            'time_spent' => $row->time_spent_seconds,
+            'watched' => $row->watched_seconds,
+        ]);
     }
 
     public function storeNote(Request $request, Course $course): JsonResponse

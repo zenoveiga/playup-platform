@@ -3,8 +3,9 @@ import VideoNotes from '@/Components/Student/VideoNotes';
 import VideoPlayer from '@/Components/Student/VideoPlayer';
 import StudentLayout from '@/Layouts/StudentLayout';
 import { orderByOutline } from '@/lib/outline';
+import useLessonTracker, { postProgress } from '@/lib/useLessonTracker';
 import { Head, Link } from '@inertiajs/react';
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 /* Ambiente do curso adquirido: vídeos, aplicação, materiais de apoio e exercícios. */
 
@@ -12,7 +13,7 @@ const formatDate = (d) => (d ? new Date(`${d}T00:00:00`).toLocaleDateString('pt-
 
 const MATERIAL_ICONS = { video: 'smart_display', document: 'menu_book', link: 'link', file: 'attach_file' };
 
-const exerciseLesson = (set) => ({ key: `es${set.id}`, token: `set:${set.id}`, kind: 'exercises', title: set.title, subtitle: `Exercício · ${set.questions.length} questão(ões)`, item: set });
+const exerciseLesson = (set) => ({ key: `es${set.id}`, token: `set:${set.id}`, track: { type: 'exercise_set', id: set.id }, kind: 'exercises', title: set.title, subtitle: `Exercício · ${set.questions.length} questão(ões)`, item: set });
 
 /** Monta a trilha do curso como uma lista de "aulas" navegáveis. */
 function buildOutline(course) {
@@ -22,9 +23,9 @@ function buildOutline(course) {
             title: `Módulo ${mi + 1}: ${m.title}`,
             description: m.description,
             lessons: orderByOutline([
-                ...m.videos.map((v) => ({ key: `v${v.id}`, token: `video:${v.id}`, kind: 'video', title: v.title, subtitle: v.category, minutes: v.duration_minutes, item: v })),
+                ...m.videos.map((v) => ({ key: `v${v.id}`, token: `video:${v.id}`, track: { type: 'video', id: v.id }, kind: 'video', title: v.title, subtitle: v.category, minutes: v.duration_minutes, item: v })),
                 ...(m.application_instructions
-                    ? [{ key: `a${m.id}`, token: 'application', kind: 'application', title: 'Aplicação', subtitle: 'Atividade prática', minutes: m.application_minutes, item: m }]
+                    ? [{ key: `a${m.id}`, token: 'application', track: { type: 'application', id: m.id }, kind: 'application', title: 'Aplicação', subtitle: 'Atividade prática', minutes: m.application_minutes, item: m }]
                     : []),
                 ...m.exercise_sets.map(exerciseLesson),
             ], m.outline),
@@ -39,6 +40,7 @@ function buildOutline(course) {
                 ...course.materials.filter((v) => v.type === 'video').map((v) => ({
                     key: `v${v.id}`,
                     token: `material:${v.id}`,
+                    track: { type: 'video', id: v.id },
                     kind: v.type === 'video' ? 'video' : 'material',
                     title: v.title,
                     subtitle: v.type === 'video' ? 'Vídeo' : v.type === 'document' ? 'Apostila' : v.type === 'link' ? 'Link' : 'Arquivo',
@@ -68,7 +70,7 @@ const openIcon = (m) => (m.file_url && !isPdf(m) ? 'download' : 'open_in_new');
 
 const MATERIAL_KIND = { document: 'Apostila', link: 'Link', file: 'Arquivo', video: 'Vídeo' };
 
-function SupportCard({ groups }) {
+function SupportCard({ groups, onOpen }) {
     const [open, setOpen] = useState(false);
     const total = groups.reduce((s, g) => s + g.items.length, 0);
     if (!total) return null;
@@ -102,6 +104,7 @@ function SupportCard({ groups }) {
                                     href={m.file_url || m.url}
                                     target="_blank"
                                     rel="noreferrer"
+                                    onClick={() => onOpen?.(m)}
                                     className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-surface-container-low transition-colors group"
                                 >
                                     <span className="material-symbols-outlined text-primary">{MATERIAL_ICONS[m.type] ?? 'attach_file'}</span>
@@ -139,7 +142,7 @@ function MaterialLink({ material }) {
     );
 }
 
-function Player({ lesson, playerRef, courseSlug, answers, onAnswer, onPlayback, notes = [] }) {
+function Player({ lesson, playerRef, courseSlug, answers, onAnswer, onPlayback, notes = [], tracker, completed }) {
     if (!lesson) return null;
 
     if (lesson.kind === 'video') {
@@ -148,8 +151,14 @@ function Player({ lesson, playerRef, courseSlug, answers, onAnswer, onPlayback, 
                 ref={playerRef}
                 video={lesson.item}
                 markers={notes.filter((n) => n.course_material_id === lesson.item.id).map((n) => ({ id: n.id, time: n.timestamp_seconds, label: n.body }))}
-                onTime={(time) => onPlayback((p) => (Math.floor(p.time) === Math.floor(time) ? p : { ...p, time }))}
-                onPlayState={(paused) => onPlayback((p) => (p.paused === paused ? p : { ...p, paused }))}
+                onTime={(time, duration) => {
+                    tracker.onMediaTime(time, duration);
+                    onPlayback((p) => (Math.floor(p.time) === Math.floor(time) ? p : { ...p, time }));
+                }}
+                onPlayState={(paused) => {
+                    tracker.onPlayState(paused);
+                    onPlayback((p) => (p.paused === paused ? p : { ...p, paused }));
+                }}
             />
         );
     }
@@ -167,6 +176,19 @@ function Player({ lesson, playerRef, courseSlug, answers, onAnswer, onPlayback, 
                     </div>
                 </div>
                 <p className="text-sm text-on-surface leading-relaxed whitespace-pre-line">{lesson.item.application_instructions}</p>
+                <div className="mt-6 flex justify-end">
+                    {completed ? (
+                        <span className="px-4 py-2 rounded-xl bg-[#cdffd4] text-[#006a35] text-sm font-bold flex items-center gap-1">
+                            <span className="material-symbols-outlined text-base" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
+                            Atividade concluída
+                        </span>
+                    ) : (
+                        <button type="button" onClick={tracker.complete} className="kinetic-gradient text-white px-5 py-2.5 rounded-xl text-sm font-bold flex items-center gap-1">
+                            <span className="material-symbols-outlined text-base">task_alt</span>
+                            Marcar como concluída
+                        </button>
+                    )}
+                </div>
             </div>
         );
     }
@@ -203,24 +225,59 @@ function Player({ lesson, playerRef, courseSlug, answers, onAnswer, onPlayback, 
     return <ExerciseList key={lesson.key} exerciseSet={lesson.item} courseSlug={courseSlug} answers={answers} onAnswer={onAnswer} />;
 }
 
-export default function CourseView({ course, access, answers: initialAnswers = {}, notes: initialNotes = [] }) {
+const trackKey = (l) => (l?.track ? `${l.track.type}:${l.track.id}` : null);
+
+const watchedText = (p) => (p?.watched_pct ? `${p.watched_pct}% assistido` : null);
+
+export default function CourseView({ course, access, answers: initialAnswers = {}, notes: initialNotes = [], progress: initialProgress = { lessons: {} } }) {
     const outline = useMemo(() => buildOutline(course), [course]);
     const lessons = outline.flatMap((s) => s.lessons);
-    const [currentKey, setCurrentKey] = useState(lessons[0]?.key);
+    const [progress, setProgress] = useState(initialProgress.lessons ?? {});
+    // Abre na última aula acessada; se ela já foi concluída, na próxima aula pendente
+    // (assim módulos concluídos ficam recolhidos e o aluno continua de onde parou).
+    const [currentKey, setCurrentKey] = useState(() => {
+        const done = (l) =>
+            l.kind === 'exercises'
+                ? l.item.questions.length > 0 && l.item.questions.every((q) => initialAnswers[q.id])
+                : !!progress[trackKey(l)]?.completed;
+        const last = lessons
+            .filter((l) => progress[trackKey(l)]?.last_seen_at)
+            .sort((a, b) => progress[trackKey(b)].last_seen_at.localeCompare(progress[trackKey(a)].last_seen_at))[0];
+        if (last && !done(last)) return last.key;
+        const from = last ? lessons.indexOf(last) : 0;
+        const next = lessons.slice(from).find((l) => !done(l)) ?? lessons.find((l) => !done(l));
+        return (next ?? last ?? lessons[0])?.key;
+    });
     const playerRef = useRef(null);
     const [answers, setAnswers] = useState(initialAnswers);
     const [notes, setNotes] = useState(initialNotes);
     const [playback, setPlayback] = useState({ time: 0, paused: true });
-    const [expanded, setExpanded] = useState(() => Object.fromEntries(outline.map((s, i) => [s.key, i === 0])));
+    // Só o módulo da aula atual fica aberto; ao mudar de módulo, os demais recolhem.
+    const onlyCurrent = (key) => Object.fromEntries(outline.map((s) => [s.key, s.lessons.some((l) => l.key === key)]));
+    const [expanded, setExpanded] = useState(() => onlyCurrent(currentKey));
+    const currentSection = outline.find((s) => s.lessons.some((l) => l.key === currentKey))?.key;
+    useEffect(() => {
+        setExpanded(onlyCurrent(currentKey));
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [currentSection]);
+
+    // Exercício conta como concluído quando todas as questões foram respondidas.
+    const isDone = (l) =>
+        l.kind === 'exercises' ? l.item.questions.length > 0 && l.item.questions.every((q) => answers[q.id]) : !!progress[trackKey(l)]?.completed;
+    const doneCount = lessons.filter(isDone).length;
+    const percent = lessons.length ? Math.floor((doneCount / lessons.length) * 100) : 0;
 
     const index = lessons.findIndex((l) => l.key === currentKey);
     const current = lessons[index];
+
+    const tracker = useLessonTracker(course.slug, current?.track ?? null, (r) =>
+        setProgress((p) => ({ ...p, [r.key]: { ...p[r.key], completed: r.completed, time_spent: r.time_spent, watched: r.watched } })),
+    );
     const go = (dir) => {
         const next = lessons[index + dir];
         if (!next) return;
         setCurrentKey(next.key);
         const section = outline.find((s) => s.lessons.some((l) => l.key === next.key));
-        if (section) setExpanded((e) => ({ ...e, [section.key]: true }));
     };
 
     return (
@@ -244,6 +301,8 @@ export default function CourseView({ course, access, answers: initialAnswers = {
                             onAnswer={(result) => setAnswers((a) => ({ ...a, [result.exercise_id]: result }))}
                             onPlayback={setPlayback}
                             notes={notes}
+                            tracker={tracker}
+                            completed={isDone(current)}
                         />
                     ) : (
                         <div className="w-full aspect-video bg-surface-container-lowest rounded-xl flex items-center justify-center text-on-surface-variant">
@@ -302,24 +361,64 @@ export default function CourseView({ course, access, answers: initialAnswers = {
                         <p className="text-xs text-on-surface-variant mt-1">
                             {[course.category, course.workload_hours && `${course.workload_hours}h`, `${lessons.length} itens`].filter(Boolean).join(' · ')}
                         </p>
+                        <div className="mt-4">
+                            <div className="flex items-center justify-between text-xs font-bold mb-1.5">
+                                <span className="text-on-surface-variant">
+                                    {doneCount} de {lessons.length} aulas concluídas
+                                </span>
+                                <span className="text-primary tabular-nums">{percent}%</span>
+                            </div>
+                            <div className="h-2 rounded-full bg-surface-container overflow-hidden">
+                                <div className="h-full kinetic-gradient rounded-full transition-all duration-500" style={{ width: `${percent}%` }} />
+                            </div>
+                        </div>
                     </div>
 
-                    <SupportCard groups={supportGroups(course)} />
+                    <SupportCard groups={supportGroups(course)} onOpen={(m) => postProgress(course.slug, { lesson_type: 'material', lesson_id: m.id, open: true })} />
 
-                    {outline.map((section) => (
-                        <div key={section.key} className="bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden">
+                    {outline.map((section) => {
+                        const sectionDone = section.lessons.filter(isDone).length;
+                        const finished = section.lessons.length > 0 && sectionDone === section.lessons.length;
+                        return (
+                        <div
+                            key={section.key}
+                            className={`rounded-xl shadow-sm overflow-hidden ${finished ? 'bg-[#e6f4ea] dark:bg-emerald-950/40 ring-1 ring-emerald-500/20' : 'bg-surface-container-lowest'}`}
+                        >
                             <button
                                 onClick={() => setExpanded((e) => ({ ...e, [section.key]: !e[section.key] }))}
-                                className="w-full flex items-center justify-between gap-3 p-4 text-left hover:bg-surface-container-low transition-colors"
+                                aria-expanded={!!expanded[section.key]}
+                                className={`w-full flex items-center justify-between gap-3 p-4 text-left transition-colors ${
+                                    finished ? 'hover:bg-emerald-100/60 dark:hover:bg-emerald-900/30' : 'hover:bg-surface-container-low'
+                                }`}
                             >
-                                <span className="font-bold text-sm text-on-surface">{section.title}</span>
-                                <span className={`material-symbols-outlined text-on-surface-variant transition-transform ${expanded[section.key] ? 'rotate-180' : ''}`}>expand_more</span>
+                                {finished && (
+                                    <span className="material-symbols-outlined text-[#137333] dark:text-[#6bfe9c] shrink-0" style={{ fontVariationSettings: "'FILL' 1" }}>
+                                        check_circle
+                                    </span>
+                                )}
+                                <span className="flex-1 min-w-0">
+                                    <span className={`block font-bold text-sm ${finished ? 'text-[#0d5c2a] dark:text-[#6bfe9c]' : 'text-on-surface'}`}>{section.title}</span>
+                                    <span className={`block text-[11px] font-bold mt-0.5 ${finished ? 'text-[#137333] dark:text-emerald-300' : 'text-on-surface-variant'}`}>
+                                        {finished ? 'Módulo concluído' : `${sectionDone} de ${section.lessons.length} aulas concluídas`}
+                                    </span>
+                                </span>
+                                <span
+                                    className={`material-symbols-outlined transition-transform ${finished ? 'text-[#137333] dark:text-emerald-300' : 'text-on-surface-variant'} ${
+                                        expanded[section.key] ? 'rotate-180' : ''
+                                    }`}
+                                >
+                                    expand_more
+                                </span>
                             </button>
                             {expanded[section.key] && (
                                 <ul className="pb-2">
                                     {section.lessons.map((l) => {
                                         const active = l.key === currentKey;
-                                        const icon =
+                                        const done = isDone(l);
+                                        const watched = l.kind === 'video' && !done ? watchedText(progress[trackKey(l)]) : null;
+                                        const icon = done
+                                            ? 'check_circle'
+                                            :
                                             l.kind === 'video' ? 'play_circle' : l.kind === 'application' ? 'construction' : l.kind === 'exercises' ? 'quiz' : MATERIAL_ICONS[l.item?.type] ?? 'folder_open';
                                         return (
                                             <li key={l.key}>
@@ -329,12 +428,18 @@ export default function CourseView({ course, access, answers: initialAnswers = {
                                                         active ? 'bg-primary/10 border-l-4 border-primary' : 'hover:bg-surface-container-low border-l-4 border-transparent'
                                                     }`}
                                                 >
-                                                    <span className={`material-symbols-outlined ${active ? 'text-primary' : 'text-on-surface-variant'}`} style={active ? { fontVariationSettings: "'FILL' 1" } : {}}>
+                                                    <span
+                                                        className={`material-symbols-outlined ${done ? 'text-[#006a35]' : active ? 'text-primary' : 'text-on-surface-variant'}`}
+                                                        style={active || done ? { fontVariationSettings: "'FILL' 1" } : {}}
+                                                        title={done ? 'Concluída' : undefined}
+                                                    >
                                                         {icon}
                                                     </span>
                                                     <span className="flex-1 min-w-0">
                                                         <span className={`block text-sm truncate ${active ? 'font-bold text-primary' : 'text-on-surface'}`}>{l.title}</span>
-                                                        <span className="block text-[11px] text-on-surface-variant truncate">{l.subtitle}</span>
+                                                        <span className="block text-[11px] text-on-surface-variant truncate">
+                                                            {[l.subtitle, watched].filter(Boolean).join(' · ')}
+                                                        </span>
                                                     </span>
                                                     {l.minutes && <span className="text-[11px] text-on-surface-variant">{l.minutes} min</span>}
                                                 </button>
@@ -345,7 +450,8 @@ export default function CourseView({ course, access, answers: initialAnswers = {
                                 </ul>
                             )}
                         </div>
-                    ))}
+                        );
+                    })}
                 </aside>
             </div>
         </StudentLayout>

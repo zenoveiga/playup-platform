@@ -173,6 +173,17 @@ export default function SchoolAdminLayout({ children }) {
                         <span className="material-symbols-outlined" style={route().current('school-admin.sales.index') ? { fontVariationSettings: "'FILL' 1" } : {}}>point_of_sale</span>
                         <span className="font-['Manrope'] text-sm">Vendas</span>
                     </Link>
+                    <Link
+                        className={`flex items-center gap-3 px-4 py-3 rounded-xl hover:translate-x-1 transition-all duration-200 ${
+                            route().current('school-admin.engagement.*')
+                                ? 'bg-white dark:bg-slate-800 text-[#0050d4] dark:text-[#00D1FF] font-bold shadow-sm'
+                                : 'text-[#003346]/70 dark:text-white/70 hover:bg-white/40 dark:hover:bg-slate-800/40'
+                        }`}
+                        href={route('school-admin.engagement.index')}
+                    >
+                        <span className="material-symbols-outlined" style={route().current('school-admin.engagement.*') ? { fontVariationSettings: "'FILL' 1" } : {}}>monitoring</span>
+                        <span className="font-['Manrope'] text-sm">Engajamento</span>
+                    </Link>
 
                     <a className="flex items-center gap-3 px-4 py-3 text-[#003346]/70 dark:text-white/70 hover:bg-white/40 dark:hover:bg-slate-800/40 rounded-xl hover:translate-x-1 transition-all duration-200" href="#">
                         <span className="material-symbols-outlined">receipt</span>

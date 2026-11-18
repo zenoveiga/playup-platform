@@ -93,6 +93,27 @@ export default function Courses({ initialTab = 'meus-cursos', myCourses = [], av
                                             </div>
                                         </div>
 
+                                        {course.progress && course.progress.total > 0 && (
+                                            <div className="mt-5 space-y-1.5">
+                                                <div className="flex items-center justify-between text-[11px] font-bold">
+                                                    <span className="text-slate-500">
+                                                        {course.progress.percent === 100
+                                                            ? 'Curso concluído'
+                                                            : course.progress.completed === 0
+                                                              ? 'Ainda não iniciado'
+                                                              : `${course.progress.completed} de ${course.progress.total} aulas concluídas`}
+                                                    </span>
+                                                    <span className={course.progress.percent === 100 ? 'text-[#006a35]' : 'text-primary'}>{course.progress.percent}%</span>
+                                                </div>
+                                                <div className="h-2 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
+                                                    <div
+                                                        className={`h-full rounded-full transition-all ${course.progress.percent === 100 ? 'bg-[#006a35]' : 'kinetic-gradient'}`}
+                                                        style={{ width: `${course.progress.percent}%` }}
+                                                    />
+                                                </div>
+                                            </div>
+                                        )}
+
                                         <div className="space-y-4 mt-6 pt-4 border-t border-slate-100 dark:border-slate-800">
                                             <p className="text-[11px] font-bold text-slate-400 flex items-center gap-1">
                                                 <span className="material-symbols-outlined text-sm">event_available</span>
@@ -107,7 +128,7 @@ export default function Courses({ initialTab = 'meus-cursos', myCourses = [], av
                                                     href={route('student.courses.show', course.slug)}
                                                     className="w-full py-3 bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-750 text-slate-700 dark:text-slate-350 font-bold text-xs rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform"
                                                 >
-                                                    <span>Acessar curso</span>
+                                                    <span>{course.progress?.completed > 0 && course.progress.percent < 100 ? 'Continuar curso' : 'Acessar curso'}</span>
                                                     <span className="material-symbols-outlined text-sm font-black">arrow_forward</span>
                                                 </Link>
                                             ) : (
