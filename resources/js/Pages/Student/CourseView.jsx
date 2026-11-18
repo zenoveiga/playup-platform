@@ -276,19 +276,27 @@ export default function CourseView({ course, access, answers: initialAnswers = {
     const go = (dir) => {
         const next = lessons[index + dir];
         if (!next) return;
-        setCurrentKey(next.key);
+        openLesson(next.key);
     };
-    // No celular a trilha fica abaixo do player: ao escolher uma aula, volta ao topo.
+    // Ao trocar de aula (Anterior/Próxima ou pela trilha), a página volta ao início.
+    // A rolagem acontece depois de a nova aula ser renderizada, para não parar no meio
+    // quando a altura da página muda (ex.: de um exercício longo para um vídeo).
+    const scrollToTop = useRef(false);
     const openLesson = (key) => {
+        scrollToTop.current = true;
         setCurrentKey(key);
-        if (window.matchMedia('(max-width: 1023px)').matches) window.scrollTo({ top: 0, behavior: 'smooth' });
     };
+    useEffect(() => {
+        if (!scrollToTop.current) return;
+        scrollToTop.current = false;
+        window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    }, [currentKey]);
 
     return (
         <StudentLayout>
             <Head title={`${course.title} | PlayUp Academy`} />
 
-            <div className="p-3 sm:p-6 md:p-8 flex flex-col lg:flex-row gap-4 sm:gap-8">
+            <div className="p-3 pb-20 sm:p-6 sm:pb-20 md:p-8 lg:pb-8 flex flex-col lg:flex-row gap-4 sm:gap-8">
                 <section className="flex-grow min-w-0 flex flex-col gap-4 sm:gap-6 lg:w-2/3">
                     <div className="flex items-center gap-2 text-xs font-bold text-on-surface-variant min-w-0">
                         <Link href={route('student.courses')} className="hover:text-primary shrink-0">Meus Cursos</Link>
@@ -464,6 +472,41 @@ export default function CourseView({ course, access, answers: initialAnswers = {
                     })}
                 </aside>
             </div>
+
+            {/* Navegação fixa no celular: anterior / lista de aulas / próxima, sempre à mão (ex.: no meio de um exercício). */}
+            {current && (
+                <div className="lg:hidden fixed inset-x-0 bottom-[calc(4rem+env(safe-area-inset-bottom))] z-30 px-3 pb-2 pointer-events-none">
+                    <div className="pointer-events-auto flex items-center gap-1 rounded-2xl bg-white/95 backdrop-blur shadow-lg ring-1 ring-slate-200 p-1">
+                        <button
+                            type="button"
+                            onClick={() => go(-1)}
+                            disabled={index <= 0}
+                            aria-label="Aula anterior"
+                            className="w-11 h-11 shrink-0 rounded-xl flex items-center justify-center text-on-surface hover:bg-surface-container-low disabled:opacity-30"
+                        >
+                            <span className="material-symbols-outlined">skip_previous</span>
+                        </button>
+                        <a href="#trilha" className="flex-1 min-w-0 px-2 py-1 rounded-xl hover:bg-surface-container-low flex items-center gap-2">
+                            <span className="material-symbols-outlined text-primary">format_list_bulleted</span>
+                            <span className="min-w-0">
+                                <span className="block text-[10px] font-black uppercase tracking-wider text-on-surface-variant">
+                                    Aula {index + 1} de {lessons.length} · ver todas
+                                </span>
+                                <span className="block text-sm font-bold text-on-surface truncate">{current.title}</span>
+                            </span>
+                        </a>
+                        <button
+                            type="button"
+                            onClick={() => go(1)}
+                            disabled={index >= lessons.length - 1}
+                            aria-label="Próxima aula"
+                            className="w-11 h-11 shrink-0 rounded-xl kinetic-gradient text-white flex items-center justify-center disabled:opacity-30"
+                        >
+                            <span className="material-symbols-outlined">skip_next</span>
+                        </button>
+                    </div>
+                </div>
+            )}
         </StudentLayout>
     );
 }
