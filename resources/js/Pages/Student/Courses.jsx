@@ -29,11 +29,11 @@ export default function Courses({ initialTab = 'meus-cursos', myCourses = [], av
         <StudentLayout>
             <Head title="Meus Cursos - PlayUp" />
 
-            <div className="p-8 max-w-7xl mx-auto space-y-8">
+            <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-6 lg:space-y-8">
                 {/* Header Title & Switcher */}
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
-                        <h2 className="text-3xl font-extrabold text-slate-800 dark:text-slate-100 font-headline tracking-tight">Cursos</h2>
+                        <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-800 dark:text-slate-100 font-headline tracking-tight">Cursos</h2>
                         <p className="text-sm text-slate-500 font-medium">Acesse os cursos que você adquiriu e conheça os demais cursos disponíveis.</p>
                     </div>
 

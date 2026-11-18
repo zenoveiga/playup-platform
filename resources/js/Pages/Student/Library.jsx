@@ -71,7 +71,7 @@ export default function Library() {
         <StudentLayout>
             <Head title="Biblioteca - PlayUp" />
             
-            <div className="px-8 pb-12 space-y-10 pt-4">
+            <div className="px-4 sm:px-6 lg:px-8 pb-12 space-y-10 pt-4">
                 {/* Hero Section */}
                 <section className="bg-[#f7f5ff] dark:bg-[#13112b] rounded-3xl p-8 lg:p-10 flex items-center justify-between overflow-hidden relative min-h-[340px] border border-purple-100 dark:border-purple-950/20">
                     <div className="max-w-xl z-10 space-y-6">

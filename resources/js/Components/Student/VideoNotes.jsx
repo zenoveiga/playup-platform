@@ -97,7 +97,7 @@ export default function VideoNotes({ courseSlug, video, notes, onNotesChange, pl
     };
 
     return (
-        <div className="bg-surface-container-lowest rounded-xl p-6 shadow-sm space-y-4">
+        <div className="bg-surface-container-lowest rounded-xl p-4 sm:p-6 shadow-sm space-y-4">
             <div className="flex items-center justify-between">
                 <h3 className="font-headline font-bold text-lg text-on-surface flex items-center gap-2">
                     <span className="material-symbols-outlined text-primary">edit_note</span>

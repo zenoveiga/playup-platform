@@ -40,12 +40,18 @@ function ControlBar({ videoRef, wrapperRef, state, markers = [] }) {
         if (!v()) return;
         v().playbackRate = SPEEDS[(SPEEDS.indexOf(rate) + 1) % SPEEDS.length] ?? 1;
     };
-    const toggleFullscreen = () => (document.fullscreenElement ? document.exitFullscreen() : wrapperRef.current?.requestFullscreen?.());
+    const toggleFullscreen = () => {
+        if (document.fullscreenElement) return document.exitFullscreen();
+        const el = wrapperRef.current;
+        if (el?.requestFullscreen) return el.requestFullscreen();
+        // iPhone (Safari) só permite tela cheia no próprio <video>.
+        v()?.webkitEnterFullscreen?.();
+    };
 
     return (
         <div className="bg-inverse-surface px-3 pt-2 pb-2 select-none">
             {/* Linha do tempo */}
-            <div className="relative h-4 flex items-center group/timeline">
+            <div className="relative h-6 sm:h-4 flex items-center group/timeline">
                 <div className="relative w-full h-1.5 group-hover/timeline:h-2 transition-all rounded-full bg-white/20 overflow-hidden">
                     <div className="absolute inset-y-0 left-0 bg-white/30" style={{ width: `${pct(buffered)}%` }} />
                     <div className="absolute inset-y-0 left-0 bg-primary-container kinetic-gradient" style={{ width: `${pct(time)}%` }} />
@@ -61,7 +67,7 @@ function ControlBar({ videoRef, wrapperRef, state, markers = [] }) {
                                 type="button"
                                 aria-label={`Ir para a nota em ${clock(m.time)}: ${m.label}`}
                                 onClick={() => v() && (v().currentTime = m.time)}
-                                className="block w-2.5 h-2.5 rounded-full bg-amber-400 ring-2 ring-inverse-surface group-hover/marker:scale-150 focus-visible:scale-150 outline-none transition-transform"
+                                className="block w-3 h-3 sm:w-2.5 sm:h-2.5 rounded-full bg-amber-400 ring-2 ring-inverse-surface group-hover/marker:scale-150 focus-visible:scale-150 outline-none transition-transform"
                             />
                             <span
                                 role="tooltip"
@@ -104,7 +110,7 @@ function ControlBar({ videoRef, wrapperRef, state, markers = [] }) {
                         title={muted ? 'Ativar som' : 'Silenciar'}
                         onClick={() => v() && (v().muted = !v().muted)}
                     />
-                    <span className="w-0 overflow-hidden group-hover/volume:w-20 group-focus-within/volume:w-20 transition-all flex items-center">
+                    <span className="hidden sm:flex w-0 overflow-hidden group-hover/volume:w-20 group-focus-within/volume:w-20 transition-all items-center">
                         <input
                             type="range"
                             min="0"
@@ -121,7 +127,7 @@ function ControlBar({ videoRef, wrapperRef, state, markers = [] }) {
                         />
                     </span>
                 </div>
-                <span className="ml-2 text-xs font-bold text-white/80 tabular-nums">
+                <span className="ml-1 sm:ml-2 text-[11px] sm:text-xs font-bold text-white/80 tabular-nums whitespace-nowrap">
                     {clock(time)} / {clock(duration)}
                 </span>
                 <div className="ml-auto flex items-center gap-1">

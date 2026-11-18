@@ -350,7 +350,7 @@ export default function ExerciseList({ exerciseSet, courseSlug, answers, onAnswe
     const scored = questions.reduce((s, q) => s + Number(answers[q.id]?.score ?? 0), 0);
 
     return (
-        <div className="w-full bg-surface-container-lowest rounded-xl shadow-sm p-8">
+        <div className="w-full bg-surface-container-lowest rounded-xl shadow-sm p-4 sm:p-8">
             <div className="flex flex-wrap items-start justify-between gap-3 mb-6">
                 <div>
                     <h3 className="font-headline font-bold text-xl text-on-surface">{exerciseSet.title}</h3>

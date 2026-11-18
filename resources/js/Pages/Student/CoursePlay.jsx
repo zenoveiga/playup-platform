@@ -91,7 +91,7 @@ export default function CoursePlay() {
             `}} />
 
             {/* Content Area */}
-            <div className="p-6 md:p-8 flex flex-col lg:flex-row gap-8">
+            <div className="p-3 sm:p-6 md:p-8 flex flex-col lg:flex-row gap-4 sm:gap-8">
                     {/* Left/Center Column (Player & Details) */}
                     <section className="flex-grow flex flex-col gap-6 lg:w-2/3">
                         {/* Video Player Container */}

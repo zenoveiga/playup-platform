@@ -13,11 +13,11 @@ export default function Activities() {
         <StudentLayout>
             <Head title="Atividades - PlayUp" />
 
-            <div className="p-8 max-w-7xl mx-auto space-y-8">
+            <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-6 lg:space-y-8">
                 {/* Header Title Banner */}
                 <div className="flex items-center justify-between">
                     <div>
-                        <h2 className="text-3xl font-extrabold text-slate-800 dark:text-slate-100 font-headline tracking-tight">Atividades</h2>
+                        <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-800 dark:text-slate-100 font-headline tracking-tight">Atividades</h2>
                         <p className="text-sm text-slate-500 font-medium">Acompanhe e gerencie suas tarefas do portal</p>
                     </div>
                 </div>
@@ -272,7 +272,7 @@ export default function Activities() {
             </div>
 
             {/* Float Info (Glassmorphism) */}
-            <div className="fixed bottom-8 right-8 z-50">
+            <div className="fixed bottom-24 right-4 lg:bottom-8 lg:right-8 z-50">
                 <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border border-white/20 dark:border-slate-800 p-4 rounded-3xl shadow-xl flex items-center gap-4">
                     <div className="relative w-12 h-12">
                         <svg className="w-full h-full -rotate-90" viewBox="0 0 36 36">

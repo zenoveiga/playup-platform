@@ -11,15 +11,15 @@ export default function Dashboard() {
         <StudentLayout>
             <Head title="Meu Painel - PlayUp" />
             
-            <div className="p-8 max-w-7xl mx-auto space-y-8">
+            <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-6 lg:space-y-8">
                 {/* Top Bento Banner */}
-                <section className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl p-6 shadow-sm shadow-slate-100/50 flex flex-col xl:flex-row gap-6 items-stretch">
+                <section className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl p-3 sm:p-6 shadow-sm shadow-slate-100/50 flex flex-col xl:flex-row gap-6 items-stretch">
                     {/* Left Column: Indigo/Purple Gradient Box */}
-                    <div className="flex-1 min-w-0 bg-gradient-to-br from-[#53389e] to-[#7f56d9] rounded-2xl p-6 text-white flex flex-col justify-between relative overflow-hidden shadow-md">
+                    <div className="flex-1 min-w-0 bg-gradient-to-br from-[#53389e] to-[#7f56d9] rounded-2xl p-5 sm:p-6 text-white flex flex-col justify-between relative overflow-hidden shadow-md">
                         {/* Core content row */}
                         <div className="flex flex-col md:flex-row items-center gap-6 z-10">
                             {/* 3D Student Illustration */}
-                            <div className="w-36 h-36 shrink-0 relative flex items-center justify-center">
+                            <div className="w-24 h-24 sm:w-36 sm:h-36 shrink-0 relative flex items-center justify-center">
                                 <img 
                                     alt="Student Illustration" 
                                     className="w-full h-full object-contain filter drop-shadow-md rounded-2xl" 
@@ -29,7 +29,7 @@ export default function Dashboard() {
                             {/* Welcome and stats details */}
                             <div className="flex-1 text-center md:text-left space-y-4">
                                 <div className="space-y-1">
-                                    <h2 className="text-3xl font-extrabold tracking-tight flex items-center justify-center md:justify-start gap-2">
+                                    <h2 className="text-2xl sm:text-2xl sm:text-3xl font-extrabold tracking-tight flex items-center justify-center md:justify-start gap-2">
                                         <span>👋</span> Bom dia, {firstName}!
                                     </h2>
                                     <p className="text-purple-100 text-sm font-medium">
@@ -119,14 +119,14 @@ export default function Dashboard() {
                 {/* Main Bento Grid */}
                 <section className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
                     {/* Courses in Progress (spans 8 cols) */}
-                    <div className="lg:col-span-8 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 p-6 rounded-3xl shadow-sm shadow-slate-100/50 flex flex-col justify-between space-y-6">
+                    <div className="lg:col-span-8 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 p-4 sm:p-6 rounded-3xl shadow-sm shadow-slate-100/50 flex flex-col justify-between space-y-6">
                         <div className="flex items-center gap-3">
                             <span className="material-symbols-outlined text-[#7f56d9] text-2xl">trending_up</span>
                             <h3 className="text-lg font-extrabold text-slate-800 dark:text-slate-200">Progresso dos Cursos</h3>
                         </div>
 
                         {/* Courses Grid */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
                             {/* Card 1: Marketing Digital */}
                             <div className="bg-[#fcfaff] dark:bg-slate-900/40 border border-purple-100 dark:border-purple-950/30 rounded-2xl p-5 flex flex-col justify-between hover:shadow-md hover:border-purple-200 transition-all group">
                                 <div className="space-y-4">
@@ -137,7 +137,7 @@ export default function Dashboard() {
                                         </span>
                                     </div>
                                     {/* Illustration */}
-                                    <div className="h-32 bg-[#f4f0ff] dark:bg-purple-950/20 rounded-xl overflow-hidden flex items-center justify-center p-2 relative">
+                                    <div className="h-24 sm:h-32 bg-[#f4f0ff] dark:bg-purple-950/20 rounded-xl overflow-hidden flex items-center justify-center p-2 relative">
                                         <img 
                                             alt="Marketing Digital" 
                                             className="h-full object-contain filter drop-shadow-md group-hover:scale-105 transition-transform duration-200" 
@@ -182,7 +182,7 @@ export default function Dashboard() {
                                         </span>
                                     </div>
                                     {/* Illustration */}
-                                    <div className="h-32 bg-[#edf7ff] dark:bg-sky-950/20 rounded-xl overflow-hidden flex items-center justify-center p-2 relative">
+                                    <div className="h-24 sm:h-32 bg-[#edf7ff] dark:bg-sky-950/20 rounded-xl overflow-hidden flex items-center justify-center p-2 relative">
                                         <img 
                                             alt="Power BI" 
                                             className="h-full object-contain filter drop-shadow-md group-hover:scale-105 transition-transform duration-200" 
@@ -227,7 +227,7 @@ export default function Dashboard() {
                                         </span>
                                     </div>
                                     {/* Illustration */}
-                                    <div className="h-32 bg-[#ebf7ef] dark:bg-emerald-950/20 rounded-xl overflow-hidden flex items-center justify-center p-2 relative">
+                                    <div className="h-24 sm:h-32 bg-[#ebf7ef] dark:bg-emerald-950/20 rounded-xl overflow-hidden flex items-center justify-center p-2 relative">
                                         <img 
                                             alt="Excel Avançado" 
                                             className="h-full object-contain filter drop-shadow-md group-hover:scale-105 transition-transform duration-200" 
@@ -264,7 +264,7 @@ export default function Dashboard() {
                     </div>
 
                     {/* Trilha de Aprendizado (spans 4 cols) */}
-                    <div className="lg:col-span-4 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 p-6 rounded-[2rem] shadow-sm shadow-slate-100/50 flex flex-col justify-between">
+                    <div className="lg:col-span-4 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 p-4 sm:p-6 rounded-[2rem] shadow-sm shadow-slate-100/50 flex flex-col justify-between">
                         <div className="space-y-6">
                             {/* Card Header with Cyan Pill */}
                             <div className="flex items-center gap-3">
@@ -372,7 +372,7 @@ export default function Dashboard() {
                 </section>
 
                 {/* Bottom Row: 5 Stats Cards */}
-                <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                <section className="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
                     {/* Card 1: Desempenho Geral */}
                     <div className="bg-[#f0f7ff] dark:bg-slate-900/30 border border-sky-100 dark:border-sky-950/20 rounded-2xl p-5 space-y-3 flex flex-col justify-between shadow-sm">
                         <div className="space-y-2">

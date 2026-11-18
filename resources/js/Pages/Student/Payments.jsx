@@ -117,10 +117,10 @@ export default function Payments() {
                 .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #b5e3ff; }
             `}} />
 
-            <div className="p-8 max-w-7xl mx-auto space-y-8 relative">
+            <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-6 lg:space-y-8 relative">
                 {/* Toast Notification */}
                 {toastMessage && (
-                    <div className="fixed bottom-8 right-8 bg-[#003346] text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 z-55 border border-outline-variant/20 animate-fade-in">
+                    <div className="fixed bottom-24 left-4 right-4 sm:left-auto lg:bottom-8 lg:right-8 bg-[#003346] text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 z-55 border border-outline-variant/20 animate-fade-in">
                         <span className="material-symbols-outlined text-primary text-xl font-bold animate-pulse">check_circle</span>
                         <span className="text-sm font-semibold">{toastMessage}</span>
                     </div>
@@ -136,12 +136,12 @@ export default function Payments() {
 
                 {/* Page Header */}
                 <div>
-                    <h2 className="text-4xl font-headline font-extrabold text-slate-800 dark:text-slate-100 tracking-tight">Extrato Financeiro</h2>
+                    <h2 className="text-2xl sm:text-4xl font-headline font-extrabold text-slate-800 dark:text-slate-100 tracking-tight">Extrato Financeiro</h2>
                     <p className="text-lg font-body text-slate-500 mt-2">Acompanhe todo o histórico de pagamentos realizados.</p>
                 </div>
 
                 {/* Summary Cards Row */}
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
                     <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-100 dark:border-slate-800 shadow-sm flex flex-col justify-between h-28">
                         <div className="flex items-center gap-3 mb-2">
                             <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-850 flex items-center justify-center text-primary shrink-0">

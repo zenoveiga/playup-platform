@@ -183,17 +183,17 @@ export default function Messages() {
             `}} />
 
             {/* Content Area */}
-            <div className="p-8 space-y-8 max-w-[1600px] mx-auto">
+            <div className="p-4 sm:p-6 lg:p-8 space-y-6 lg:space-y-8 max-w-[1600px] mx-auto">
                 {/* Hero/Action Section */}
                 <section>
                     <div className="flex flex-col gap-1 mb-6">
-                        <h1 className="text-3xl font-display font-extrabold text-on-surface tracking-tight">Mensagens</h1>
+                        <h1 className="text-2xl sm:text-3xl font-display font-extrabold text-on-surface tracking-tight">Mensagens</h1>
                         <p className="text-on-surface-variant font-medium">Gerencie sua comunicação e acompanhe os avisos da plataforma.</p>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                         {/* Nova Mensagem CTA */}
                         <div 
-                            className="kinetic-gradient p-6 rounded-2xl flex flex-col justify-between h-40 transition-transform hover:scale-[1.02] cursor-pointer shadow-xl shadow-primary/10 group"
+                            className="kinetic-gradient p-4 sm:p-6 rounded-2xl flex flex-col justify-between gap-3 h-36 sm:h-40 transition-transform hover:scale-[1.02] cursor-pointer shadow-xl shadow-primary/10 group"
                             onClick={() => setIsComposeOpen(true)}
                         >
                             <div className="flex justify-between items-start">
@@ -202,33 +202,33 @@ export default function Messages() {
                                 </div>
                                 <span className="material-symbols-outlined text-white/50 group-hover:text-white transition-colors">arrow_outward</span>
                             </div>
-                            <span className="text-white font-headline font-bold text-lg">Nova Mensagem</span>
+                            <span className="text-white font-headline font-bold text-base sm:text-lg">Nova Mensagem</span>
                         </div>
                         {/* Secondary Actions */}
-                        <div className="bg-surface-container-lowest p-6 rounded-2xl flex flex-col justify-between h-40 transition-all hover:bg-surface-container-low cursor-pointer border border-outline-variant/15">
+                        <div className="bg-surface-container-lowest p-4 sm:p-6 rounded-2xl flex flex-col justify-between gap-3 h-36 sm:h-40 transition-all hover:bg-surface-container-low cursor-pointer border border-outline-variant/15">
                             <div className="bg-secondary-container p-3 rounded-xl w-fit">
                                 <span className="material-symbols-outlined text-on-secondary-container">campaign</span>
                             </div>
                             <div>
-                                <p className="text-on-surface font-headline font-bold text-lg">Avisos da Escola</p>
+                                <p className="text-on-surface font-headline font-bold text-base sm:text-lg leading-tight">Avisos da Escola</p>
                                 <p className="text-on-surface-variant text-xs mt-1">4 novos avisos importantes</p>
                             </div>
                         </div>
-                        <div className="bg-surface-container-lowest p-6 rounded-2xl flex flex-col justify-between h-40 transition-all hover:bg-surface-container-low cursor-pointer border border-outline-variant/15">
+                        <div className="bg-surface-container-lowest p-4 sm:p-6 rounded-2xl flex flex-col justify-between gap-3 h-36 sm:h-40 transition-all hover:bg-surface-container-low cursor-pointer border border-outline-variant/15">
                             <div className="bg-tertiary-container p-3 rounded-xl w-fit">
                                 <span className="material-symbols-outlined text-on-tertiary-container">support_agent</span>
                             </div>
                             <div>
-                                <p className="text-on-surface font-headline font-bold text-lg">Central de Suporte</p>
+                                <p className="text-on-surface font-headline font-bold text-base sm:text-lg leading-tight">Central de Suporte</p>
                                 <p className="text-on-surface-variant text-xs mt-1">Tempo de espera: 5 min</p>
                             </div>
                         </div>
-                        <div className="bg-surface-container-lowest p-6 rounded-2xl flex flex-col justify-between h-40 transition-all hover:bg-surface-container-low cursor-pointer border border-outline-variant/15">
+                        <div className="bg-surface-container-lowest p-4 sm:p-6 rounded-2xl flex flex-col justify-between gap-3 h-36 sm:h-40 transition-all hover:bg-surface-container-low cursor-pointer border border-outline-variant/15">
                             <div className="bg-surface-container-highest p-3 rounded-xl w-fit">
                                 <span className="material-symbols-outlined text-on-surface">notifications_active</span>
                             </div>
                             <div>
-                                <p className="text-on-surface font-headline font-bold text-lg">Notificações</p>
+                                <p className="text-on-surface font-headline font-bold text-base sm:text-lg leading-tight">Notificações</p>
                                 <p className="text-on-surface-variant text-xs mt-1">Configurações de alerta</p>
                             </div>
                         </div>
@@ -236,12 +236,12 @@ export default function Messages() {
                 </section>
 
                 {/* Main Content Area: Bento Style */}
-                <div className="grid grid-cols-12 gap-8">
+                <div className="grid grid-cols-12 gap-6 lg:gap-8">
                     {/* Left: Message List (8/12) */}
-                    <section className="col-span-12 lg:col-span-8 space-y-6">
+                    <section className="col-span-12 lg:col-span-8 space-y-6 min-w-0">
                         <div className="bg-surface-container-lowest rounded-2xl overflow-hidden shadow-sm border border-outline-variant/10">
                             <div className="p-6 border-b border-outline-variant/10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                                <div className="flex gap-2">
+                                <div className="flex gap-1 sm:gap-2 flex-wrap">
                                     <button 
                                         className={`px-4 py-2 rounded-full text-sm font-bold transition-all ${activeFilter === 'todas' ? 'bg-primary text-on-primary shadow-lg shadow-primary/20' : 'text-on-surface-variant hover:bg-surface-container-low'}`}
                                         onClick={() => setActiveFilter('todas')}
@@ -272,7 +272,7 @@ export default function Messages() {
                                         <div 
                                             key={msg.id} 
                                             onClick={() => markAsRead(msg.id)}
-                                            className="p-6 flex gap-4 hover:bg-surface-container-low/50 transition-all cursor-pointer relative group"
+                                            className="p-4 sm:p-6 flex gap-3 sm:gap-4 hover:bg-surface-container-low/50 transition-all cursor-pointer relative group"
                                         >
                                             {msg.unread && <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary"></div>}
                                             
@@ -297,7 +297,7 @@ export default function Messages() {
                                                 {msg.unread ? <span className="w-2 h-2 bg-primary rounded-full"></span> : <span />}
                                                 <button 
                                                     onClick={(e) => toggleStar(e, msg.id)}
-                                                    className={`material-symbols-outlined hover:scale-115 transition-transform ${msg.starred ? 'text-primary opacity-100' : 'text-on-surface-variant opacity-0 group-hover:opacity-100'}`}
+                                                    className={`material-symbols-outlined hover:scale-115 transition-transform ${msg.starred ? 'text-primary opacity-100' : 'text-on-surface-variant opacity-40 sm:opacity-0 group-hover:opacity-100'}`}
                                                     style={{ fontVariationSettings: msg.starred ? "'FILL' 1" : "'FILL' 0" }}
                                                 >
                                                     star
@@ -318,7 +318,7 @@ export default function Messages() {
                     </section>
 
                     {/* Right: Shared Files (4/12) */}
-                    <aside className="col-span-12 lg:col-span-4 space-y-6">
+                    <aside className="col-span-12 lg:col-span-4 space-y-6 min-w-0">
                         <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-sm border border-outline-variant/10 h-fit">
                             <div className="flex items-center justify-between mb-6">
                                 <h3 className="text-lg font-headline font-bold text-on-surface">Arquivos Compartilhados</h3>

@@ -25,11 +25,11 @@ export default function ReportCard() {
         <StudentLayout>
             <Head title="Boletim Acadêmico - PlayUp" />
             
-            <div className="p-8 max-w-7xl mx-auto space-y-8">
+            <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-6 lg:space-y-8">
                 {/* Header Title with Semester Filter */}
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
-                        <h2 className="text-3xl font-extrabold text-slate-800 dark:text-slate-100 font-headline tracking-tight">Boletim Acadêmico</h2>
+                        <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-800 dark:text-slate-100 font-headline tracking-tight">Boletim Acadêmico</h2>
                         <p className="text-sm text-slate-500 font-medium">Acompanhe seu desempenho e evolução acadêmica.</p>
                     </div>
                     
@@ -52,7 +52,7 @@ export default function ReportCard() {
                     <div className="lg:col-span-5 p-8 lg:p-10 space-y-6 flex flex-col justify-center">
                         <div className="space-y-2">
                             <p className="text-sm font-bold text-purple-550 text-slate-500 dark:text-slate-400">Sua jornada neste semestre</p>
-                            <h3 className="text-3xl lg:text-[34px] font-extrabold text-slate-800 dark:text-slate-100 leading-tight">Você está no caminho certo!</h3>
+                            <h3 className="text-2xl sm:text-3xl lg:text-[34px] font-extrabold text-slate-800 dark:text-slate-100 leading-tight">Você está no caminho certo!</h3>
                             <p className="text-base text-slate-500 dark:text-slate-400">
                                 Sua média geral é <span className="font-extrabold text-slate-800 dark:text-slate-200">8,3</span> e você está acima da média da turma.
                             </p>
@@ -94,7 +94,7 @@ export default function ReportCard() {
                 </section>
 
                 {/* Metric Cards (Bento Grid) */}
-                <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                <section className="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
                     {/* Card 1 */}
                     <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm hover:-translate-y-1 transition-all duration-200">
                         <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center text-primary mb-4 shrink-0">
@@ -218,7 +218,7 @@ export default function ReportCard() {
 
             {/* Sticky Bottom Achievement Notification */}
             {showToast && (
-                <div className="fixed bottom-8 right-8 bg-gradient-to-r from-primary to-[#7b9cff] text-white px-6 py-4 rounded-2xl shadow-xl flex items-center gap-4 z-50 animate-slide-up duration-300">
+                <div className="fixed bottom-24 left-4 right-4 sm:left-auto lg:bottom-8 lg:right-8 bg-gradient-to-r from-primary to-[#7b9cff] text-white px-6 py-4 rounded-2xl shadow-xl flex items-center gap-4 z-50 animate-slide-up duration-300">
                     <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center shrink-0">
                         <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>emoji_events</span>
                     </div>

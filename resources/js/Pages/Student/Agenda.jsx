@@ -6,11 +6,11 @@ export default function Agenda() {
         <StudentLayout>
             <Head title="Agenda Mensal - PlayUp" />
             
-            <div className="p-8 max-w-7xl mx-auto space-y-8">
+            <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-6 lg:space-y-8">
                 {/* Header Title */}
                 <div className="flex items-center justify-between">
                     <div>
-                        <h2 className="text-3xl font-extrabold text-slate-800 dark:text-slate-100 font-headline tracking-tight">Minha Jornada</h2>
+                        <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-800 dark:text-slate-100 font-headline tracking-tight">Minha Jornada</h2>
                         <p className="text-sm text-slate-500 font-medium">Acompanhe seu calendário de aulas, provas e mentorias</p>
                     </div>
                 </div>
@@ -324,7 +324,7 @@ export default function Agenda() {
             </div>
 
             {/* FAB for adding events */}
-            <button className="fixed bottom-8 right-8 w-16 h-16 bg-primary text-on-primary rounded-2xl shadow-xl shadow-primary/30 flex items-center justify-center group hover:scale-110 active:scale-95 transition-all duration-200 z-50">
+            <button className="fixed bottom-24 right-4 lg:bottom-8 lg:right-8 w-16 h-16 bg-primary text-on-primary rounded-2xl shadow-xl shadow-primary/30 flex items-center justify-center group hover:scale-110 active:scale-95 transition-all duration-200 z-50">
                 <span className="material-symbols-outlined text-3xl group-hover:rotate-90 transition-transform">add</span>
             </button>
         </StudentLayout>

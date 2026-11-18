@@ -85,10 +85,10 @@ export default function Documents() {
                 }
             `}} />
 
-            <div className="p-8 max-w-7xl mx-auto space-y-8 relative">
+            <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-6 lg:space-y-8 relative">
                 {/* Notification Toast */}
                 {toastMessage && (
-                    <div className="fixed bottom-8 right-8 bg-[#003346] text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 z-50 border border-outline-variant/20 animate-fade-in">
+                    <div className="fixed bottom-24 left-4 right-4 sm:left-auto lg:bottom-8 lg:right-8 bg-[#003346] text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 z-50 border border-outline-variant/20 animate-fade-in">
                         <span className="material-symbols-outlined text-primary text-xl font-bold animate-spin">
                             {toastMessage.includes('concluído') ? 'check_circle' : 'sync'}
                         </span>
@@ -99,7 +99,7 @@ export default function Documents() {
                 {/* Header Section */}
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                     <div>
-                        <h1 className="font-headline text-4xl font-extrabold text-slate-800 dark:text-slate-100 tracking-tight">Documentos Acadêmicos</h1>
+                        <h1 className="font-headline text-3xl sm:text-4xl font-extrabold text-slate-800 dark:text-slate-100 tracking-tight">Documentos Acadêmicos</h1>
                         <p className="text-slate-500 font-medium mt-1">
                             Acesse e faça o download de seus documentos acadêmicos e financeiros de forma rápida e segura.
                         </p>
@@ -118,7 +118,7 @@ export default function Documents() {
                 </div>
 
                 {/* Quick Action Bento Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
                     {/* Certificados */}
                     <div className="group p-6 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 flex flex-col">
                         <div className="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">

@@ -24,11 +24,11 @@ export default function Progress() {
         <StudentLayout>
             <Head title="Meu Progresso Acadêmico - PlayUp" />
             
-            <div className="p-8 max-w-7xl mx-auto space-y-8">
+            <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-6 lg:space-y-8">
                 {/* Header Title with Semester Filter */}
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
-                        <h2 className="text-3xl font-extrabold text-slate-800 dark:text-slate-100 font-headline tracking-tight">Meu Progresso</h2>
+                        <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-800 dark:text-slate-100 font-headline tracking-tight">Meu Progresso</h2>
                         <p className="text-sm text-slate-500 font-medium">Acompanhe seu avanço em módulos, atividades e marcos do curso.</p>
                     </div>
                     
@@ -55,7 +55,7 @@ export default function Progress() {
                                 PROGRESSO DA CERTIFICAÇÃO
                             </span>
                         </div>
-                        <h2 className="text-3xl font-extrabold text-slate-800 dark:text-slate-100 font-headline leading-tight">
+                        <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-800 dark:text-slate-100 font-headline leading-tight">
                             🚀 Seu progresso de certificação está voando!
                         </h2>
                         <p className="text-base lg:text-lg text-slate-500 dark:text-slate-400 font-medium leading-relaxed">

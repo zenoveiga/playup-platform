@@ -163,7 +163,7 @@ function Player({ lesson, playerRef, courseSlug, answers, onAnswer, onPlayback, 
         );
     }
 
-    const panel = 'w-full min-h-[280px] bg-surface-container-lowest rounded-xl shadow-sm p-8';
+    const panel = 'w-full min-h-[280px] bg-surface-container-lowest rounded-xl shadow-sm p-4 sm:p-8';
 
     if (lesson.kind === 'application') {
         return (
@@ -277,19 +277,23 @@ export default function CourseView({ course, access, answers: initialAnswers = {
         const next = lessons[index + dir];
         if (!next) return;
         setCurrentKey(next.key);
-        const section = outline.find((s) => s.lessons.some((l) => l.key === next.key));
+    };
+    // No celular a trilha fica abaixo do player: ao escolher uma aula, volta ao topo.
+    const openLesson = (key) => {
+        setCurrentKey(key);
+        if (window.matchMedia('(max-width: 1023px)').matches) window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     return (
         <StudentLayout>
             <Head title={`${course.title} | PlayUp Academy`} />
 
-            <div className="p-6 md:p-8 flex flex-col lg:flex-row gap-8">
-                <section className="flex-grow flex flex-col gap-6 lg:w-2/3">
-                    <div className="flex items-center gap-2 text-xs font-bold text-on-surface-variant">
-                        <Link href={route('student.courses')} className="hover:text-primary">Meus Cursos</Link>
+            <div className="p-3 sm:p-6 md:p-8 flex flex-col lg:flex-row gap-4 sm:gap-8">
+                <section className="flex-grow min-w-0 flex flex-col gap-4 sm:gap-6 lg:w-2/3">
+                    <div className="flex items-center gap-2 text-xs font-bold text-on-surface-variant min-w-0">
+                        <Link href={route('student.courses')} className="hover:text-primary shrink-0">Meus Cursos</Link>
                         <span className="material-symbols-outlined text-xs">chevron_right</span>
-                        <span className="text-primary">{course.title}</span>
+                        <span className="text-primary truncate">{course.title}</span>
                     </div>
 
                     {current ? (
@@ -310,34 +314,40 @@ export default function CourseView({ course, access, answers: initialAnswers = {
                         </div>
                     )}
 
-                    <div className="bg-surface-container-lowest rounded-xl p-6 shadow-sm space-y-4">
+                    <div className="bg-surface-container-lowest rounded-xl p-4 sm:p-6 shadow-sm space-y-4">
                         <div className="flex flex-wrap items-start justify-between gap-4">
                             <div>
                                 <p className="text-[10px] font-black uppercase tracking-widest text-primary">{current?.subtitle}</p>
-                                <h1 className="text-2xl font-extrabold font-headline text-on-surface">{current?.title ?? course.title}</h1>
+                                <h1 className="text-xl sm:text-2xl font-extrabold font-headline text-on-surface">{current?.title ?? course.title}</h1>
                             </div>
-                            <div className="flex gap-2">
+                            <div className="flex gap-2 w-full sm:w-auto">
                                 <button
                                     onClick={() => go(-1)}
                                     disabled={index <= 0}
-                                    className="px-4 py-2 rounded-xl bg-surface-container-low font-bold text-sm text-on-surface disabled:opacity-40 flex items-center gap-1"
+                                    className="flex-1 sm:flex-none justify-center px-4 py-2.5 sm:py-2 rounded-xl bg-surface-container-low font-bold text-sm text-on-surface disabled:opacity-40 flex items-center gap-1"
                                 >
                                     <span className="material-symbols-outlined text-base">skip_previous</span>Anterior
                                 </button>
                                 <button
                                     onClick={() => go(1)}
                                     disabled={index >= lessons.length - 1}
-                                    className="px-4 py-2 rounded-xl gradient-button kinetic-gradient text-white font-bold text-sm disabled:opacity-40 flex items-center gap-1"
+                                    className="flex-1 sm:flex-none justify-center px-4 py-2.5 sm:py-2 rounded-xl gradient-button kinetic-gradient text-white font-bold text-sm disabled:opacity-40 flex items-center gap-1"
                                 >
                                     Próxima<span className="material-symbols-outlined text-base">skip_next</span>
                                 </button>
                             </div>
                         </div>
                         {current?.kind === 'video' && current.item.description && <p className="text-sm text-on-surface-variant">{current.item.description}</p>}
-                        <p className="text-xs font-bold text-on-surface-variant flex items-center gap-1">
-                            <span className="material-symbols-outlined text-sm">event_available</span>
-                            {access.expires_at ? `Seu acesso vai até ${formatDate(access.expires_at)}` : 'Acesso vitalício'}
-                        </p>
+                        <div className="flex items-center justify-between gap-3 flex-wrap">
+                            <p className="text-xs font-bold text-on-surface-variant flex items-center gap-1">
+                                <span className="material-symbols-outlined text-sm">event_available</span>
+                                {access.expires_at ? `Seu acesso vai até ${formatDate(access.expires_at)}` : 'Acesso vitalício'}
+                            </p>
+                            <a href="#trilha" className="lg:hidden text-xs font-bold text-primary flex items-center gap-1">
+                                <span className="material-symbols-outlined text-sm">list</span>
+                                Conteúdo do curso ({doneCount}/{lessons.length})
+                            </a>
+                        </div>
                     </div>
 
                     {current?.kind === 'video' && (
@@ -355,8 +365,8 @@ export default function CourseView({ course, access, answers: initialAnswers = {
                 </section>
 
                 {/* Trilha */}
-                <aside className="lg:w-1/3 space-y-4">
-                    <div className="bg-surface-container-lowest rounded-xl p-6 shadow-sm">
+                <aside id="trilha" className="lg:w-1/3 min-w-0 space-y-4 scroll-mt-20">
+                    <div className="bg-surface-container-lowest rounded-xl p-4 sm:p-6 shadow-sm">
                         <h2 className="font-headline font-extrabold text-lg text-on-surface">{course.title}</h2>
                         <p className="text-xs text-on-surface-variant mt-1">
                             {[course.category, course.workload_hours && `${course.workload_hours}h`, `${lessons.length} itens`].filter(Boolean).join(' · ')}
@@ -423,7 +433,7 @@ export default function CourseView({ course, access, answers: initialAnswers = {
                                         return (
                                             <li key={l.key}>
                                                 <button
-                                                    onClick={() => setCurrentKey(l.key)}
+                                                    onClick={() => openLesson(l.key)}
                                                     className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-colors ${
                                                         active ? 'bg-primary/10 border-l-4 border-primary' : 'hover:bg-surface-container-low border-l-4 border-transparent'
                                                     }`}

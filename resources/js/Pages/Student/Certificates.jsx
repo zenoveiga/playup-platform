@@ -55,10 +55,10 @@ export default function Certificates() {
         <StudentLayout>
             <Head title="Certificados | PlayUp Velocity" />
 
-            <div className="p-8 max-w-7xl mx-auto space-y-8 relative">
+            <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-6 lg:space-y-8 relative">
                 {/* Toast Notification */}
                 {toastMessage && (
-                    <div className="fixed bottom-8 right-8 bg-[#003346] text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 z-50 border border-outline-variant/20 animate-fade-in">
+                    <div className="fixed bottom-24 left-4 right-4 sm:left-auto lg:bottom-8 lg:right-8 bg-[#003346] text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 z-50 border border-outline-variant/20 animate-fade-in">
                         <span className="material-symbols-outlined text-primary text-xl font-bold animate-pulse">check_circle</span>
                         <span className="text-sm font-semibold">{toastMessage}</span>
                     </div>
@@ -75,7 +75,7 @@ export default function Certificates() {
                 {/* Header Block */}
                 <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
                     <div>
-                        <h1 className="text-3xl font-extrabold text-slate-800 dark:text-slate-100 font-headline tracking-tight">Meus Certificados</h1>
+                        <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-800 dark:text-slate-100 font-headline tracking-tight">Meus Certificados</h1>
                         <p className="text-slate-500 mt-2 max-w-2xl font-body leading-relaxed text-sm">
                             Visualize e baixe suas conquistas acadêmicas. Todos os seus certificados são validados digitalmente e prontos para o mercado.
                         </p>

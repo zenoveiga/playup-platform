@@ -9,11 +9,11 @@ export default function Attendance() {
         <StudentLayout>
             <Head title="Frequência & Desempenho - PlayUp" />
             
-            <div className="p-8 max-w-7xl mx-auto space-y-8">
+            <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-6 lg:space-y-8">
                 {/* Header Title with Semester Filter */}
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
-                        <h2 className="text-3xl font-extrabold text-slate-800 dark:text-slate-100 font-headline tracking-tight">Meu Desempenho</h2>
+                        <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-800 dark:text-slate-100 font-headline tracking-tight">Meu Desempenho</h2>
                         <p className="text-sm text-slate-500 font-medium">Acompanhe sua evolução e mantenha o foco nos seus objetivos.</p>
                     </div>
                     
@@ -39,7 +39,7 @@ export default function Attendance() {
                             <span className="material-symbols-outlined text-primary bg-white dark:bg-slate-800 p-2.5 rounded-xl shadow-sm text-xl">calendar_today</span>
                             <span className="material-symbols-outlined text-primary bg-white dark:bg-slate-800 p-2.5 rounded-xl shadow-sm text-xl">military_tech</span>
                         </div>
-                        <h2 className="text-3xl font-extrabold text-slate-800 dark:text-slate-100 font-headline leading-tight">
+                        <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-800 dark:text-slate-100 font-headline leading-tight">
                             👋 Olá! Seu desempenho está excelente!
                         </h2>
                         <p className="text-base lg:text-lg text-slate-500 dark:text-slate-400 font-medium leading-relaxed">
@@ -62,7 +62,7 @@ export default function Attendance() {
                         <div className="flex justify-between items-start">
                             <div>
                                 <p className="text-[10px] font-black tracking-widest text-primary uppercase leading-none">📈 PROGRESSO</p>
-                                <h3 className="text-4xl font-black text-slate-800 dark:text-slate-200 mt-2">72%</h3>
+                                <h3 className="text-3xl sm:text-4xl font-black text-slate-800 dark:text-slate-200 mt-2">72%</h3>
                             </div>
                             <div className="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-bold">Curso em andamento</div>
                         </div>
@@ -79,7 +79,7 @@ export default function Attendance() {
                         <div className="flex justify-between items-start">
                             <div>
                                 <p className="text-[10px] font-black tracking-widest text-emerald-600 dark:text-emerald-500 uppercase leading-none">📅 FREQUÊNCIA</p>
-                                <h3 className="text-4xl font-black text-slate-800 dark:text-slate-200 mt-2">94%</h3>
+                                <h3 className="text-3xl sm:text-4xl font-black text-slate-800 dark:text-slate-200 mt-2">94%</h3>
                             </div>
                             <div className="bg-emerald-50 text-emerald-600 dark:bg-emerald-950/20 dark:text-emerald-500 px-3 py-1 rounded-full text-xs font-bold">Excelente presença</div>
                         </div>

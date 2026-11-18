@@ -38,10 +38,10 @@ export default function Financial() {
                 }
             `}} />
 
-            <div className="p-8 max-w-7xl mx-auto space-y-8 relative">
+            <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-6 lg:space-y-8 relative">
                 {/* Toast Notification */}
                 {toastMessage && (
-                    <div className="fixed bottom-8 right-8 bg-[#003346] text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 z-50 border border-outline-variant/20 animate-fade-in">
+                    <div className="fixed bottom-24 left-4 right-4 sm:left-auto lg:bottom-8 lg:right-8 bg-[#003346] text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 z-50 border border-outline-variant/20 animate-fade-in">
                         <span className="material-symbols-outlined text-primary text-xl font-bold animate-pulse">check_circle</span>
                         <span className="text-sm font-semibold">{toastMessage}</span>
                     </div>
@@ -49,34 +49,34 @@ export default function Financial() {
 
                 {/* Page Header Section */}
                 <section>
-                    <h1 className="text-4xl font-headline font-extrabold text-slate-800 dark:text-slate-100 tracking-tight">Financeiro</h1>
+                    <h1 className="text-3xl sm:text-4xl font-headline font-extrabold text-slate-800 dark:text-slate-100 tracking-tight">Financeiro</h1>
                     <p className="text-slate-500 mt-1 text-lg">Gerencie seus pagamentos, documentos e informações financeiras.</p>
                 </section>
 
                 {/* Summary Cards Grid */}
-                <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <div className="premium-card p-6 border border-slate-100 dark:border-slate-800 dark:bg-slate-900 rounded-2xl flex flex-col justify-between h-36 shadow-sm">
-                        <div className="flex items-center justify-between mb-4">
+                <section className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
+                    <div className="premium-card p-4 sm:p-6 border border-slate-100 dark:border-slate-800 dark:bg-slate-900 rounded-2xl flex flex-col justify-between min-h-[8rem] sm:h-36 shadow-sm min-w-0">
+                        <div className="flex items-start justify-between gap-2 mb-3 sm:mb-4">
                             <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Situação Atual</span>
                             <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950 flex items-center justify-center">
                                 <span className="material-symbols-outlined text-emerald-600 text-xl" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
                             </div>
                         </div>
                         <div>
-                            <p className="text-2xl font-headline font-extrabold text-emerald-650">Em dia</p>
+                            <p className="text-lg sm:text-2xl font-headline font-extrabold text-emerald-650">Em dia</p>
                             <p className="text-xs text-slate-400 mt-1">Sem pendências registradas</p>
                         </div>
                     </div>
 
-                    <div className="premium-card p-6 border border-slate-100 dark:border-slate-800 dark:bg-slate-900 rounded-2xl flex flex-col justify-between h-36 shadow-sm">
-                        <div className="flex items-center justify-between mb-4">
+                    <div className="premium-card p-4 sm:p-6 border border-slate-100 dark:border-slate-800 dark:bg-slate-900 rounded-2xl flex flex-col justify-between min-h-[8rem] sm:h-36 shadow-sm min-w-0">
+                        <div className="flex items-start justify-between gap-2 mb-3 sm:mb-4">
                             <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Próximo Vencimento</span>
                             <div className="w-8 h-8 rounded-lg bg-red-50 dark:bg-red-950 flex items-center justify-center">
                                 <span className="material-symbols-outlined text-red-650 text-xl">calendar_month</span>
                             </div>
                         </div>
                         <div>
-                            <p className="text-2xl font-headline font-extrabold text-slate-800 dark:text-slate-150">10 Mai</p>
+                            <p className="text-lg sm:text-2xl font-headline font-extrabold text-slate-800 dark:text-slate-150">10 Mai</p>
                             <div className="flex items-center gap-1.5 mt-1">
                                 <span className="text-xs text-red-650 font-bold">Vence em 6 dias</span>
                                 <span className="text-xs text-slate-400">• Parcela 05/12</span>
@@ -84,15 +84,15 @@ export default function Financial() {
                         </div>
                     </div>
 
-                    <div className="premium-card p-6 border border-slate-100 dark:border-slate-800 dark:bg-slate-900 rounded-2xl flex flex-col justify-between h-36 shadow-sm">
-                        <div className="flex items-center justify-between mb-4">
+                    <div className="premium-card p-4 sm:p-6 border border-slate-100 dark:border-slate-800 dark:bg-slate-900 rounded-2xl flex flex-col justify-between min-h-[8rem] sm:h-36 shadow-sm min-w-0">
+                        <div className="flex items-start justify-between gap-2 mb-3 sm:mb-4">
                             <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Em Aberto</span>
                             <div className="w-8 h-8 rounded-lg bg-primary/10 dark:bg-primary/20 flex items-center justify-center">
                                 <span className="material-symbols-outlined text-primary text-xl">account_balance_wallet</span>
                             </div>
                         </div>
                         <div>
-                            <p className="text-2xl font-headline font-extrabold text-slate-800 dark:text-slate-150">R$ 1.250,00</p>
+                            <p className="text-lg sm:text-2xl font-headline font-extrabold text-slate-800 dark:text-slate-150">R$ 1.250,00</p>
                             <div className="flex items-center justify-between mt-1">
                                 <span className="text-xs text-slate-400">1 parcela em aberto</span>
                                 <button onClick={() => showToast("Exibindo detalhamento de faturas.")} className="text-xs font-bold text-primary hover:underline">Ver detalhes</button>
@@ -100,15 +100,15 @@ export default function Financial() {
                         </div>
                     </div>
 
-                    <div className="premium-card p-6 border border-slate-100 dark:border-slate-800 dark:bg-slate-900 rounded-2xl flex flex-col justify-between h-36 shadow-sm">
-                        <div className="flex items-center justify-between mb-4">
+                    <div className="premium-card p-4 sm:p-6 border border-slate-100 dark:border-slate-800 dark:bg-slate-900 rounded-2xl flex flex-col justify-between min-h-[8rem] sm:h-36 shadow-sm min-w-0">
+                        <div className="flex items-start justify-between gap-2 mb-3 sm:mb-4">
                             <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Total Pago</span>
                             <div className="w-8 h-8 rounded-lg bg-secondary/10 dark:bg-secondary/20 flex items-center justify-center">
                                 <span className="material-symbols-outlined text-secondary text-xl">payments</span>
                             </div>
                         </div>
                         <div>
-                            <p className="text-2xl font-headline font-extrabold text-slate-800 dark:text-slate-150">R$ 5.000,00</p>
+                            <p className="text-lg sm:text-2xl font-headline font-extrabold text-slate-800 dark:text-slate-150">R$ 5.000,00</p>
                             <div className="flex items-center justify-between mt-1">
                                 <span className="text-xs text-slate-400">Total acumulado no período</span>
                                 <button onClick={() => showToast("Gerando extrato financeiro...")} className="text-xs font-bold text-primary hover:underline">Ver extrato</button>
@@ -120,38 +120,38 @@ export default function Financial() {
                 {/* Main Action Block */}
                 <section>
                     <h2 className="text-lg font-headline font-bold text-slate-800 dark:text-slate-200 mb-4">O que você deseja fazer?</h2>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-3 gap-2 sm:gap-4">
                         <Link 
                             href={route('student.financial.installments')}
-                            className="premium-card group p-5 border border-slate-100 dark:border-slate-800 dark:bg-slate-900 rounded-2xl text-left flex flex-col justify-between border-b-4 hover:border-primary shadow-sm"
+                            className="premium-card group p-5 border border-slate-100 dark:border-slate-800 dark:bg-slate-900 rounded-2xl text-left flex flex-col justify-between border-b-4 !p-3 sm:!p-5 hover:border-primary shadow-sm"
                         >
                             <div className="w-10 h-10 bg-primary/10 dark:bg-primary/20 rounded-xl flex items-center justify-center mb-4">
                                 <span className="material-symbols-outlined text-primary">receipt_long</span>
                             </div>
-                            <span className="text-sm font-bold text-slate-750 dark:text-slate-205 flex-1">Mensalidades</span>
-                            <span className="material-symbols-outlined text-slate-400/40 text-lg mt-4 group-hover:translate-x-1 transition-transform self-end">arrow_forward</span>
+                            <span className="text-xs sm:text-sm font-bold text-slate-750 dark:text-slate-205 flex-1 leading-tight">Mensalidades</span>
+                            <span className="material-symbols-outlined text-slate-400/40 text-lg mt-2 sm:mt-4 group-hover:translate-x-1 transition-transform self-end">arrow_forward</span>
                         </Link>
 
                         <Link 
                             href={route('student.financial.payments')}
-                            className="premium-card group p-5 border border-slate-100 dark:border-slate-800 dark:bg-slate-900 rounded-2xl text-left flex flex-col justify-between border-b-4 hover:border-tertiary shadow-sm"
+                            className="premium-card group p-5 border border-slate-100 dark:border-slate-800 dark:bg-slate-900 rounded-2xl text-left flex flex-col justify-between border-b-4 !p-3 sm:!p-5 hover:border-tertiary shadow-sm"
                         >
                             <div className="w-10 h-10 bg-emerald-50 dark:bg-emerald-950 rounded-xl flex items-center justify-center mb-4">
                                 <span className="material-symbols-outlined text-emerald-600">check_circle</span>
                             </div>
-                            <span className="text-sm font-bold text-slate-750 dark:text-slate-205 flex-1">Pagamentos</span>
-                            <span className="material-symbols-outlined text-slate-400/40 text-lg mt-4 group-hover:translate-x-1 transition-transform self-end">arrow_forward</span>
+                            <span className="text-xs sm:text-sm font-bold text-slate-750 dark:text-slate-205 flex-1 leading-tight">Pagamentos</span>
+                            <span className="material-symbols-outlined text-slate-400/40 text-lg mt-2 sm:mt-4 group-hover:translate-x-1 transition-transform self-end">arrow_forward</span>
                         </Link>
 
                         <button 
                             onClick={() => showToast("Carregando configurações de faturamento...")}
-                            className="premium-card group p-5 border border-slate-100 dark:border-slate-800 dark:bg-slate-900 rounded-2xl text-left flex flex-col justify-between border-b-4 hover:border-cyan-500 shadow-sm"
+                            className="premium-card group p-5 border border-slate-100 dark:border-slate-800 dark:bg-slate-900 rounded-2xl text-left flex flex-col justify-between border-b-4 !p-3 sm:!p-5 hover:border-cyan-500 shadow-sm"
                         >
                             <div className="w-10 h-10 bg-cyan-500/10 dark:bg-cyan-500/20 rounded-xl flex items-center justify-center mb-4">
                                 <span className="material-symbols-outlined text-cyan-500">database</span>
                             </div>
-                            <span className="text-sm font-bold text-slate-750 dark:text-slate-205 flex-1">Dados Financeiros</span>
-                            <span className="material-symbols-outlined text-slate-400/40 text-lg mt-4 group-hover:translate-x-1 transition-transform self-end">arrow_forward</span>
+                            <span className="text-xs sm:text-sm font-bold text-slate-750 dark:text-slate-205 flex-1 leading-tight">Dados Financeiros</span>
+                            <span className="material-symbols-outlined text-slate-400/40 text-lg mt-2 sm:mt-4 group-hover:translate-x-1 transition-transform self-end">arrow_forward</span>
                         </button>
                     </div>
                 </section>
