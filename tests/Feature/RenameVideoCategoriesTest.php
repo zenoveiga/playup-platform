@@ -2,44 +2,76 @@
 
 namespace Tests\Feature;
 
+use App\Models\CourseMaterial;
 use App\Models\CourseModule;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 class RenameVideoCategoriesTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_old_category_names_are_renamed_and_no_longer_suggested(): void
+    private CourseModule $module;
+
+    protected function setUp(): void
     {
-        $module = CourseModule::create(['title' => 'Fundamentos', 'application_minutes' => 10]);
-        $video = fn (string $category, int $pos) => $module->materials()->create([
-            'slot' => 'video', 'type' => 'video', 'title' => "V$pos", 'url' => 'https://vimeo.com/1', 'position' => $pos, 'category' => $category,
+        parent::setUp();
+        $this->module = CourseModule::create(['title' => 'Fundamentos', 'application_minutes' => 10]);
+    }
+
+    /** Grava direto no banco, como os dados antigos (sem passar pela normalização do model). */
+    private function legacyVideo(string $category, int $pos): int
+    {
+        return DB::table('course_materials')->insertGetId([
+            'materialable_type' => $this->module->getMorphClass(),
+            'materialable_id' => $this->module->id,
+            'slot' => 'video', 'type' => 'video', 'title' => "V$pos", 'url' => 'https://vimeo.com/1',
+            'position' => $pos, 'category' => $category, 'created_at' => now(), 'updated_at' => now(),
         ]);
-        $revisao = $video('Revisão', 0);
-        $revisaoEspaco = $video(' revisão ', 1);
-        $erros = $video('Erros comuns', 2);
-        $outra = $video('Minha categoria', 3);
-        $errorsTypo = $video('Errors Comuns', 4);
-        $erroComum = $video('Erro Comum', 5);
+    }
+
+    private function suggestions()
+    {
+        return $this->actingAs(User::factory()->create(['role' => 'super_admin']))
+            ->get(route('platform.modules.edit', $this->module))
+            ->assertOk();
+    }
+
+    private const EXPECTED = ['Conceito', 'Exemplo', 'Erros Comuns', 'Aplicação', 'Estudo de caso', 'Dica rápida', 'Minha categoria'];
+
+    public function test_old_names_and_typos_are_not_suggested_twice_even_before_migrating(): void
+    {
+        foreach (['Revisão', ' revisão ', 'Erro Comum', 'Errors Comuns', 'erros comuns', 'Minha categoria'] as $i => $c) {
+            $this->legacyVideo($c, $i);
+        }
+
+        $this->suggestions()->assertInertia(fn ($page) => $page
+            ->where('videoCategories', self::EXPECTED)
+            ->where('module.materials.2.category', 'Erros Comuns')
+            ->where('module.materials.0.category', 'Aplicação'));
+    }
+
+    public function test_new_videos_are_saved_with_the_canonical_name(): void
+    {
+        $video = $this->module->materials()->create(['slot' => 'video', 'type' => 'video', 'title' => 'X', 'url' => 'https://vimeo.com/1', 'position' => 0, 'category' => 'erro comum']);
+
+        $this->assertSame('Erros Comuns', DB::table('course_materials')->where('id', $video->id)->value('category'));
+    }
+
+    public function test_migrations_rewrite_saved_categories(): void
+    {
+        $ids = collect(['Revisão', ' revisão ', 'Erros comuns', 'Errors Comuns', 'Erro Comum', 'Minha categoria'])
+            ->map(fn ($c, $i) => $this->legacyVideo($c, $i));
 
         (require database_path('migrations/2026_11_18_180000_rename_video_categories.php'))->up();
         (require database_path('migrations/2026_11_18_190000_unify_common_errors_category.php'))->up();
 
-        $this->assertSame('Aplicação', $revisao->fresh()->category);
-        $this->assertSame('Aplicação', $revisaoEspaco->fresh()->category);
-        foreach ([$erros, $errorsTypo, $erroComum] as $m) {
-            $this->assertSame('Erros Comuns', $m->fresh()->category);
-        }
-        $this->assertSame('Minha categoria', $outra->fresh()->category);
+        $saved = $ids->map(fn ($id) => DB::table('course_materials')->where('id', $id)->value('category'))->all();
+        $this->assertSame(['Aplicação', 'Aplicação', 'Erros Comuns', 'Erros Comuns', 'Erros Comuns', 'Minha categoria'], $saved);
 
-        // As sugestões do construtor de módulos não repetem mais os nomes antigos.
-        $this->actingAs(User::factory()->create(['role' => 'super_admin']))
-            ->get(route('platform.modules.edit', $module))
-            ->assertOk()
-            ->assertInertia(fn ($page) => $page->where('videoCategories', [
-                'Conceito', 'Exemplo', 'Erros Comuns', 'Aplicação', 'Estudo de caso', 'Dica rápida', 'Minha categoria',
-            ]));
+        $this->suggestions()->assertInertia(fn ($page) => $page->where('videoCategories', self::EXPECTED));
+        $this->assertSame(1, CourseMaterial::where('category', 'Minha categoria')->count());
     }
 }

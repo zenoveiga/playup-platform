@@ -9,6 +9,7 @@ const CATEGORY_ICONS = {
     conceito: 'lightbulb',
     exemplo: 'play_lesson',
     'erros comuns': 'report',
+    aplicação: 'construction',
     revisão: 'replay',
     'estudo de caso': 'cases',
     'dica rápida': 'bolt',

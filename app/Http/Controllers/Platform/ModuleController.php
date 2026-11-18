@@ -176,7 +176,7 @@ class ModuleController extends Controller
                     ->distinct()
                     ->pluck('category')
             )
-            ->map(fn ($c) => trim($c))
+            ->map(fn ($c) => \App\Support\VideoCategory::normalize($c))
             ->unique(fn ($c) => mb_strtolower($c))
             ->values()
             ->all();
@@ -218,7 +218,7 @@ class ModuleController extends Controller
         $items = [];
 
         foreach (array_values($data['videos'] ?? []) as $video) {
-            $category = trim($video['category']);
+            $category = \App\Support\VideoCategory::normalize($video['category']);
             $items[] = [
                 ...$video,
                 'slot' => CourseModule::VIDEO_SLOT,

@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use App\Support\Media;
+use App\Support\VideoCategory;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 
 class CourseMaterial extends Model
 {
@@ -32,6 +34,15 @@ class CourseMaterial extends Model
         static::deleting(function (CourseMaterial $material) {
             Media::delete($material->file_path);
         });
+    }
+
+    /** Categoria sempre no nome canônico (ex.: "Erro comum" → "Erros Comuns"). */
+    protected function category(): Attribute
+    {
+        return Attribute::make(
+            get: fn (?string $value) => VideoCategory::normalize($value),
+            set: fn (?string $value) => VideoCategory::normalize($value),
+        );
     }
 
     public function materialable(): MorphTo

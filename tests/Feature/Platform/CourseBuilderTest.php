@@ -70,7 +70,7 @@ class CourseBuilderTest extends TestCase
         $this->assertSame(2, $module->exerciseSets[0]->questions()->count());
         $this->assertSame([['text' => 'SOMA', 'correct' => true], ['text' => 'MÉDIA', 'correct' => false]], $module->exercises[0]->options);
 
-        $this->assertSame(['Conceito', 'Exemplo', 'Erros comuns'], $module->videos()->pluck('category')->all());
+        $this->assertSame(['Conceito', 'Exemplo', 'Erros Comuns'], $module->videos()->pluck('category')->all());
         $this->assertSame('Conceito', $module->videos()->first()->title);
 
         $concept = $module->videos()->where('category', 'Conceito')->first();
@@ -139,8 +139,8 @@ class CourseBuilderTest extends TestCase
         $this->assertSame('https://vimeo.com/999', $videos['Exemplo']->fresh()->url);
         // Reordenado e vídeo removido apagado do armazenamento.
         $this->assertSame(['Exemplo', 'Conceito'], $module->videos()->pluck('category')->all());
-        $this->assertNull($videos['Erros comuns']->fresh());
-        Storage::disk(config('playup.media.disk'))->assertMissing($videos['Erros comuns']->file_path);
+        $this->assertNull($videos['Erros Comuns']->fresh());
+        Storage::disk(config('playup.media.disk'))->assertMissing($videos['Erros Comuns']->file_path);
         $this->assertSame(0, $module->supportMaterials()->count());
         Storage::disk(config('playup.media.disk'))->assertMissing($apostila->file_path);
     }

@@ -25,6 +25,22 @@ return [
     */
     'video_categories' => ['Conceito', 'Exemplo', 'Erros Comuns', 'Aplicação', 'Estudo de caso', 'Dica rápida'],
 
+    /*
+    | Nomes antigos ou variações de escrita que devem ser tratados como uma das
+    | categorias acima (comparação sem diferenciar maiúsculas). Ao renomear uma
+    | categoria padrão, acrescente o nome antigo aqui para não duplicar.
+    */
+    'video_category_aliases' => [
+        'Revisão' => 'Aplicação',
+        'Revisao' => 'Aplicação',
+        'Erro comum' => 'Erros Comuns',
+        'Errors comuns' => 'Erros Comuns',
+        'Error comum' => 'Erros Comuns',
+        'Errors comum' => 'Erros Comuns',
+        'Erros comum' => 'Erros Comuns',
+        'Erro comuns' => 'Erros Comuns',
+    ],
+
     'uploads' => [
         'max_video_kb' => (int) env('PLAYUP_MAX_VIDEO_KB', 1024 * 1024), // 1 GB
         'max_file_kb' => (int) env('PLAYUP_MAX_FILE_KB', 100 * 1024),    // 100 MB
