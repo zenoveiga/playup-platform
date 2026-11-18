@@ -21,12 +21,17 @@ class RenameVideoCategoriesTest extends TestCase
         $revisaoEspaco = $video(' revisão ', 1);
         $erros = $video('Erros comuns', 2);
         $outra = $video('Minha categoria', 3);
+        $errorsTypo = $video('Errors Comuns', 4);
+        $erroComum = $video('Erro Comum', 5);
 
         (require database_path('migrations/2026_11_18_180000_rename_video_categories.php'))->up();
+        (require database_path('migrations/2026_11_18_190000_unify_common_errors_category.php'))->up();
 
         $this->assertSame('Aplicação', $revisao->fresh()->category);
         $this->assertSame('Aplicação', $revisaoEspaco->fresh()->category);
-        $this->assertSame('Erro comum', $erros->fresh()->category);
+        foreach ([$erros, $errorsTypo, $erroComum] as $m) {
+            $this->assertSame('Erros Comuns', $m->fresh()->category);
+        }
         $this->assertSame('Minha categoria', $outra->fresh()->category);
 
         // As sugestões do construtor de módulos não repetem mais os nomes antigos.
@@ -34,7 +39,7 @@ class RenameVideoCategoriesTest extends TestCase
             ->get(route('platform.modules.edit', $module))
             ->assertOk()
             ->assertInertia(fn ($page) => $page->where('videoCategories', [
-                'Conceito', 'Exemplo', 'Erro comum', 'Aplicação', 'Estudo de caso', 'Dica rápida', 'Minha categoria',
+                'Conceito', 'Exemplo', 'Erros Comuns', 'Aplicação', 'Estudo de caso', 'Dica rápida', 'Minha categoria',
             ]));
     }
 }

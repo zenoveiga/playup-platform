@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\DB;
 
 /**
  * As categorias padrão dos vídeos mudaram em config/playup.php
- * ("Revisão" → "Aplicação", "Erros comuns" → "Erro comum").
+ * ("Revisão" → "Aplicação"; as variações de "Erros Comuns" são tratadas na migration seguinte).
  * Os vídeos já salvos com os nomes antigos faziam as duas versões aparecerem
  * nas sugestões do construtor de módulos; aqui eles passam a usar os nomes novos.
  */
@@ -14,7 +14,6 @@ return new class extends Migration
     private const RENAMES = [
         'revisão' => 'Aplicação',
         'revisao' => 'Aplicação',
-        'erros comuns' => 'Erro comum',
     ];
 
     public function up(): void

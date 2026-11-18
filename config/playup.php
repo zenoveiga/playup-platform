@@ -23,7 +23,7 @@ return [
     | Categorias sugeridas para os vídeos de um módulo. O admin também pode digitar
     | uma categoria nova; as já usadas passam a ser sugeridas automaticamente.
     */
-    'video_categories' => ['Conceito', 'Exemplo', 'Erro comum', 'Aplicação', 'Estudo de caso', 'Dica rápida'],
+    'video_categories' => ['Conceito', 'Exemplo', 'Erros Comuns', 'Aplicação', 'Estudo de caso', 'Dica rápida'],
 
     'uploads' => [
         'max_video_kb' => (int) env('PLAYUP_MAX_VIDEO_KB', 1024 * 1024), // 1 GB
