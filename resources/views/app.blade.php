@@ -1,8 +1,11 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="light">
+{{-- O conteúdo é em português: declarar pt-BR evita que o navegador ofereça/aplique tradução automática,
+     que quebra os ícones (os nomes "menu", "skip_next"... são traduzidos) e altera textos. --}}
+<html lang="pt-BR" translate="no" class="light notranslate">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="google" content="notranslate">
 
         <title inertia>{{ config('app.name', 'Laravel') }}</title>
 
